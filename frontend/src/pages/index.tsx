@@ -1,3 +1,4 @@
+import { Button } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Head from "next/head";
 
@@ -12,6 +13,7 @@ const HomePage: NextPage = () => {
 
       <main>
         <h1>Test</h1>
+        <Button>Test</Button>
       </main>
     </div>
   );

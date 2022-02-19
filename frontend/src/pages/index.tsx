@@ -1,5 +1,5 @@
 import { Container, Flex, Spacer } from "@chakra-ui/react";
-import type { NextPage } from "next";
+import { NextPage } from "next";
 import Head from "next/head";
 import ColorModeToggler from "../components/color-mode-toggler";
 import LoginSection from "../components/login-section";
@@ -13,10 +13,10 @@ const HomePage: NextPage = () => {
       </Head>
 
       <Flex flexDirection="column" py="4">
-        <Container maxW="container.xl">
+        <Container maxW="full">
           <Flex>
             <Spacer />
-            <ColorModeToggler p="0" variant="ghost" />
+            <ColorModeToggler variant="ghost" />
           </Flex>
         </Container>
 

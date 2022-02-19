@@ -1,13 +1,5 @@
-import {
-  extendTheme,
-  theme as baseTheme,
-  type ThemeConfig,
-} from "@chakra-ui/react";
-import {
-  mode,
-  type GlobalStyleProps,
-  type StyleFunctionProps,
-} from "@chakra-ui/theme-tools";
+import { extendTheme, ThemeConfig } from "@chakra-ui/react";
+import { mode, GlobalStyleProps } from "@chakra-ui/theme-tools";
 
 const config: ThemeConfig = {
   initialColorMode: "light",
@@ -37,6 +29,17 @@ const theme = extendTheme({
       },
     }),
   },
+  // components: {
+  //   Input: {
+  //     variants: {
+  //       outline: (props: StyleFunctionProps) => ({
+  //         field: {
+  //           bg: mode("white", "gray.700")(props),
+  //         },
+  //       }),
+  //     },
+  //   },
+  // },
   config,
 });
 

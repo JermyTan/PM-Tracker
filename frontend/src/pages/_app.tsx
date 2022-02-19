@@ -1,6 +1,6 @@
 import { ChakraProvider, CSSReset } from "@chakra-ui/react";
 import Head from "next/head";
-import type { AppProps } from "next/app";
+import { AppProps } from "next/app";
 import { APP_NAME } from "../constants";
 import theme from "../theme";
 

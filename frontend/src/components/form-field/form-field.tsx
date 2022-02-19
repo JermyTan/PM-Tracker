@@ -46,6 +46,7 @@ function FormField({
         id={name}
         type={type}
         placeholder={placeholder}
+        required={isRequired}
         {...register(name, { required: isRequired })}
       />
       {error && (errorMsg || error?.message) && (

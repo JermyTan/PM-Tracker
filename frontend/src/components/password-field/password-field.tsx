@@ -54,6 +54,7 @@ function PasswordField({
           type={showPassword ? "text" : "password"}
           placeholder={placeholder}
           autoComplete={autoComplete}
+          required={isRequired}
           {...register(name, { required: isRequired })}
         />
 

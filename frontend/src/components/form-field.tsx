@@ -37,19 +37,19 @@ function FormField({
 
   return (
     <FormControl
+      {...props}
       isInvalid={error || isInvalid}
       isRequired={showRequiredIndicator && isRequired}
-      {...props}
     >
       {labelContent && <FormLabel htmlFor={name}>{labelContent}</FormLabel>}
       <Input
         id={name}
         type={type}
         placeholder={placeholder}
-        required={isRequired}
+        isRequired={isRequired}
         {...register(name, { required: isRequired })}
       />
-      {error && (errorMsg || error?.message) && (
+      {(error || isInvalid) && (errorMsg || error?.message) && (
         <FormErrorMessage>{errorMsg ?? error?.message}</FormErrorMessage>
       )}
     </FormControl>

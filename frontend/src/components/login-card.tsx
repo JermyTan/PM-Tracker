@@ -1,5 +1,5 @@
 import { Box, useBreakpointValue, useColorModeValue } from "@chakra-ui/react";
-import LoginForm from "../login-form";
+import LoginForm from "./login-form";
 
 function LoginCard() {
   return (

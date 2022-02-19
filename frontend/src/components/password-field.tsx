@@ -43,9 +43,9 @@ function PasswordField({
 
   return (
     <FormControl
+      {...props}
       isInvalid={error || isInvalid}
       isRequired={showRequiredIndicator && isRequired}
-      {...props}
     >
       {labelContent && <FormLabel htmlFor={name}>{labelContent}</FormLabel>}
       <InputGroup>
@@ -53,8 +53,8 @@ function PasswordField({
           id={name}
           type={showPassword ? "text" : "password"}
           placeholder={placeholder}
+          isRequired={isRequired}
           autoComplete={autoComplete}
-          required={isRequired}
           {...register(name, { required: isRequired })}
         />
 
@@ -68,7 +68,7 @@ function PasswordField({
         </InputRightElement>
       </InputGroup>
 
-      {error && (errorMsg || error?.message) && (
+      {(error || isInvalid) && (errorMsg || error?.message) && (
         <FormErrorMessage>{errorMsg ?? error?.message}</FormErrorMessage>
       )}
     </FormControl>

@@ -1,6 +1,6 @@
 import { Text, Button, Heading, HStack, VStack, Stack } from "@chakra-ui/react";
-import { APP_NAME } from "../../constants";
-import LoginCard from "../login-card";
+import { APP_NAME } from "../constants";
+import LoginCard from "./login-card";
 
 function LoginSection() {
   return (

@@ -1,17 +1,5 @@
-import {
-  Box,
-  Button,
-  Checkbox,
-  Divider,
-  FormControl,
-  FormLabel,
-  HStack,
-  Input,
-  Stack,
-  useBreakpointValue,
-  useColorModeValue,
-  Text,
-} from "@chakra-ui/react";
+import { Box, useBreakpointValue, useColorModeValue } from "@chakra-ui/react";
+import LoginForm from "../login-form";
 
 function LoginCard() {
   return (
@@ -25,30 +13,7 @@ function LoginCard() {
       boxShadow={{ base: "none", sm: useColorModeValue("md", "md-dark") }}
       borderRadius={{ base: "none", sm: "xl" }}
     >
-      <Stack spacing="6">
-        <Stack spacing="5">
-          <FormControl>
-            <FormLabel htmlFor="email">Email</FormLabel>
-            <Input id="email" type="email" />
-          </FormControl>
-        </Stack>
-        <HStack justify="space-between">
-          <Checkbox defaultIsChecked>Remember me</Checkbox>
-          <Button variant="link" colorScheme="blue" size="sm">
-            Forgot password?
-          </Button>
-        </HStack>
-        <Stack spacing="6">
-          <Button variant="primary">Sign in</Button>
-          <HStack>
-            <Divider />
-            <Text fontSize="sm" whiteSpace="nowrap" color="muted">
-              or continue with
-            </Text>
-            <Divider />
-          </HStack>
-        </Stack>
-      </Stack>
+      <LoginForm />
     </Box>
   );
 }

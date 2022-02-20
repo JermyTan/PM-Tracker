@@ -1,10 +1,10 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import { CURRENT_USER, REMEMBER_ME } from "../constants";
 import { storage } from "../utils/storage-utils";
-import currentUserReducer, {
+import currentUserSlice, {
   updateCurrentUserAction,
 } from "./slices/current-user-slice";
-import rememberMeReducer from "./slices/remember-me-slice";
+import rememberMeSlice from "./slices/remember-me-slice";
 
 const preloadedState = (() => {
   // ignore if this is running in server side
@@ -24,8 +24,8 @@ const preloadedState = (() => {
 
 const store = configureStore({
   reducer: {
-    currentUser: currentUserReducer,
-    rememberMe: rememberMeReducer,
+    [currentUserSlice.name]: currentUserSlice.reducer,
+    [rememberMeSlice.name]: rememberMeSlice.reducer,
   },
   preloadedState,
 });

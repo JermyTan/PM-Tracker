@@ -10,7 +10,7 @@ import useMyToast from "../custom-hooks/use-my-toast";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import {
   selectRememberMe,
-  updateRememberMeAction,
+  setRememberMeAction,
 } from "../redux/slices/remember-me-slice";
 import CheckboxField from "./checkbox-field";
 import { updateCurrentUserAction } from "../redux/slices/current-user-slice";
@@ -59,7 +59,7 @@ function LoginForm() {
     return new Promise((resolve) => {
       setTimeout(() => {
         toast.success({ title: "Signed in successfully." });
-        dispatch(updateRememberMeAction(formData.rememberMe));
+        dispatch(setRememberMeAction(formData.rememberMe));
         dispatch(
           updateCurrentUserAction({ tokens: { access: "lee", refresh: "ds" } }),
         );

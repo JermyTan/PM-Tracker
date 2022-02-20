@@ -38,4 +38,4 @@ export const selectCurrentUserDisplayInfo = createSelector(
   },
 );
 
-export default currentUserSlice.reducer;
+export default currentUserSlice;

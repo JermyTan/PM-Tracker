@@ -8,12 +8,12 @@ const rememberMeSlice = createSlice({
   name: REMEMBER_ME,
   initialState,
   reducers: {
-    setRememberMeAction: (_, { payload }: PayloadAction<boolean>) => payload,
+    setRememberMe: (_, { payload }: PayloadAction<boolean>) => payload,
   },
 });
 
 // action creators
-export const { setRememberMeAction } = rememberMeSlice.actions;
+export const { setRememberMe } = rememberMeSlice.actions;
 
 // selectors
 export const selectRememberMe = ({ rememberMe }: RootState) => rememberMe;

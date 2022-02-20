@@ -8,12 +8,10 @@ import FormField from "./form-field";
 import PasswordField from "./password-field";
 import useMyToast from "../custom-hooks/use-my-toast";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import {
-  selectRememberMe,
-  setRememberMeAction,
-} from "../redux/slices/remember-me-slice";
+import { selectRememberMe } from "../redux/slices/remember-me-slice";
 import CheckboxField from "./checkbox-field";
-import { updateCurrentUserAction } from "../redux/slices/current-user-slice";
+import loggedIn from "../redux/thunks/logged-in";
+import { usePasswordLoginMutation } from "../redux/services/auth-api";
 
 const SCHEMA = yup.object().shape({
   [EMAIL]: yup
@@ -38,6 +36,7 @@ const DEFAULT_VALUES: LoginFormProps = {
 function LoginForm() {
   const rememberMe = useAppSelector(selectRememberMe);
   const dispatch = useAppDispatch();
+  const [passwordLogin] = usePasswordLoginMutation();
   const toast = useMyToast();
   const methods = useForm<LoginFormProps>({
     resolver: yupResolver(SCHEMA),
@@ -49,23 +48,24 @@ function LoginForm() {
     formState: { isSubmitting },
   } = methods;
 
-  const onSubmit = (formData: LoginFormProps) => {
+  const onSubmit = async (formData: LoginFormProps) => {
     if (isSubmitting) {
       return;
     }
 
     console.log(formData);
+    const { email, password, rememberMe } = formData;
 
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        toast.success({ title: "Signed in successfully." });
-        dispatch(setRememberMeAction(formData.rememberMe));
-        dispatch(
-          updateCurrentUserAction({ tokens: { access: "lee", refresh: "ds" } }),
-        );
-        resolve(null);
-      }, 1000);
-    });
+    try {
+      const currentUser = await passwordLogin({ email, password }).unwrap();
+
+      dispatch(loggedIn(currentUser, rememberMe));
+
+      toast.success({ title: "Signed in successfully." });
+    } catch (error: any) {
+      console.log(error);
+      toast.error({ title: error?.data?.detail });
+    }
   };
 
   return (

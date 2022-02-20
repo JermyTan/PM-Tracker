@@ -11,7 +11,6 @@ from rest_framework_simplejwt.settings import api_settings
 from pigeonhole.common.constants import (
     NAME,
     EMAIL,
-    USER_ID,
     REFRESH,
     TOKEN_ID,
     ACCESS_TOKEN,
@@ -209,7 +208,8 @@ class FacebookLoginSerializer(
 class PasswordLoginSerializer(
     PasswordAuthenticationSerializer, BaseAuthenticationSerializer
 ):
-    name = serializers.CharField()
+    ## TODO: to update once login process is finalized
+    name = serializers.CharField(required=False, default="New user")
     email = serializers.EmailField()
 
     def validate(self, attrs):

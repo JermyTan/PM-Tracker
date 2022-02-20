@@ -1,8 +1,9 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import { CURRENT_USER, REMEMBER_ME } from "../constants";
 import { storage } from "../utils/storage-utils";
+import baseApi from "./services/base-api";
 import currentUserSlice, {
-  updateCurrentUserAction,
+  updateCurrentUser,
 } from "./slices/current-user-slice";
 import rememberMeSlice from "./slices/remember-me-slice";
 
@@ -24,10 +25,13 @@ const preloadedState = (() => {
 
 const store = configureStore({
   reducer: {
+    [baseApi.reducerPath]: baseApi.reducer,
     [currentUserSlice.name]: currentUserSlice.reducer,
     [rememberMeSlice.name]: rememberMeSlice.reducer,
   },
   preloadedState,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(baseApi.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;
@@ -40,7 +44,7 @@ export type AppThunk<ReturnType = void> = ThunkAction<
 >;
 
 export const resetAppState = () => {
-  store.dispatch(updateCurrentUserAction(null));
+  store.dispatch(updateCurrentUser(null));
 
   //   window.FB?.getLoginStatus(({ status }) => {
   //     status === "connected" && window.FB?.logout();

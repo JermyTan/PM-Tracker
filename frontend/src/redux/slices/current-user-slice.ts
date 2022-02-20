@@ -11,7 +11,7 @@ const currentUserSlice = createSlice({
   name: CURRENT_USER,
   initialState,
   reducers: {
-    updateCurrentUserAction: (
+    updateCurrentUser: (
       state,
       { payload }: PayloadAction<CurrentUserState | null>,
     ) => (payload === null ? null : { ...state, ...payload }),
@@ -19,7 +19,7 @@ const currentUserSlice = createSlice({
 });
 
 // action creators
-export const { updateCurrentUserAction } = currentUserSlice.actions;
+export const { updateCurrentUser } = currentUserSlice.actions;
 
 // selectors
 export const selectCurrentUser = ({ currentUser }: RootState) => currentUser;

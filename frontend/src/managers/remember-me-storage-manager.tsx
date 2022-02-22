@@ -1,16 +1,17 @@
 import { useEffect } from "react";
 import { REMEMBER_ME } from "../constants";
-import { useAppSelector } from "../redux/hooks";
 import { selectRememberMe } from "../redux/slices/remember-me-slice";
 import { storage } from "../utils/storage-utils";
+import { subscribeToStore } from "../redux/store";
 
 function RememberMeStorageManager() {
-  const rememberMe = useAppSelector(selectRememberMe);
-
-  useEffect(() => {
-    console.log(rememberMe);
-    storage.local.save(REMEMBER_ME, rememberMe);
-  }, [rememberMe]);
+  useEffect(
+    () =>
+      subscribeToStore(selectRememberMe, (rememberMe) =>
+        storage.local.save(REMEMBER_ME, rememberMe),
+      ),
+    [],
+  );
 
   return null;
 }

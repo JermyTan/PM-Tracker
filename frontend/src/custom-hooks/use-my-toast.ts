@@ -7,7 +7,7 @@ export default function useMyToast() {
   const toastGenerator = useCallback(
     (status: Exclude<UseToastOptions["status"], undefined>) =>
       (options?: Omit<UseToastOptions, "status">) =>
-        toast({ status, isClosable: true, ...options }),
+        toast({ status, isClosable: true, duration: 4000, ...options }),
     [toast],
   );
 

@@ -2,9 +2,7 @@ import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import { CURRENT_USER, REMEMBER_ME } from "../constants";
 import { storage } from "../utils/storage-utils";
 import baseApi from "./services/base-api";
-import currentUserSlice, {
-  updateCurrentUser,
-} from "./slices/current-user-slice";
+import currentUserSlice from "./slices/current-user-slice";
 import rememberMeSlice from "./slices/remember-me-slice";
 
 const preloadedState = (() => {
@@ -43,12 +41,28 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   Action<string>
 >;
 
-export const resetAppState = () => {
-  store.dispatch(updateCurrentUser(null));
+// reference: https://github.com/reduxjs/redux/issues/303#issuecomment-125184409
+export function subscribeToStore<T>(
+  selector: (rootState: RootState) => T,
+  onChange: (newState: T, rootState: RootState) => void,
+) {
+  let currentState: T | undefined;
 
-  //   window.FB?.getLoginStatus(({ status }) => {
-  //     status === "connected" && window.FB?.logout();
-  //   });
-};
+  const handleChange = () => {
+    const rootState = store.getState();
+    const newState = selector(rootState);
+
+    if (currentState !== newState) {
+      currentState = newState;
+      onChange(newState, rootState);
+    }
+  };
+
+  const unsubscribe = store.subscribe(handleChange);
+
+  handleChange();
+
+  return unsubscribe;
+}
 
 export default store;

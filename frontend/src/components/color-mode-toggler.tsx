@@ -9,12 +9,12 @@ function ColorModeToggler(props: Props) {
   return (
     <IconButton
       aria-label={
-        colorMode == "light" ? "Switch to dark mode" : "Switch to light mode"
+        colorMode === "light" ? "Switch to dark mode" : "Switch to light mode"
       }
       onClick={toggleColorMode}
       {...props}
     >
-      {colorMode == "light" ? <MoonIcon /> : <SunIcon />}
+      {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
     </IconButton>
   );
 }

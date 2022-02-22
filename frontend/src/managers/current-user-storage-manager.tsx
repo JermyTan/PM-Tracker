@@ -1,20 +1,26 @@
 import { useEffect } from "react";
 import { CURRENT_USER } from "../constants";
-import { useAppSelector } from "../redux/hooks";
 import { selectCurrentUser } from "../redux/slices/current-user-slice";
-import { selectRememberMe } from "../redux/slices/remember-me-slice";
+import { subscribeToStore } from "../redux/store";
 import { storage } from "../utils/storage-utils";
 
 function CurrentUserStorageManager() {
-  const currentUser = useAppSelector(selectCurrentUser);
-  const rememberMe = useAppSelector(selectRememberMe);
-  const storageService = rememberMe ? storage.local : storage.session;
-
-  useEffect(() => {
-    // may run twice when currentUser + rememberMe both changes
-    console.log("test");
-    storageService.save(CURRENT_USER, currentUser);
-  }, [currentUser, storageService]);
+  useEffect(
+    () =>
+      subscribeToStore(selectCurrentUser, (currentUser, { rememberMe }) => {
+        if (currentUser === null) {
+          // remove from both local and session storage
+          storage.local.save(CURRENT_USER, null);
+          storage.session.save(CURRENT_USER, null);
+        } else {
+          (rememberMe ? storage.local : storage.session).save(
+            CURRENT_USER,
+            currentUser,
+          );
+        }
+      }),
+    [],
+  );
 
   return null;
 }

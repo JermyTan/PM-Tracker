@@ -12,6 +12,7 @@ import { selectRememberMe } from "../redux/slices/remember-me-slice";
 import CheckboxField from "./checkbox-field";
 import loggedIn from "../redux/thunks/logged-in";
 import { usePasswordLoginMutation } from "../redux/services/auth-api";
+import useResolveError from "../custom-hooks/use-resolve-error";
 
 const SCHEMA = yup.object().shape({
   [EMAIL]: yup
@@ -37,6 +38,7 @@ function LoginForm() {
   const rememberMe = useAppSelector(selectRememberMe);
   const dispatch = useAppDispatch();
   const [passwordLogin] = usePasswordLoginMutation();
+  const resolveError = useResolveError();
   const toast = useMyToast();
   const methods = useForm<LoginFormProps>({
     resolver: yupResolver(SCHEMA),
@@ -62,9 +64,8 @@ function LoginForm() {
       dispatch(loggedIn(currentUser, rememberMe));
 
       toast.success({ title: "Signed in successfully." });
-    } catch (error: any) {
-      console.log(error);
-      toast.error({ title: error?.data?.detail });
+    } catch (error) {
+      resolveError(error);
     }
   };
 

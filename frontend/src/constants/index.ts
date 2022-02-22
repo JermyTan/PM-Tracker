@@ -15,3 +15,6 @@ export const GOOGLE_AUTH = "googleAuth";
 export const FACEBOOK_AUTH = "facebookAuth";
 export const REMEMBER_ME = "rememberMe";
 export const CURRENT_USER = "currentUser";
+export const DATE_FORMAT = "dd/MM/yyyy";
+export const TIME_FORMAT = "h.mm a";
+export const DATE_TIME_FORMAT = `${DATE_FORMAT} ${TIME_FORMAT}`;

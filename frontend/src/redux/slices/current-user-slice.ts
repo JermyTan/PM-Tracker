@@ -33,9 +33,7 @@ export const selectCurrentUserTokens = createSelector(
 );
 export const selectCurrentUserDisplayInfo = createSelector(
   selectCurrentUser,
-  (currentUser) => {
-    return currentUser?.user;
-  },
+  (currentUser) => currentUser?.user,
 );
 
 export default currentUserSlice;

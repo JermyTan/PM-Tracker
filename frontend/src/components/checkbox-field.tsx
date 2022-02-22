@@ -6,7 +6,7 @@ import {
   FormControl,
   FormErrorMessage,
 } from "@chakra-ui/react";
-import { useFormContext, UseFormRegisterReturn } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 
 type Props = CheckboxProps & {
   name: string;

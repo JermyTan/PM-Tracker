@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { REMEMBER_ME } from "../../constants";
 import type { RootState } from "../store";
 
-const initialState: boolean = true;
+const initialState = true;
 
 const rememberMeSlice = createSlice({
   name: REMEMBER_ME,

@@ -1,4 +1,5 @@
 import { extendTheme, ThemeConfig } from "@chakra-ui/react";
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { mode, GlobalStyleProps } from "@chakra-ui/theme-tools";
 
 const config: ThemeConfig = {

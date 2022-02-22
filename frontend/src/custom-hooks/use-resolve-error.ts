@@ -17,7 +17,7 @@ export default function useResolveError() {
   const resolveError = useCallback(
     (
       error?: unknown,
-      defaultErrorMessage: string = "An unknown error has occurred.",
+      defaultErrorMessage: string = "An unknown error has occurred." as string,
     ) => {
       if (!error) {
         return;
@@ -36,6 +36,7 @@ export default function useResolveError() {
 
           return;
         }
+        // eslint-disable-next-line no-empty
       } catch {}
 
       toast.error({ title: defaultErrorMessage });

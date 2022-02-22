@@ -18,43 +18,43 @@ function isForbiddenOrNotAuthenticated(error?: FetchBaseQueryError) {
 
 const baseQuery = fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_URL });
 
-const baseQueryWithReauth: BaseQueryFn<
-  string | FetchArgs,
-  unknown,
-  FetchBaseQueryError
-> = async (args, api, extraOptions) => {
-  let result = await baseQuery(args, api, extraOptions);
+// const baseQueryWithReauth: BaseQueryFn<
+//   string | FetchArgs,
+//   unknown,
+//   FetchBaseQueryError
+// > = async (args, api, extraOptions) => {
+//   let result = await baseQuery(args, api, extraOptions);
 
-  if (isForbiddenOrNotAuthenticated(result.error)) {
-    // try to get a new token
-    const refreshResult = await baseQuery(
-      {
-        url: "/gateway/refresh",
-        method: "POST",
-        body: {},
-      },
-      api,
-      extraOptions,
-    );
+//   if (isForbiddenOrNotAuthenticated(result.error)) {
+//     // try to get a new token
+//     const refreshResult = await baseQuery(
+//       {
+//         url: "/gateway/refresh",
+//         method: "POST",
+//         body: {},
+//       },
+//       api,
+//       extraOptions,
+//     );
 
-    if (refreshResult.error) {
-    }
+//     if (refreshResult.error) {
+//     }
 
-    if (refreshResult.data) {
-      // store the new token
-      api.dispatch(updateCurrentUser(refreshResult.data as AuthenticationData));
-      // retry the initial query
-      result = await baseQuery(args, api, extraOptions);
-    } else {
-      api.dispatch(loggedOut());
-    }
-  }
+//     if (refreshResult.data) {
+//       // store the new token
+//       api.dispatch(updateCurrentUser(refreshResult.data as AuthenticationData));
+//       // retry the initial query
+//       result = await baseQuery(args, api, extraOptions);
+//     } else {
+//       api.dispatch(loggedOut());
+//     }
+//   }
 
-  return result;
-};
+//   return result;
+// };
 
 const baseApi = createApi({
-  baseQuery: baseQuery,
+  baseQuery,
   endpoints: () => ({}),
 });
 

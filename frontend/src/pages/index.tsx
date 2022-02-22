@@ -5,8 +5,7 @@ import ColorModeToggler from "../components/color-mode-toggler";
 import LoginSection from "../components/login-section";
 import { APP_NAME } from "../constants";
 
-const HomePage: NextPage = () => {
-  return (
+const HomePage: NextPage = () => (
     <>
       <Head>
         <title>Login | {APP_NAME}</title>
@@ -30,6 +29,5 @@ const HomePage: NextPage = () => {
       </Flex>
     </>
   );
-};
 
 export default HomePage;

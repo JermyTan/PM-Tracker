@@ -11,7 +11,7 @@ const preloadedState = (() => {
     return undefined;
   }
   // default to true, even for non-existent/corrupted value
-  const rememberMe = storage.local.load(REMEMBER_ME) === false ? false : true;
+  const rememberMe = storage.local.load(REMEMBER_ME) !== false;
 
   return {
     currentUser: rememberMe

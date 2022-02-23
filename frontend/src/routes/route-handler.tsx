@@ -1,40 +1,46 @@
-import { useRouter } from "next/router";
-import { ReactNode, useEffect } from "react";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { useAppSelector } from "../redux/hooks";
 import { selectIsLoggedIn } from "../redux/slices/current-user-slice";
-import PlaceholderWrapper from "../components/placeholder-wrapper";
-import { ALL_ROUTES, DASHBOARD_PATH, HOME_PATH } from "./paths";
-import LoginPage from "../pages";
+import {
+  DASHBOARD_PATH,
+  LOGIN_PATH,
+  MY_ACCOUNT_PATH,
+  MY_COURSES_PATH,
+} from "./paths";
+import AppLayoutContainer from "../components/app-layout-container";
+import LoginPage from "../components/pages/login-page";
+import DashboardPage from "../components/pages/dashboard-page";
+import MyCoursesPage from "../components/pages/my-courses-page";
+import MyAccountPage from "../components/pages/my-account-page";
 
-type Props = {
-  children: ReactNode;
-};
-
-function RouteHandler({ children }: Props) {
+function RouteHandler() {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
-  const router = useRouter();
+  const location = useLocation();
 
-  useEffect(() => {
-    // direct user to dashboard page if user has already logged in
-    if (isLoggedIn && router.pathname === HOME_PATH) {
-      router.push(DASHBOARD_PATH);
-    }
-  }, [isLoggedIn, router]);
+  console.log(location.pathname);
 
-  // isFallback only matters if SSR is enabled
-  // reference: https://nextjs.org/docs/api-reference/data-fetching/get-static-paths#fallback-pages
-  if ((isLoggedIn && router.pathname === HOME_PATH) || router.isFallback) {
-    return (
-      <PlaceholderWrapper minH="100vh" isLoading loadingMessage="Loading..." />
-    );
-  }
+  return (
+    <Routes>
+      {isLoggedIn ? (
+        <>
+          <Route
+            path={LOGIN_PATH}
+            element={<Navigate to={DASHBOARD_PATH} replace />}
+          />
 
-  // direct user to login page if user has yet to login
-  if (!isLoggedIn && ALL_ROUTES.includes(router.pathname)) {
-    return <LoginPage />;
-  }
+          <Route element={<AppLayoutContainer p="12" />}>
+            <Route path={DASHBOARD_PATH} element={<DashboardPage />} />
+            <Route path={MY_COURSES_PATH} element={<MyCoursesPage />} />
+            <Route path={MY_ACCOUNT_PATH} element={<MyAccountPage />} />
+          </Route>
 
-  return <>{children}</>;
+          <Route path="*" element={<Navigate to={DASHBOARD_PATH} replace />} />
+        </>
+      ) : (
+        <Route path="*" element={<LoginPage />} />
+      )}
+    </Routes>
+  );
 }
 
 export default RouteHandler;

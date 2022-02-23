@@ -8,7 +8,7 @@ import theme from "../theme";
 import store from "../redux/store";
 import RememberMeStorageManager from "../managers/remember-me-storage-manager";
 import CurrentUserStorageManager from "../managers/current-user-storage-manager";
-import RouteHandler from "../routes/route-handler";
+import SafeHydrate from "../components/SafeHydrate";
 
 function App({ Component, pageProps }: AppProps) {
   return (
@@ -27,9 +27,9 @@ function App({ Component, pageProps }: AppProps) {
         <RememberMeStorageManager />
         <CurrentUserStorageManager />
 
-        <RouteHandler>
+        <SafeHydrate>
           <Component {...pageProps} />
-        </RouteHandler>
+        </SafeHydrate>
       </ChakraProvider>
     </ReduxProvider>
   );

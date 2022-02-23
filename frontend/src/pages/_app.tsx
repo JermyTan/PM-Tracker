@@ -8,7 +8,8 @@ import theme from "../theme";
 import store from "../redux/store";
 import RememberMeStorageManager from "../managers/remember-me-storage-manager";
 import CurrentUserStorageManager from "../managers/current-user-storage-manager";
-import SafeHydrate from "../components/SafeHydrate";
+import SafeHydrate from "../components/safe-hydrate";
+import SplashScreen from "../components/splash-screen";
 
 function App({ Component, pageProps }: AppProps) {
   return (
@@ -28,7 +29,9 @@ function App({ Component, pageProps }: AppProps) {
         <CurrentUserStorageManager />
 
         <SafeHydrate>
-          <Component {...pageProps} />
+          <SplashScreen duration={1000}>
+            <Component {...pageProps} />
+          </SplashScreen>
         </SafeHydrate>
       </ChakraProvider>
     </ReduxProvider>

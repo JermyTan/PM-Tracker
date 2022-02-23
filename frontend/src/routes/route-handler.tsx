@@ -23,10 +23,7 @@ function RouteHandler() {
     <Routes>
       {isLoggedIn ? (
         <>
-          <Route
-            path={LOGIN_PATH}
-            element={<Navigate to={DASHBOARD_PATH} replace />}
-          />
+          <Route path={LOGIN_PATH} element={<Navigate to={DASHBOARD_PATH} />} />
 
           <Route element={<AppLayoutContainer p="12" />}>
             <Route path={DASHBOARD_PATH} element={<DashboardPage />} />
@@ -34,7 +31,7 @@ function RouteHandler() {
             <Route path={MY_ACCOUNT_PATH} element={<MyAccountPage />} />
           </Route>
 
-          <Route path="*" element={<Navigate to={DASHBOARD_PATH} replace />} />
+          <Route path="*" element={<Navigate to={DASHBOARD_PATH} />} />
         </>
       ) : (
         <Route path="*" element={<LoginPage />} />

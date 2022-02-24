@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate, useLocation } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import { useAppSelector } from "../redux/hooks";
 import { selectIsLoggedIn } from "../redux/slices/current-user-slice";
 import {
@@ -15,9 +15,6 @@ import MyAccountPage from "../components/pages/my-account-page";
 
 function RouteHandler() {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
-  const location = useLocation();
-
-  console.log(location.pathname);
 
   return (
     <Routes>

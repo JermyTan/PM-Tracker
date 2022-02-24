@@ -55,7 +55,6 @@ function LoginForm() {
       return;
     }
 
-    console.log(formData);
     const { email, password, rememberMe } = formData;
 
     try {

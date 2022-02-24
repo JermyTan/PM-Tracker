@@ -1,9 +1,9 @@
 import { updateCurrentUser } from "../slices/current-user-slice";
 import type { AppThunk } from "../store";
 
-const loggedOut = (): AppThunk => (dispatch) => {
+const resetAppState = (): AppThunk => (dispatch) => {
   // add actions here to clean up app state upon logout
   dispatch(updateCurrentUser(null));
 };
 
-export default loggedOut;
+export default resetAppState;

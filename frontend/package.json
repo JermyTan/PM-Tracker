@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && next export",
     "start": "next start",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
-    "format": "prettier --write src"
+    "format": "prettier --write src",
+    "serve": "serve -s out"
   },
   "dependencies": {
     "@chakra-ui/icons": "^1.1.7",
@@ -28,6 +29,7 @@
     "react-hook-form": "^7.27.1",
     "react-icons": "^4.3.1",
     "react-redux": "^7.2.6",
+    "react-router-dom": "6",
     "yup": "^0.32.11"
   },
   "devDependencies": {
@@ -48,6 +50,7 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "prettier": "^2.5.1",
+    "serve": "^13.0.2",
     "typescript": "4.5.5"
   }
 }

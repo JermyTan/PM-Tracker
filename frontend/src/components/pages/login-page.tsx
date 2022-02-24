@@ -20,7 +20,7 @@ function LoginPage() {
         <title>Login | {APP_NAME}</title>
       </Head>
 
-      <Flex flexDirection="column" py="4">
+      <Flex as="main" flexDirection="column" py="4">
         <Container maxW="full">
           <Flex>
             <Spacer />

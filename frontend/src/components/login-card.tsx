@@ -10,7 +10,7 @@ function LoginCard() {
         base: "transparent",
         sm: useColorModeValue("white", "gray.800"),
       })}
-      boxShadow={{ base: "none", sm: useColorModeValue("md", "md-dark") }}
+      shadow={{ base: "none", sm: useColorModeValue("md", "md-dark") }}
       borderRadius={{ base: "none", sm: "xl" }}
     >
       <LoginForm />

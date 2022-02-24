@@ -29,7 +29,7 @@ function PlaceholderWrapper({
   ...props
 }: Props) {
   return isLoading || showDefaultMessage ? (
-    <VStack justifyContent="center" {...props}>
+    <VStack justify="center" {...props}>
       {isLoading && (
         <>
           <Spinner speed="0.5s" size="xl" {...spinnerProps} />

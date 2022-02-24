@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "yarn format && yarn lint --fix",
     "build": "next build && next export",
     "start": "next start",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",

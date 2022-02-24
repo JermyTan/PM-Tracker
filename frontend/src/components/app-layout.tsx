@@ -67,6 +67,9 @@ function AppLayout({ children }: Props) {
           borderBottomWidth="1px"
           bg={useColorModeValue("white", "gray.800")}
           borderColor={useColorModeValue("inherit", "gray.700")}
+          pos="sticky"
+          zIndex="sticky"
+          top="0"
         >
           <IconButton
             aria-label={sidebar.isOpen ? "Collapse sidebar" : "Expand sidebar"}

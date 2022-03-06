@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Box, Text, useDisclosure } from "@chakra-ui/react";
+import { Box, useDisclosure } from "@chakra-ui/react";
 import Header from "./header";
 import Sidebar from "./sidebar";
 
@@ -37,7 +37,6 @@ function AppLayout({ children }: Props) {
         <Box as="main" p="4">
           {children}
         </Box>
-        <Box height="3000px" />
       </Box>
     </Box>
   );

@@ -4,6 +4,7 @@ import { storage } from "../utils/storage-utils";
 import baseApi from "./services/base-api";
 import currentUserSlice from "./slices/current-user-slice";
 import rememberMeSlice from "./slices/remember-me-slice";
+import listenerMiddleware from "./listener-middleware";
 
 const preloadedState = (() => {
   // ignore if this is running in server side
@@ -29,7 +30,9 @@ const store = configureStore({
   },
   preloadedState,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(baseApi.middleware),
+    getDefaultMiddleware()
+      .prepend(listenerMiddleware.middleware)
+      .concat(baseApi.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;
@@ -41,6 +44,7 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   Action<string>
 >;
 
+// subscribeToStore is depreciated in favor of listenerMiddleware
 // reference: https://github.com/reduxjs/redux/issues/303#issuecomment-125184409
 export function subscribeToStore<T>(
   selector: (rootState: RootState) => T,

@@ -20,7 +20,7 @@ class User(TimestampedModel):
         Image, null=True, blank=True, on_delete=models.SET_NULL
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} | {self.email}"
 
 
@@ -42,5 +42,5 @@ post_delete.connect(
 class UserInvite(TimestampedModel):
     email = models.EmailField(unique=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.email}"

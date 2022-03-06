@@ -28,8 +28,8 @@ class Image(TimestampedModel):
     image_url = models.URLField(max_length=500)
     image_id = models.CharField(max_length=255, blank=True)
 
-    def __str__(self):
-        return self.image_url
+    def __str__(self) -> str:
+        return f"{self.image_url}"
 
     def copy(self):
         return self.__class__(

@@ -21,7 +21,7 @@ class AuthenticationMethod(TimestampedModel):
     class Meta:
         abstract = True
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.user}"
 
     def is_valid(self, auth_data: "AuthenticationData") -> bool:
@@ -43,7 +43,7 @@ class CustomProfileAuthenticationMethod(AuthenticationMethod):
     class Meta:
         abstract = True
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.email} | {super().__str__()}"
 
     @classmethod
@@ -113,7 +113,7 @@ class AuthenticationData(ABC):
         self.auth_method_class = auth_method_class
         self.profile_image = profile_image
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} | {self.email} | {self.auth_id} | {self.profile_image}"
 
     @transaction.atomic

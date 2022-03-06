@@ -1,5 +1,10 @@
-import { MoonIcon, SunIcon } from "@chakra-ui/icons";
-import { IconButton, IconButtonProps, useColorMode } from "@chakra-ui/react";
+import { FaSun, FaMoon } from "react-icons/fa";
+import {
+  IconButton,
+  IconButtonProps,
+  useColorMode,
+  Icon,
+} from "@chakra-ui/react";
 
 type Props = Omit<IconButtonProps, "onClick" | "aria-label">;
 
@@ -14,7 +19,7 @@ function ColorModeToggler(props: Props) {
       onClick={toggleColorMode}
       {...props}
     >
-      {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+      {colorMode === "light" ? <Icon as={FaMoon} /> : <Icon as={FaSun} />}
     </IconButton>
   );
 }

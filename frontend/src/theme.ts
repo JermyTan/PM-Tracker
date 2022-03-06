@@ -15,6 +15,11 @@ const theme = extendTheme({
     "lg-dark": "0px 8px 16px rgba(11, 12, 17, 0.9)",
     "xl-dark": "0px 16px 24px rgba(11, 12, 17, 0.9)",
   },
+  colors: {
+    gray: {
+      850: "#13151b",
+    },
+  },
   semanticTokens: {
     colors: {
       muted: {

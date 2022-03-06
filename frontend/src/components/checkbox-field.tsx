@@ -18,7 +18,6 @@ function CheckboxField({
   name,
   isInvalid,
   isRequired,
-  children,
   errorMsg,
   ...props
 }: Props) {
@@ -36,9 +35,7 @@ function CheckboxField({
         isInvalid={error || isInvalid}
         isRequired={isRequired}
         {...register(name, { required: isRequired })}
-      >
-        {children}
-      </Checkbox>
+      />
       {(error || isInvalid) && (errorMsg || error?.message) && (
         <FormErrorMessage>{errorMsg ?? error?.message}</FormErrorMessage>
       )}

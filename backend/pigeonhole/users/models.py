@@ -13,9 +13,23 @@ class PatchUserAction(models.TextChoices):
     PROFILE_IMAGE = "PROFILE_IMAGE"
 
 
+class AccountType(models.TextChoices):
+    ADMIN = "ADMIN"  ## can change other users' type
+    EDUCATOR = "EDUCATOR"  ## can create new courses
+    STANDARD = "STANDARD"
+
+
+MAX_ACCOUNT_TYPE_LENGTH = max(map(len, AccountType))
+
+
 class User(TimestampedModel):
     name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
+    account_type = models.CharField(
+        max_length=MAX_ACCOUNT_TYPE_LENGTH,
+        choices=AccountType.choices,
+        default=AccountType.STANDARD,
+    )
     profile_image = models.ForeignKey(
         Image, null=True, blank=True, on_delete=models.SET_NULL
     )

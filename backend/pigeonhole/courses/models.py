@@ -1,4 +1,3 @@
-from pyexpat import model
 from django.db import models
 
 from pigeonhole.common.models import TimestampedModel
@@ -6,8 +5,9 @@ from users.models import User
 
 
 class Role(models.TextChoices):
+    CO_OWNER = "CO-OWNER"
     INSTRUCTOR = "INSTRUCTOR"
-    STUDENT = "STUDENT"
+    MEMBER = "MEMBER"
 
 
 MAX_ROLE_LENGTH = max(map(len, Role))
@@ -17,17 +17,22 @@ class Course(TimestampedModel):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    is_published = models.BooleanField()
 
     def __str__(self) -> str:
         return f"{self.name} | {self.owner}"
 
 
 ## Table extension of Course
-class CourseSetting(TimestampedModel):
+## Only owner and co-owner can modify
+class CourseSettings(TimestampedModel):
     course = models.OneToOneField(Course, on_delete=models.CASCADE)
-    is_published = models.BooleanField()
     show_group_members_names = models.BooleanField()
+    allow_members_to_create_groups = models.BooleanField()
     milestone_alias = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        verbose_name_plural = "course settings"
 
     def __str__(self) -> str:
         return f"{self.course}"
@@ -37,7 +42,7 @@ class CourseMember(TimestampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     role = models.CharField(
-        max_length=MAX_ROLE_LENGTH, choices=Role.choices, default=Role.STUDENT
+        max_length=MAX_ROLE_LENGTH, choices=Role.choices, default=Role.MEMBER
     )
 
     class Meta:

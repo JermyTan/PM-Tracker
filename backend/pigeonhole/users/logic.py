@@ -11,6 +11,7 @@ from pigeonhole.common.constants import (
     CREATED_AT,
     UPDATED_AT,
     PROFILE_IMAGE,
+    ACCOUNT_TYPE,
     HAS_PASSWORD_AUTH,
     GOOGLE_AUTH,
     FACEBOOK_AUTH,
@@ -22,29 +23,33 @@ from authentication.models import (
     FacebookAuthentication,
 )
 from content_delivery_service.models import Image
+from pigeonhole.common.parsers import to_base_json
 from .models import User, UserInvite, PatchUserAction
 
 
-def user_to_json(user: User) -> dict:
-    data = {
-        ID: user.id,
-        NAME: user.name,
-        EMAIL: user.email,
-        PROFILE_IMAGE: None
-        if user.profile_image is None
-        else user.profile_image.image_url,
-        CREATED_AT: parse_datetime_to_ms_timestamp(user.created_at),
-        UPDATED_AT: parse_datetime_to_ms_timestamp(user.updated_at),
-    }
+def user_to_json(user: User, extra: dict = {}) -> dict:
+    data = to_base_json(user)
+
+    data.update(
+        {
+            NAME: user.name,
+            EMAIL: user.email,
+            PROFILE_IMAGE: None
+            if user.profile_image is None
+            else user.profile_image.image_url,
+        }
+    )
+
+    data.update(extra)
 
     return data
 
 
 def requester_to_json(requester: User) -> dict:
-    data = user_to_json(user=requester)
-
-    data.update(
-        {
+    return user_to_json(
+        user=requester,
+        extra={
+            ACCOUNT_TYPE: requester.account_type,
             HAS_PASSWORD_AUTH: hasattr(
                 requester, PasswordAuthentication.get_related_name()
             ),
@@ -60,10 +65,8 @@ def requester_to_json(requester: User) -> dict:
             }
             if hasattr(requester, FacebookAuthentication.get_related_name())
             else None,
-        }
+        },
     )
-
-    return data
 
 
 def user_invite_to_json(user_invite: UserInvite) -> dict:

@@ -124,6 +124,7 @@ class AuthenticationData(ABC):
         if self.auth_method_class is not PasswordAuthentication:
             try:
                 auth_method = self.auth_method_class.objects.select_related(
+                    "user__profile_image",
                     "user__passwordauthentication",
                     "user__googleauthentication",
                     "user__facebookauthentication",

@@ -23,7 +23,7 @@ const myQuery: BaseQueryFn<
   unknown,
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
-  console.log(args);
+  console.log("Start api call:", args);
   const result = await baseQuery(args, api, extraOptions);
 
   // if (isForbiddenOrNotAuthenticated(result.error)) {
@@ -51,6 +51,7 @@ const myQuery: BaseQueryFn<
   //   }
   // }
 
+  console.log("Api call result:", result);
   return result;
 };
 

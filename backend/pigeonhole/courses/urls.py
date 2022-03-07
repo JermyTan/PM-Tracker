@@ -1,15 +1,9 @@
 from django.urls import path
 
-# from .views import (
-#     UserInvitesView,
-#     SingleUserInviteView,
-#     UsersView,
-#     RequesterView,
-#     SingleUserView,
-# )
+from .views import MyCoursesView
 
 urlpatterns = [
-    # path("", UsersView.as_view(), name="users"),
+    path("", MyCoursesView.as_view(), name="my_courses"),
     # path("self", RequesterView.as_view(), name="self"),
     # path("invite", UserInvitesView.as_view(), name="user_invites"),
     # path(

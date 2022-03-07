@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     Course,
-    CourseSetting,
+    CourseSettings,
     CourseMember,
     CourseGroup,
     CourseGroupMember,
@@ -11,7 +11,7 @@ from .models import (
 
 # Register your models here.
 admin.site.register(Course)
-admin.site.register(CourseSetting)
+admin.site.register(CourseSettings)
 admin.site.register(CourseMember)
 admin.site.register(CourseGroup)
 admin.site.register(CourseGroupMember)

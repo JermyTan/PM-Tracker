@@ -1,4 +1,5 @@
 import {
+  ACCOUNT_TYPE,
   EMAIL,
   FACEBOOK_AUTH,
   GOOGLE_AUTH,
@@ -8,6 +9,12 @@ import {
   PROFILE_IMAGE,
 } from "../constants";
 
+export enum AccountType {
+  Admin = "ADMIN",
+  Educator = "EDUCATOR",
+  Standard = "STANDARD",
+}
+
 export type UserData = {
   [EMAIL]: string;
   [NAME]: string;
@@ -15,6 +22,7 @@ export type UserData = {
 };
 
 export type SelfData = UserData & {
+  [ACCOUNT_TYPE]: AccountType;
   [HAS_PASSWORD_AUTH]: boolean;
   [GOOGLE_AUTH]: { [EMAIL]: string; [PROFILE_IMAGE]: string } | null;
   [FACEBOOK_AUTH]: { [EMAIL]: string; [PROFILE_IMAGE]: string } | null;

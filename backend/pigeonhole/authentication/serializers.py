@@ -34,10 +34,10 @@ from .models import (
 
 
 class GoogleAuthenticationSerializer(serializers.Serializer):
-    token_id = serializers.CharField()
+    token_id = serializers.CharField(required=True)
 
-    def validate(self, attrs):
-        token_id = attrs[TOKEN_ID]
+    def validate(self, data):
+        token_id = data[TOKEN_ID]
 
         params = {"id_token": token_id}
 
@@ -73,7 +73,7 @@ VALID_SCOPES = {"email", "public_profile"}
 
 
 class FacebookAuthenticationSerializer(serializers.Serializer):
-    access_token = serializers.CharField()
+    access_token = serializers.CharField(required=True)
 
     def verify_access_token(self, access_token: str):
         params = {
@@ -116,8 +116,8 @@ class FacebookAuthenticationSerializer(serializers.Serializer):
                 code="fail_facebook_token_verification",
             )
 
-    def validate(self, attrs):
-        access_token = attrs[ACCESS_TOKEN]
+    def validate(self, data):
+        access_token = data[ACCESS_TOKEN]
 
         self.verify_access_token(access_token)
 
@@ -148,10 +148,10 @@ class FacebookAuthenticationSerializer(serializers.Serializer):
 
 
 class PasswordAuthenticationSerializer(serializers.Serializer):
-    password = serializers.CharField()
+    password = serializers.CharField(required=True)
 
-    def validate(self, attrs):
-        password = attrs[PASSWORD]
+    def validate(self, data):
+        password = data[PASSWORD]
 
         auth_data = PasswordAuthenticationData(
             name="",
@@ -184,9 +184,9 @@ class BaseAuthenticationSerializer(serializers.Serializer):
 class GoogleLoginSerializer(
     GoogleAuthenticationSerializer, BaseAuthenticationSerializer
 ):
-    def validate(self, attrs):
+    def validate(self, data):
         try:
-            auth_data = super().validate(attrs)
+            auth_data = super().validate(data)
         except BadRequest as e:
             self.raise_invalid_user()
 
@@ -196,9 +196,9 @@ class GoogleLoginSerializer(
 class FacebookLoginSerializer(
     FacebookAuthenticationSerializer, BaseAuthenticationSerializer
 ):
-    def validate(self, attrs):
+    def validate(self, data):
         try:
-            auth_data = super().validate(attrs)
+            auth_data = super().validate(data)
         except BadRequest as e:
             self.raise_invalid_user()
 
@@ -210,13 +210,13 @@ class PasswordLoginSerializer(
 ):
     ## TODO: to update once login process is finalized
     name = serializers.CharField(required=False, default="New user")
-    email = serializers.EmailField()
+    email = serializers.EmailField(required=True)
 
-    def validate(self, attrs):
-        name = attrs[NAME]
-        email = attrs[EMAIL]
+    def validate(self, data):
+        name = data[NAME]
+        email = data[EMAIL]
 
-        auth_data = super().validate(attrs)
+        auth_data = super().validate(data)
         auth_data.name = name
         auth_data.email = email
 
@@ -227,8 +227,8 @@ class AccessTokenRefreshSerializer(
     TokenRefreshSerializer,
     BaseAuthenticationSerializer,
 ):
-    def validate(self, attrs):
-        tokens = super().validate(attrs)
+    def validate(self, data):
+        tokens = super().validate(data)
 
         user_id = RefreshToken(tokens[REFRESH]).get(key=api_settings.USER_ID_CLAIM)
 
@@ -252,10 +252,10 @@ class AccessTokenRefreshSerializer(
 
 
 class CheckAccountSerializer(BaseAuthenticationSerializer):
-    email = serializers.EmailField()
+    email = serializers.EmailField(required=True)
 
-    def validate(self, attrs):
-        email = attrs[EMAIL]
+    def validate(self, data):
+        email = data[EMAIL]
 
         try:
             user = get_users(email=email).get()
@@ -273,10 +273,10 @@ class CheckAccountSerializer(BaseAuthenticationSerializer):
 
 
 class PasswordResetSerializer(BaseAuthenticationSerializer):
-    email = serializers.EmailField()
+    email = serializers.EmailField(required=True)
 
-    def validate(self, attrs):
-        email = attrs[EMAIL]
+    def validate(self, data):
+        email = data[EMAIL]
 
         try:
             user = get_users(email=email).get()

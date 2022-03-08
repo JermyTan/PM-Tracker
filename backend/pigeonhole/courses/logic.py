@@ -1,4 +1,5 @@
 from typing import Optional
+from datetime import datetime
 
 from django.db.models import QuerySet
 from django.db import transaction
@@ -11,12 +12,14 @@ from pigeonhole.common.constants import (
     SHOW_GROUP_MEMBERS_NAMES,
     ALLOW_MEMBERS_TO_CREATE_GROUPS,
     MILESTONE_ALIAS,
+    START_DATE_TIME,
+    END_DATE_TIME,
 )
-from pigeonhole.common.parsers import to_base_json
+from pigeonhole.common.parsers import to_base_json, parse_datetime_to_ms_timestamp
 from users.models import User
 from users.logic import user_to_json
 
-from .models import Course, CourseMembership, CourseSettings, Role
+from .models import Course, CourseMembership, CourseMilestone, CourseSettings, Role
 
 
 def course_to_json(course: Course, extra: dict = {}) -> dict:
@@ -48,12 +51,23 @@ def course_with_settings_to_json(course: Course) -> dict:
     )
 
 
+def course_milestone_to_json(milestone: CourseMilestone) -> dict:
+    data = to_base_json(milestone)
+
+    data.update(
+        {
+            NAME: milestone.name,
+            DESCRIPTION: milestone.description,
+            START_DATE_TIME: parse_datetime_to_ms_timestamp(milestone.start_date_time),
+            END_DATE_TIME: parse_datetime_to_ms_timestamp(milestone.end_date_time),
+        }
+    )
+
+    return data
+
+
 def get_courses(*args, **kwargs) -> QuerySet[Course]:
     return Course.objects.filter(*args, **kwargs)
-
-
-def get_course_memberships(*args, **kwargs) -> QuerySet[CourseMembership]:
-    return CourseMembership.objects.filter(*args, **kwargs)
 
 
 @transaction.atomic
@@ -78,7 +92,7 @@ def create_course(
         course=new_course,
         show_group_members_names=show_group_members_names,
         allow_members_to_create_groups=allow_members_to_create_groups,
-        milestone_alias=milestone_alias,
+        milestone_alias=milestone_alias.lower(),
     )
 
     ## IMPORTANT!! make owner as course member
@@ -109,7 +123,7 @@ def update_course(
     course_settings: CourseSettings = course.coursesettings
     course_settings.show_group_members_names = show_group_members_names
     course_settings.allow_members_to_create_groups = allow_members_to_create_groups
-    course_settings.milestone_alias = milestone_alias
+    course_settings.milestone_alias = milestone_alias.lower()
     course_settings.save()
 
     ## make new owner co-owner role
@@ -118,3 +132,40 @@ def update_course(
         owner_membership.save()
 
     return course
+
+
+@transaction.atomic
+def create_course_milestone(
+    course: Course,
+    name: str,
+    description: str,
+    start_date_time: datetime,
+    end_date_time: Optional[datetime],
+) -> CourseMilestone:
+    new_milestone = CourseMilestone.objects.create(
+        course=course,
+        name=name,
+        description=description,
+        start_date_time=start_date_time,
+        end_date_time=end_date_time,
+    )
+
+    return new_milestone
+
+
+@transaction.atomic
+def update_course_milestone(
+    milestone: CourseMilestone,
+    name: str,
+    description: str,
+    start_date_time: datetime,
+    end_date_time: Optional[datetime],
+) -> CourseMilestone:
+    milestone.name = name
+    milestone.description = description
+    milestone.start_date_time = start_date_time
+    milestone.end_date_time = end_date_time
+
+    milestone.save()
+
+    return milestone

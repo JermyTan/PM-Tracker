@@ -92,7 +92,7 @@ class CourseMilestone(TimestampedModel):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     start_date_time = models.DateTimeField()
-    end_date_time = models.DateTimeField()
+    end_date_time = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         constraints = [
@@ -100,6 +100,7 @@ class CourseMilestone(TimestampedModel):
                 fields=["course_id", "name"],
                 name="unique_course_milestone_name",
             ),
+            ## CHECK constraint will pass even if expression evaluates to unknown/null
             models.CheckConstraint(
                 check=models.Q(start_date_time__lt=models.F("end_date_time")),
                 name="course_milestone_start_date_time_lt_end_date_time",

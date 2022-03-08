@@ -47,9 +47,9 @@ class GoogleAuthenticationSerializer(serializers.Serializer):
         )
         response_data = response.json()
 
-        name = response_data.get("name")
-        email = response_data.get("email")
-        auth_id = response_data.get("sub")
+        name = response_data.get("name", "")
+        email = response_data.get("email", "")
+        auth_id = response_data.get("sub", "")
 
         if not all((name, email, auth_id)):
             raise BadRequest(
@@ -133,14 +133,14 @@ class FacebookAuthenticationSerializer(serializers.Serializer):
         response_data = response.json()
 
         try:
-            profile_image = response_data.get("picture").get("data").get("url")
+            profile_image = response_data.get("picture").get("data").get("url", "")
         except Exception as e:
             profile_image = ""
 
         auth_data = FacebookAuthenticationData(
-            name=response_data.get("name"),
-            email=response_data.get("email"),
-            auth_id=response_data.get("id"),
+            name=response_data.get("name", ""),
+            email=response_data.get("email", ""),
+            auth_id=response_data.get("id", ""),
             profile_image=profile_image,
         )
 

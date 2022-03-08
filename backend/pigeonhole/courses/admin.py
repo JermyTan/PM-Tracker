@@ -1,8 +1,10 @@
 from django.contrib import admin
+
+from pigeonhole.common.admin import BaseAdmin
 from .models import (
     Course,
     CourseSettings,
-    CourseMember,
+    CourseMembership,
     CourseGroup,
     CourseGroupMember,
     CourseMilestone,
@@ -10,10 +12,10 @@ from .models import (
 )
 
 # Register your models here.
-admin.site.register(Course)
-admin.site.register(CourseSettings)
-admin.site.register(CourseMember)
-admin.site.register(CourseGroup)
-admin.site.register(CourseGroupMember)
-admin.site.register(CourseMilestone)
-admin.site.register(CourseSubmission)
+admin.site.register(Course, BaseAdmin)
+admin.site.register(CourseSettings, BaseAdmin)
+admin.site.register(CourseMembership, BaseAdmin)
+admin.site.register(CourseGroup, BaseAdmin)
+admin.site.register(CourseGroupMember, BaseAdmin)
+admin.site.register(CourseMilestone, BaseAdmin)
+admin.site.register(CourseSubmission, BaseAdmin)

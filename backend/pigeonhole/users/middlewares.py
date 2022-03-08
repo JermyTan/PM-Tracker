@@ -4,7 +4,7 @@ from .models import User, AccountType
 from .logic import get_users
 
 
-def check_access(*allowed_account_types: AccountType):
+def check_account_access(*allowed_account_types: AccountType):
     def _method_wrapper(view_method):
         def _arguments_wrapper(instance, request, *args, **kwargs):
             requester_id = request.user.id

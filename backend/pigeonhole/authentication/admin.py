@@ -1,5 +1,7 @@
 from django.contrib import admin
 
+from pigeonhole.common.admin import BaseAdmin
+
 from .models import (
     GoogleAuthentication,
     FacebookAuthentication,
@@ -7,6 +9,6 @@ from .models import (
 )
 
 # Register your models here.
-admin.site.register(GoogleAuthentication)
-admin.site.register(FacebookAuthentication)
-admin.site.register(PasswordAuthentication)
+admin.site.register(GoogleAuthentication, BaseAdmin)
+admin.site.register(FacebookAuthentication, BaseAdmin)
+admin.site.register(PasswordAuthentication, BaseAdmin)

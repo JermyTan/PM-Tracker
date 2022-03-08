@@ -38,7 +38,7 @@ class CourseSettings(TimestampedModel):
         return f"{self.course}"
 
 
-class CourseMember(TimestampedModel):
+class CourseMembership(TimestampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     role = models.CharField(
@@ -48,7 +48,7 @@ class CourseMember(TimestampedModel):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["user_id", "course_id"], name="unique_course_member"
+                fields=["user_id", "course_id"], name="unique_course_membership"
             )
         ]
 
@@ -72,7 +72,7 @@ class CourseGroup(TimestampedModel):
 
 
 class CourseGroupMember(TimestampedModel):
-    member = models.ForeignKey(CourseMember, on_delete=models.CASCADE)
+    member = models.ForeignKey(CourseMembership, on_delete=models.CASCADE)
     group = models.ForeignKey(CourseGroup, on_delete=models.CASCADE)
 
     class Meta:
@@ -120,7 +120,7 @@ class CourseSubmission(TimestampedModel):
     parent_submission = models.ForeignKey(
         "self", on_delete=models.SET_NULL, blank=True, null=True
     )
-    creator = models.ForeignKey(CourseMember, on_delete=models.CASCADE)
+    creator = models.ForeignKey(CourseMembership, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
 
     class Meta:

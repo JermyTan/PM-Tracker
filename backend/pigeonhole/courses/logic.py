@@ -3,7 +3,15 @@ from typing import Optional
 from django.db.models import QuerySet
 from django.db import transaction
 
-from pigeonhole.common.constants import NAME, OWNER, DESCRIPTION, IS_PUBLISHED
+from pigeonhole.common.constants import (
+    NAME,
+    OWNER,
+    DESCRIPTION,
+    IS_PUBLISHED,
+    SHOW_GROUP_MEMBERS_NAMES,
+    ALLOW_MEMBERS_TO_CREATE_GROUPS,
+    MILESTONE_ALIAS,
+)
 from pigeonhole.common.parsers import to_base_json
 from users.models import User
 from users.logic import user_to_json
@@ -26,6 +34,18 @@ def course_to_json(course: Course, extra: dict = {}) -> dict:
     data.update(extra)
 
     return data
+
+
+def course_with_settings_to_json(course: Course) -> dict:
+    course_settings: CourseSettings = course.coursesettings
+    return course_to_json(
+        course=course,
+        extra={
+            SHOW_GROUP_MEMBERS_NAMES: course_settings.show_group_members_names,
+            ALLOW_MEMBERS_TO_CREATE_GROUPS: course_settings.allow_members_to_create_groups,
+            MILESTONE_ALIAS: course_settings.milestone_alias,
+        },
+    )
 
 
 def get_courses(*args, **kwargs) -> QuerySet[Course]:
@@ -72,7 +92,7 @@ def create_course(
 @transaction.atomic
 def update_course(
     course: Course,
-    new_owner_membership: Optional[CourseMembership],
+    owner_membership: CourseMembership,
     name: str,
     description: str,
     is_published: bool,
@@ -80,12 +100,7 @@ def update_course(
     allow_members_to_create_groups: bool,
     milestone_alias: str,
 ) -> Course:
-    if new_owner_membership is not None:
-        course.owner = new_owner_membership.user
-        ## make new owner co-owner role
-        new_owner_membership.role = Role.CO_OWNER
-        new_owner_membership.save()
-
+    course.owner = owner_membership.user
     course.name = name
     course.description = description
     course.is_published = is_published
@@ -96,5 +111,10 @@ def update_course(
     course_settings.allow_members_to_create_groups = allow_members_to_create_groups
     course_settings.milestone_alias = milestone_alias
     course_settings.save()
+
+    ## make new owner co-owner role
+    if owner_membership.role != Role.CO_OWNER:
+        owner_membership.role = Role.CO_OWNER
+        owner_membership.save()
 
     return course

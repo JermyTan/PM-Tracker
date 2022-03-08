@@ -10,7 +10,13 @@ from pigeonhole.common.exceptions import BadRequest
 from users.middlewares import check_account_access
 from users.models import User, AccountType
 from .models import Course, CourseMembership, Role
-from .logic import course_to_json, create_course, get_course_memberships, update_course
+from .logic import (
+    course_to_json,
+    course_with_settings_to_json,
+    create_course,
+    get_course_memberships,
+    update_course,
+)
 from .serializers import PostCourseSerializer, PutCourseSerializer
 from .middlewares import check_course, check_membership, check_role_access
 
@@ -41,7 +47,7 @@ class MyCoursesView(APIView):
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
 
-        new_course, new_member = create_course(
+        new_course, new_membership = create_course(
             owner=requester,
             name=validated_data.get("name", ""),
             description=validated_data.get("description", ""),
@@ -55,12 +61,26 @@ class MyCoursesView(APIView):
             milestone_alias=validated_data.get("milestone_alias", ""),
         )
 
-        data = course_to_json(course=new_course, extra={ROLE: new_member.role})
+        data = course_to_json(course=new_course, extra={ROLE: new_membership.role})
 
         return Response(data, status=status.HTTP_201_CREATED)
 
 
 class SingleCourseView(APIView):
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_membership
+    def get(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+    ):
+        data = course_with_settings_to_json(course)
+
+        return Response(data, status=status.HTTP_200_OK)
+
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
     @check_membership
@@ -83,24 +103,20 @@ class SingleCourseView(APIView):
         if owner_id is not None and course.owner != requester:
             raise PermissionDenied()
 
-        ## no need to update owner if owner is the same
-        if owner_id is None or owner_id == course.owner.id:
-            new_owner_membership = None
-        else:
-            try:
-                new_owner_membership = (
-                    get_course_memberships(user_id=owner_id, course=course)
-                    .select_related("user__profile_image")
-                    .get()
-                )
-            except CourseMembership.DoesNotExist as e:
-                raise BadRequest(
-                    "New owner is not in this course.", code="invalid_owner"
-                )
+        try:
+            owner_membership = (
+                requester_membership
+                if owner_id is None or owner_id == course.owner.id
+                else get_course_memberships(user_id=owner_id, course=course)
+                .select_related("user__profile_image")
+                .get()
+            )
+        except CourseMembership.DoesNotExist as e:
+            raise BadRequest("New owner is not in this course.", code="invalid_owner")
 
         updated_course = update_course(
             course=course,
-            new_owner_membership=new_owner_membership,
+            owner_membership=owner_membership,
             name=validated_data.get("name", ""),
             description=validated_data.get("description", ""),
             is_published=validated_data.get("is_published", False),
@@ -113,6 +129,6 @@ class SingleCourseView(APIView):
             milestone_alias=validated_data.get("milestone_alias", ""),
         )
 
-        data = course_to_json(updated_course)
+        data = course_with_settings_to_json(updated_course)
 
         return Response(data, status=status.HTTP_200_OK)

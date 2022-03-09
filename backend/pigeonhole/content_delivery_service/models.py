@@ -56,8 +56,16 @@ class Image(TimestampedModel):
             file_name=image_name,
         ).get("response", {})
 
-        self.image_url = data.get("url", "")
-        self.image_id = data.get("fileId", "")
+        image_url = data.get("url", "")
+        image_id = data.get("fileId", "")
+
+        if not all((image_url, image_id)):
+            raise ValueError(
+                f"invalid value received from image upload: image_url: {image_url}, image_id: {image_id}"
+            )
+
+        self.image_url = image_url
+        self.image_id = image_id
 
 
 def image_cleanup(sender, instance: Image, **kwargs):

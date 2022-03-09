@@ -132,15 +132,25 @@ class FacebookAuthenticationSerializer(serializers.Serializer):
         )
         response_data = response.json()
 
+        name = response_data.get("name", "")
+        email = response_data.get("email", "")
+        auth_id = response_data.get("id", "")
+
+        if not all((name, email, auth_id)):
+            raise BadRequest(
+                detail="Invalid facebook token.",
+                code="fail_facebook_token_verification",
+            )
+
         try:
             profile_image = response_data.get("picture").get("data").get("url", "")
         except Exception as e:
             profile_image = ""
 
         auth_data = FacebookAuthenticationData(
-            name=response_data.get("name", ""),
-            email=response_data.get("email", ""),
-            auth_id=response_data.get("id", ""),
+            name=name,
+            email=email,
+            auth_id=auth_id,
             profile_image=profile_image,
         )
 

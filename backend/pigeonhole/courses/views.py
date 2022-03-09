@@ -57,16 +57,14 @@ class MyCoursesView(APIView):
 
         new_course, new_membership = create_course(
             owner=requester,
-            name=validated_data.get("name", ""),
-            description=validated_data.get("description", ""),
-            is_published=validated_data.get("is_published", False),
-            show_group_members_names=validated_data.get(
-                "show_group_members_names", False
-            ),
-            allow_members_to_create_groups=validated_data.get(
-                "allow_members_to_create_groups", False
-            ),
-            milestone_alias=validated_data.get("milestone_alias", ""),
+            name=validated_data["name"],
+            description=validated_data["description"],
+            is_published=validated_data["is_published"],
+            show_group_members_names=validated_data["show_group_members_names"],
+            allow_members_to_create_groups=validated_data[
+                "allow_members_to_create_groups"
+            ],
+            milestone_alias=validated_data["milestone_alias"],
         )
 
         data = course_to_json(course=new_course, extra={ROLE: new_membership.role})
@@ -124,16 +122,14 @@ class SingleCourseView(APIView):
         updated_course = update_course(
             course=course,
             owner_membership=owner_membership,
-            name=validated_data.get("name", ""),
-            description=validated_data.get("description", ""),
-            is_published=validated_data.get("is_published", False),
-            show_group_members_names=validated_data.get(
-                "show_group_members_names", False
-            ),
-            allow_members_to_create_groups=validated_data.get(
-                "allow_members_to_create_groups", False
-            ),
-            milestone_alias=validated_data.get("milestone_alias", ""),
+            name=validated_data["name"],
+            description=validated_data["description"],
+            is_published=validated_data["is_published"],
+            show_group_members_names=validated_data["show_group_members_names"],
+            allow_members_to_create_groups=validated_data[
+                "allow_members_to_create_groups"
+            ],
+            milestone_alias=validated_data["milestone_alias"],
         )
 
         data = course_with_settings_to_json(updated_course)
@@ -195,13 +191,13 @@ class CourseMilestonesView(APIView):
 
         new_milestone = create_course_milestone(
             course=course,
-            name=validated_data.get("name", ""),
-            description=validated_data.get("description", ""),
+            name=validated_data["name"],
+            description=validated_data["description"],
             start_date_time=parse_ms_timestamp_to_datetime(
-                validated_data.get("start_date_time", 0)
+                validated_data["start_date_time"]
             ),
             end_date_time=parse_ms_timestamp_to_datetime(
-                validated_data.get("end_date_time")
+                validated_data["end_date_time"]
             ),
         )
 
@@ -230,13 +226,13 @@ class SingleCourseMilestoneView(APIView):
 
         updated_milestone = update_course_milestone(
             milestone=milestone,
-            name=validated_data.get("name", ""),
-            description=validated_data.get("description", ""),
+            name=validated_data["name"],
+            description=validated_data["description"],
             start_date_time=parse_ms_timestamp_to_datetime(
-                validated_data.get("start_date_time", 0)
+                validated_data["start_date_time"]
             ),
             end_date_time=parse_ms_timestamp_to_datetime(
-                validated_data.get("end_date_time")
+                validated_data["end_date_time"]
             ),
         )
 
@@ -261,3 +257,32 @@ class SingleCourseMilestoneView(APIView):
         milestone.delete()
 
         return Response(data, status=status.HTTP_200_OK)
+
+
+class CourseMembershipsView(APIView):
+    def get():
+        pass
+
+    def post():
+        pass
+
+
+class SingleCourseMembershipView(APIView):
+    def patch():
+        pass
+
+    def delete():
+        pass
+
+
+class CourseGroupsView(APIView):
+    def get():
+        pass
+
+    def post():
+        pass
+
+
+class SingleCourseGroupView(APIView):
+    def get():
+        pass

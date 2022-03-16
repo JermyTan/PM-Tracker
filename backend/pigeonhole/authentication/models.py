@@ -1,3 +1,4 @@
+import logging
 from abc import ABC, abstractmethod
 from typing import Optional
 
@@ -12,6 +13,7 @@ from pigeonhole.common.models import TimestampedModel
 from content_delivery_service.models import Image
 from users.models import User, UserInvite
 
+logger = logging.getLogger("main")
 
 ## DB models
 class AuthenticationMethod(TimestampedModel):
@@ -89,6 +91,7 @@ class PasswordAuthentication(AuthenticationMethod):
         try:
             validate_password(auth_data.auth_id)
         except ValidationError as e:
+            logger.warning(e)
             detail = "\n".join(e.messages) if type(e.messages) != str else e.message
             raise BadRequest(detail=detail, code="bad_password")
 
@@ -145,7 +148,8 @@ class AuthenticationData(ABC):
                     auth_method.save()
 
                 return user
-            except self.auth_method_class.DoesNotExist:
+            except self.auth_method_class.DoesNotExist as e:
+                logger.warning(e)
                 pass
 
         ## check if is existing user
@@ -161,11 +165,13 @@ class AuthenticationData(ABC):
                 .get()
             )
         except User.DoesNotExist as e:
+            logger.warning(e)
             user = None
 
         try:
             user_invite = get_user_invites(email=self.email).get()
         except UserInvite.DoesNotExist as e:
+            logger.warning(e)
             user_invite = None
 
         ## no existing user nor user invite
@@ -197,7 +203,8 @@ class AuthenticationData(ABC):
             auth_method = self.auth_method_class.objects.get(user=user)
             ## matches with given auth_id
             return user if auth_method.is_valid(auth_data=self) else None
-        except self.auth_method_class.DoesNotExist:
+        except self.auth_method_class.DoesNotExist as e:
+            logger.warning(e)
             ## proceed to create auth method for user
             pass
 

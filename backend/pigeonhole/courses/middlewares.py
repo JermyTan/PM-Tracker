@@ -1,3 +1,5 @@
+import logging
+
 from django.db.models import Prefetch
 
 from rest_framework.exceptions import NotFound, PermissionDenied
@@ -14,6 +16,8 @@ from .models import (
     Role,
 )
 
+logger = logging.getLogger("main")
+
 
 def check_course(view_method):
     def _arguments_wrapper(instance, request, course_id: int, *args, **kwargs):
@@ -25,6 +29,7 @@ def check_course(view_method):
             )
 
         except Course.DoesNotExist as e:
+            logger.warning(e)
             raise NotFound(detail="No course found.", code="no_course_found")
 
         return view_method(instance, request, course=course, *args, **kwargs)
@@ -41,6 +46,7 @@ def check_requester_membership(*allowed_roles: Role):
                 requester_membership = course.coursemembership_set.get(user=requester)
 
             except CourseMembership.DoesNotExist as e:
+                logger.warning(e)
                 raise PermissionDenied()
 
             if requester_membership.role not in allowed_roles:
@@ -69,6 +75,7 @@ def check_milestone(view_method):
             milestone = course.coursemilestone_set.get(id=milestone_id)
 
         except CourseMilestone.DoesNotExist as e:
+            logger.warning(e)
             raise NotFound(
                 detail=f"No {course.coursesettings.milestone_alias or MILESTONE} found.",
                 code="no_milestone_found",
@@ -91,6 +98,7 @@ def check_membership(view_method):
             ).get(id=member_id)
 
         except CourseMembership.DoesNotExist as e:
+            logger.warning(e)
             raise NotFound(
                 detail="No course member found.",
                 code="no_membership_found",
@@ -118,6 +126,7 @@ def check_group(view_method):
             ).get(id=group_id)
 
         except CourseGroup.DoesNotExist as e:
+            logger.warning(e)
             raise NotFound(
                 detail="No group found.",
                 code="no_group_found",

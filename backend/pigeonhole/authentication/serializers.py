@@ -1,5 +1,6 @@
 import os
 import requests
+import logging
 
 from rest_framework import serializers, exceptions
 
@@ -31,6 +32,8 @@ from .models import (
     FacebookAuthenticationData,
     PasswordAuthenticationData,
 )
+
+logger = logging.getLogger("main")
 
 
 class GoogleAuthenticationSerializer(serializers.Serializer):
@@ -95,8 +98,9 @@ class FacebookAuthenticationSerializer(serializers.Serializer):
                 error_message = response_data.get("error").get("message")
 
                 if not error_message:
-                    raise Exception()
+                    raise ValueError("Empty error message.")
             except Exception as e:
+                logger.warning(e)
                 raise BadRequest(
                     detail="Invalid facebook token.",
                     code="fail_facebook_token_verification",
@@ -145,6 +149,7 @@ class FacebookAuthenticationSerializer(serializers.Serializer):
         try:
             profile_image = response_data.get("picture").get("data").get("url", "")
         except Exception as e:
+            logger.warning(e)
             profile_image = ""
 
         auth_data = FacebookAuthenticationData(
@@ -198,6 +203,7 @@ class GoogleLoginSerializer(
         try:
             auth_data = super().validate(data)
         except BadRequest as e:
+            logger.warning(e)
             self.raise_invalid_user()
 
         return self.authenticate(auth_data)
@@ -210,6 +216,7 @@ class FacebookLoginSerializer(
         try:
             auth_data = super().validate(data)
         except BadRequest as e:
+            logger.warning(e)
             self.raise_invalid_user()
 
         return self.authenticate(auth_data)
@@ -254,6 +261,7 @@ class AccessTokenRefreshSerializer(
                 .get()
             )
         except User.DoesNotExist as e:
+            logger.warning(e)
             self.raise_invalid_user()
 
         data = requester_to_json(user)
@@ -271,12 +279,14 @@ class CheckAccountSerializer(BaseAuthenticationSerializer):
             user = get_users(email=email).get()
             return {EMAIL: user.email, NAME: user.name}
         except User.DoesNotExist as e:
+            logger.warning(e)
             pass
 
         try:
             user_invite = get_user_invites(email=email).get()
             return {EMAIL: user_invite.email}
         except UserInvite.DoesNotExist as e:
+            logger.warning(e)
             pass
 
         self.raise_invalid_user()
@@ -291,6 +301,7 @@ class PasswordResetSerializer(BaseAuthenticationSerializer):
         try:
             user = get_users(email=email).get()
         except User.DoesNotExist as e:
+            logger.warning(e)
             self.raise_invalid_user()
 
         new_password = reset_password(user=user)

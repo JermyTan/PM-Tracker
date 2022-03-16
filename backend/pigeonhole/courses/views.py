@@ -163,6 +163,7 @@ class SingleCourseView(APIView):
                 ).get(user_id=owner_id)
             )
         except CourseMembership.DoesNotExist as e:
+            logger.warning(e)
             raise BadRequest(
                 detail="New owner is not in this course.", code="invalid_owner"
             )
@@ -263,6 +264,7 @@ class CourseMilestonesView(APIView):
                 ),
             )
         except IntegrityError as e:
+            logger.warning(e)
             raise BadRequest(
                 detail=f"Another {course.coursesettings.milestone_alias or MILESTONE} with the same name already exists in this course.",
                 code="same_name_milestone_exists",

@@ -1,7 +1,11 @@
+import logging
+
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 
 from .models import User, AccountType
 from .logic import get_users
+
+logger = logging.getLogger("main")
 
 
 def check_account_access(*allowed_account_types: AccountType):
@@ -15,6 +19,7 @@ def check_account_access(*allowed_account_types: AccountType):
                 )
 
             except User.DoesNotExist as e:
+                logger.warning(e)
                 raise AuthenticationFailed(
                     detail="Invalid user.",
                     code="invalid_user",

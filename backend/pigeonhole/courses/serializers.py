@@ -1,14 +1,27 @@
 from rest_framework import serializers
 
-from .models import Course, CourseMilestone
+from .models import (
+    Course,
+    CourseGroup,
+    CourseMembership,
+    CourseMilestone,
+    PatchCourseGroupAction,
+    Role,
+)
 
 
 class PostCourseSerializer(serializers.ModelSerializer):
-    description = serializers.CharField(
-        required=True, allow_blank=True
-    )  ## need to override auto-generated one to make it required
+    ## need to override auto-generated one to make it required
+    description = serializers.CharField(required=True, allow_blank=True)
     show_group_members_names = serializers.BooleanField(required=True)
     allow_members_to_create_groups = serializers.BooleanField(required=True)
+    allow_members_to_delete_groups = serializers.BooleanField(required=True)
+    allow_members_to_join_groups = serializers.BooleanField(required=True)
+    allow_members_to_leave_groups = serializers.BooleanField(required=True)
+    allow_members_to_modify_group_name = serializers.BooleanField(required=True)
+    allow_members_to_add_or_remove_group_members = serializers.BooleanField(
+        required=True
+    )
     milestone_alias = serializers.CharField(
         required=True, max_length=255, allow_blank=True
     )
@@ -21,6 +34,11 @@ class PostCourseSerializer(serializers.ModelSerializer):
             "is_published",
             "show_group_members_names",
             "allow_members_to_create_groups",
+            "allow_members_to_delete_groups",
+            "allow_members_to_join_groups",
+            "allow_members_to_leave_groups",
+            "allow_members_to_modify_group_name",
+            "allow_members_to_add_or_remove_group_members",
             "milestone_alias",
         )
 
@@ -33,9 +51,8 @@ class PutCourseSerializer(PostCourseSerializer):
 
 
 class PostCourseMilestoneSerializer(serializers.ModelSerializer):
-    description = serializers.CharField(
-        required=True, allow_blank=True
-    )  ## need to override auto-generated one to make it required
+    ## need to override auto-generated one to make it required
+    description = serializers.CharField(required=True, allow_blank=True)
     start_date_time = serializers.IntegerField(required=True, min_value=0)
     end_date_time = serializers.IntegerField(
         required=True, allow_null=True, min_value=0
@@ -61,3 +78,35 @@ class PostCourseMilestoneSerializer(serializers.ModelSerializer):
 
 
 PutCourseMilestoneSerializer = PostCourseMilestoneSerializer
+
+
+class PostCourseMembershipSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(required=True, min_value=1)
+    ## need to override auto-generated one to make it required
+    role = serializers.ChoiceField(required=True, choices=Role.choices)
+
+    class Meta:
+        model = CourseMembership
+        fields = ("user_id", "role")
+
+
+class PatchCourseMembershipSerializer(serializers.ModelSerializer):
+    ## need to override auto-generated one to make it required
+    role = serializers.ChoiceField(required=True, choices=Role.choices)
+
+    class Meta:
+        model = CourseMembership
+        fields = ("role",)
+
+
+class PostCourseGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseGroup
+        fields = ("name",)
+
+
+class PatchCourseGroupSerializer(serializers.Serializer):
+    action = serializers.ChoiceField(
+        required=True, choices=PatchCourseGroupAction.choices
+    )
+    payload = serializers.JSONField(required=True, allow_null=True)

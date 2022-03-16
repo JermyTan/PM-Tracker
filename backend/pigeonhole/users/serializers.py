@@ -36,13 +36,17 @@ from .models import User, PatchUserAction
 
 
 class PatchRequesterSerializer(serializers.Serializer):
-    action = serializers.ChoiceField(choices=PatchUserAction.choices)
-    payload = serializers.JSONField(allow_null=True)
+    action = serializers.ChoiceField(required=True, choices=PatchUserAction.choices)
+    payload = serializers.JSONField(required=True, allow_null=True)
 
 
 class NameSerializer(serializers.Serializer):
-    name = serializers.CharField()
+    name = serializers.CharField(required=True, max_length=255)
 
 
 class ProfileImageSerializer(serializers.Serializer):
-    profile_image = serializers.CharField()
+    profile_image = serializers.CharField(required=True)
+
+
+class UserIdSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField(required=True, min_value=1)

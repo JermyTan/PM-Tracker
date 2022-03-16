@@ -10,6 +10,14 @@ class Role(models.TextChoices):
     MEMBER = "MEMBER"
 
 
+class PatchCourseGroupAction(models.TextChoices):
+    JOIN = "JOIN"
+    LEAVE = "LEAVE"
+    MODIFY = "MODIFY"
+    ADD = "ADD"
+    REMOVE = "REMOVE"
+
+
 MAX_ROLE_LENGTH = max(map(len, Role))
 
 # Create your models here.
@@ -29,6 +37,11 @@ class CourseSettings(TimestampedModel):
     course = models.OneToOneField(Course, on_delete=models.CASCADE)
     show_group_members_names = models.BooleanField()
     allow_members_to_create_groups = models.BooleanField()
+    allow_members_to_delete_groups = models.BooleanField()
+    allow_members_to_join_groups = models.BooleanField()
+    allow_members_to_leave_groups = models.BooleanField()
+    allow_members_to_modify_group_name = models.BooleanField()
+    allow_members_to_add_or_remove_group_members = models.BooleanField()
     milestone_alias = models.CharField(max_length=255, blank=True)
 
     class Meta:

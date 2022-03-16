@@ -8,12 +8,6 @@ class BadRequest(APIException):
     default_code = "bad_request"
 
 
-class Conflict(APIException):
-    status_code = status.HTTP_409_CONFLICT
-    default_detail = "Conflict."
-    default_code = "conflict"
-
-
 class InternalServerError(APIException):
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     default_detail = "Internal server error."

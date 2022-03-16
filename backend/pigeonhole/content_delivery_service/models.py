@@ -1,4 +1,5 @@
 import os
+import logging
 from typing import Optional
 
 from django.db import models
@@ -9,6 +10,8 @@ from imagekitio import ImageKit
 
 from pigeonhole.common.validators import is_url
 from pigeonhole.common.models import TimestampedModel
+
+logger = logging.getLogger("main")
 
 IMAGEKIT_PRIVATE_KEY = os.getenv("IMAGEKIT_PRIVATE_KEY")
 IMAGEKIT_PUBLIC_KEY = os.getenv("IMAGEKIT_PUBLIC_KEY")
@@ -60,9 +63,10 @@ class Image(TimestampedModel):
         image_id = data.get("fileId", "")
 
         if not all((image_url, image_id)):
-            raise ValueError(
-                f"invalid value received from image upload: image_url: {image_url}, image_id: {image_id}"
+            logger.error(
+                f"Invalid value received from image upload api: image_url: {image_url}, image_id: {image_id}"
             )
+            raise ValueError(f"Error in image upload.")
 
         self.image_url = image_url
         self.image_id = image_id

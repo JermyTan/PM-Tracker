@@ -35,7 +35,7 @@ function Sidebar({ isSidebarOpen, ...props }: Props) {
       {...props}
     >
       <Center p="4">
-        <Heading size="lg">Pigeonhole</Heading>
+        <Heading size="lg">{isSidebarOpen ? "Pigeonhole" : "P"}</Heading>
       </Center>
       <SidebarItem
         icon={MdSpaceDashboard}

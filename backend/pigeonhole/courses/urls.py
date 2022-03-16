@@ -5,6 +5,10 @@ from .views import (
     SingleCourseView,
     CourseMilestonesView,
     SingleCourseMilestoneView,
+    CourseMembershipsView,
+    SingleCourseMembershipView,
+    CourseGroupsView,
+    SingleCourseGroupView,
 )
 
 urlpatterns = [
@@ -19,6 +23,26 @@ urlpatterns = [
         "<int:course_id>/milestones/<int:milestone_id>/",
         SingleCourseMilestoneView.as_view(),
         name="single_course_milestone",
+    ),
+    path(
+        "<int:course_id>/memberships/",
+        CourseMembershipsView.as_view(),
+        name="course_memberships",
+    ),
+    path(
+        "<int:course_id>/memberships/<int:member_id>/",
+        SingleCourseMembershipView.as_view(),
+        name="single_course_membership",
+    ),
+    path(
+        "<int:course_id>/groups/",
+        CourseGroupsView.as_view(),
+        name="course_groups",
+    ),
+    path(
+        "<int:course_id>/groups/<int:group_id>/",
+        SingleCourseGroupView.as_view(),
+        name="single_course_group",
     )
     # path("self", RequesterView.as_view(), name="self"),
     # path("invite", UserInvitesView.as_view(), name="user_invites"),

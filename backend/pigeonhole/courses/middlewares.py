@@ -1,9 +1,18 @@
+from django.db.models import Prefetch
+
 from rest_framework.exceptions import NotFound, PermissionDenied
 
 from pigeonhole.common.constants import MILESTONE
 from users.models import User
 from .logic import get_courses
-from .models import Course, CourseMembership, CourseMilestone, Role
+from .models import (
+    Course,
+    CourseGroup,
+    CourseGroupMember,
+    CourseMembership,
+    CourseMilestone,
+    Role,
+)
 
 
 def check_course(view_method):
@@ -23,7 +32,7 @@ def check_course(view_method):
     return _arguments_wrapper
 
 
-def check_membership(*allowed_roles: Role):
+def check_requester_membership(*allowed_roles: Role):
     def _method_wrapper(view_method):
         def _arguments_wrapper(
             instance, request, requester: User, course: Course, *args, **kwargs
@@ -36,10 +45,6 @@ def check_membership(*allowed_roles: Role):
 
             if requester_membership.role not in allowed_roles:
                 raise PermissionDenied()
-
-            ## need to override to prevent additional db hits when user/course is accessed
-            requester_membership.user = requester
-            requester_membership.course = course
 
             return view_method(
                 instance,
@@ -71,6 +76,55 @@ def check_milestone(view_method):
 
         return view_method(
             instance, request, course=course, milestone=milestone, *args, **kwargs
+        )
+
+    return _arguments_wrapper
+
+
+def check_membership(view_method):
+    def _arguments_wrapper(
+        instance, request, member_id: int, course: Course, *args, **kwargs
+    ):
+        try:
+            membership = course.coursemembership_set.select_related(
+                "user__profile_image"
+            ).get(id=member_id)
+
+        except CourseMembership.DoesNotExist as e:
+            raise NotFound(
+                detail="No course member found.",
+                code="no_membership_found",
+            )
+
+        return view_method(
+            instance, request, course=course, membership=membership, *args, **kwargs
+        )
+
+    return _arguments_wrapper
+
+
+def check_group(view_method):
+    def _arguments_wrapper(
+        instance, request, group_id: int, course: Course, *args, **kwargs
+    ):
+        try:
+            group = course.coursegroup_set.prefetch_related(
+                Prefetch(
+                    lookup="coursegroupmember_set",
+                    queryset=CourseGroupMember.objects.select_related(
+                        "member__user__profile_image"
+                    ),
+                )
+            ).get(id=group_id)
+
+        except CourseGroup.DoesNotExist as e:
+            raise NotFound(
+                detail="No group found.",
+                code="no_group_found",
+            )
+
+        return view_method(
+            instance, request, course=course, group=group, *args, **kwargs
         )
 
     return _arguments_wrapper

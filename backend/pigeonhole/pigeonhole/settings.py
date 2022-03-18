@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "users",
     "authentication",
     "courses",
+    "forms",
 ]
 
 MIDDLEWARE = [
@@ -262,13 +263,15 @@ LOGGING = {
     "formatters": {
         "django.server": {
             "()": "django.utils.log.ServerFormatter",
-            "format": "[{server_time}] {message}",
+            "format": "[dev server] {asctime}.{msecs:03.0f} {message}",
             "style": "{",
+            "datefmt": "%d/%m/%Y %H:%M:%S",
         },
         "default": {
             "()": "colorlog.ColoredFormatter",
-            "format": "{log_color}[{levelname}] {asctime} {pathname} message: {message}",
+            "format": "{log_color}[{levelname}] {asctime}.{msecs:03.0f} {pathname} (line {lineno}) {message}",
             "style": "{",
+            "datefmt": "%d/%m/%Y %H:%M:%S",
         },
     },
     "handlers": {

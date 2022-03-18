@@ -8,6 +8,7 @@ from .models import (
     CourseGroup,
     CourseGroupMember,
     CourseMilestone,
+    CourseMilestoneTemplate,
     CourseSubmission,
 )
 
@@ -18,4 +19,5 @@ admin.site.register(CourseMembership, BaseAdmin)
 admin.site.register(CourseGroup, BaseAdmin)
 admin.site.register(CourseGroupMember, BaseAdmin)
 admin.site.register(CourseMilestone, BaseAdmin)
+admin.site.register(CourseMilestoneTemplate, BaseAdmin)
 admin.site.register(CourseSubmission, BaseAdmin)

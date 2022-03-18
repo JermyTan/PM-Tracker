@@ -1,6 +1,9 @@
 from django.db import models
+from django.db.models.signals import post_delete
 
+from pigeonhole.common.utils import default_list
 from pigeonhole.common.models import TimestampedModel
+from forms.models import Form
 from users.models import User
 
 
@@ -124,26 +127,64 @@ class CourseMilestone(TimestampedModel):
         return f"{self.name} | {self.course.name}"
 
 
+class CourseMilestoneTemplate(TimestampedModel):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    form = models.OneToOneField(Form, on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["course_id", "form_id"],
+                name="unique_course_form",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.form.name} | {self.course.name}"
+
+
+def course_milestone_template_cleanup(
+    sender, instance: CourseMilestoneTemplate, **kwargs
+):
+    if not instance.form:
+        return
+
+    instance.form.delete()
+
+
+## set up listener to delete form when a course milestone template is deleted
+post_delete.connect(
+    course_milestone_template_cleanup,
+    sender=CourseMilestoneTemplate,
+    dispatch_uid="courses.course_milestone_template.course_milestone_template_cleanup",
+)
+
+
 class CourseSubmission(TimestampedModel):
-    associated_milestone = models.ForeignKey(
+    ## ensure there are no "lost" submissions if creator is removed from the course
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    milestone = models.ForeignKey(
         CourseMilestone, on_delete=models.SET_NULL, blank=True, null=True
     )
-    associated_group = models.ForeignKey(
+    group = models.ForeignKey(
         CourseGroup, on_delete=models.SET_NULL, blank=True, null=True
     )
-    parent_submission = models.ForeignKey(
-        "self", on_delete=models.SET_NULL, blank=True, null=True
+    parent = models.ForeignKey("self", on_delete=models.SET_NULL, blank=True, null=True)
+    creator = models.ForeignKey(CourseMembership, on_delete=models.SET_NULL, null=True)
+    last_updated_by = models.ForeignKey(
+        CourseMembership, on_delete=models.SET_NULL, null=True, related_name="+"
     )
-    creator = models.ForeignKey(CourseMembership, on_delete=models.CASCADE)
-    title = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+    is_draft = models.BooleanField()
+    form_response_data = models.JSONField(blank=True, default=default_list)
 
     class Meta:
         constraints = [
             models.CheckConstraint(
-                check=~models.Q(id=models.F("parent_submission_id")),
+                check=~models.Q(id=models.F("parent_id")),
                 name="course_submission_parent_not_self_referencing",
             ),
         ]
 
     def __str__(self) -> str:
-        return f"{self.title} | {self.creator}"
+        return f"{self.name} | {self.creator}"

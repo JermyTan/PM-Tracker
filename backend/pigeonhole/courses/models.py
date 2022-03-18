@@ -13,6 +13,12 @@ class Role(models.TextChoices):
     MEMBER = "MEMBER"
 
 
+class SubmissionType(models.TextChoices):
+    INDIVIDUAL = "INDIVIDUAL"
+    GROUP = "GROUP"
+    INDIVIDUAL_GROUP = "INDIVIDUAL/GROUP"
+
+
 class PatchCourseGroupAction(models.TextChoices):
     JOIN = "JOIN"
     LEAVE = "LEAVE"
@@ -22,6 +28,7 @@ class PatchCourseGroupAction(models.TextChoices):
 
 
 MAX_ROLE_LENGTH = max(map(len, Role))
+MAX_SUBMISSION_TYPE_LENGTH = max(map(len, SubmissionType))
 
 # Create your models here.
 class Course(TimestampedModel):
@@ -130,6 +137,10 @@ class CourseMilestone(TimestampedModel):
 class CourseMilestoneTemplate(TimestampedModel):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     form = models.OneToOneField(Form, on_delete=models.CASCADE)
+    description = models.TextField(blank=True)
+    submission_type = models.CharField(
+        max_length=MAX_SUBMISSION_TYPE_LENGTH, choices=SubmissionType.choices
+    )
 
     class Meta:
         constraints = [
@@ -163,9 +174,7 @@ post_delete.connect(
 class CourseSubmission(TimestampedModel):
     ## ensure there are no "lost" submissions if creator is removed from the course
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    milestone = models.ForeignKey(
-        CourseMilestone, on_delete=models.SET_NULL, blank=True, null=True
-    )
+    milestone = models.ForeignKey(CourseMilestone, on_delete=models.SET_NULL, null=True)
     group = models.ForeignKey(
         CourseGroup, on_delete=models.SET_NULL, blank=True, null=True
     )
@@ -175,6 +184,7 @@ class CourseSubmission(TimestampedModel):
         CourseMembership, on_delete=models.SET_NULL, null=True, related_name="+"
     )
     name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
     is_draft = models.BooleanField()
     form_response_data = models.JSONField(blank=True, default=default_list)
 

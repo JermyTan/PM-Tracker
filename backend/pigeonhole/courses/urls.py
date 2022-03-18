@@ -9,6 +9,10 @@ from .views import (
     SingleCourseMembershipView,
     CourseGroupsView,
     SingleCourseGroupView,
+    CourseMilestoneTemplatesView,
+    SingleCourseMilestoneTemplateView,
+    CourseSubmissionsView,
+    SingleCourseSubmissionView,
 )
 
 urlpatterns = [
@@ -23,6 +27,26 @@ urlpatterns = [
         "<int:course_id>/milestones/<int:milestone_id>/",
         SingleCourseMilestoneView.as_view(),
         name="single_course_milestone",
+    ),
+    path(
+        "<int:course_id>/templates/",
+        CourseMilestoneTemplatesView.as_view(),
+        name="course_milestone_templates",
+    ),
+    path(
+        "<int:course_id>/templates/<int:template_id>/",
+        SingleCourseMilestoneTemplateView.as_view(),
+        name="single_course_milestone_template",
+    ),
+    path(
+        "<int:course_id>/submissions/",
+        CourseSubmissionsView.as_view(),
+        name="course_submissions",
+    ),
+    path(
+        "<int:course_id>/submissions/<int:submission_id>/",
+        SingleCourseSubmissionView.as_view(),
+        name="single_course_submission",
     ),
     path(
         "<int:course_id>/memberships/",
@@ -43,13 +67,5 @@ urlpatterns = [
         "<int:course_id>/groups/<int:group_id>/",
         SingleCourseGroupView.as_view(),
         name="single_course_group",
-    )
-    # path("self", RequesterView.as_view(), name="self"),
-    # path("invite", UserInvitesView.as_view(), name="user_invites"),
-    # path(
-    #     "invite/<int:user_invite_id>",
-    #     SingleUserInviteView.as_view(),
-    #     name="single_user_invite",
-    # ),
-    # path("<int:user_id>", SingleUserView.as_view(), name="single_user"),
+    ),
 ]

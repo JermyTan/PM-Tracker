@@ -640,3 +640,111 @@ class SingleCourseGroupView(APIView):
         group.delete()
 
         return Response(data=data, status=status.HTTP_200_OK)
+
+
+class CourseMilestoneTemplatesView(APIView):
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    def get(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+    ):
+        return Response(status=status.HTTP_200_OK)
+
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    def post(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+    ):
+        return Response(status=status.HTTP_201_CREATED)
+
+
+class SingleCourseMilestoneTemplateView(APIView):
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    def put(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+        template_id: int,
+    ):
+        return Response(status=status.HTTP_200_OK)
+
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    def delete(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+        template_id: int,
+    ):
+        return Response(status=status.HTTP_200_OK)
+
+
+class CourseSubmissionsView(APIView):
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    def get(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+    ):
+        return Response(status=status.HTTP_200_OK)
+
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    def post(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+    ):
+        return Response(status=status.HTTP_201_CREATED)
+
+
+class SingleCourseSubmissionView(APIView):
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    def patch(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+        submission_id: int,
+    ):
+        return Response(status=status.HTTP_200_OK)
+
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    def delete(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+        submission_id: int,
+    ):
+        return Response(status=status.HTTP_200_OK)

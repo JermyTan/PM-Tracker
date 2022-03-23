@@ -1,3 +1,4 @@
+from pigeonhole.common.serializers import NameSerializer
 from authentication.serializers import (
     PasswordAuthenticationSerializer,
     GoogleAuthenticationSerializer,
@@ -8,7 +9,7 @@ from authentication.models import (
     GoogleAuthentication,
     FacebookAuthentication,
 )
-from .serializers import NameSerializer, ProfileImageSerializer
+from .serializers import ProfileImageSerializer
 from .models import PatchUserAction
 
 

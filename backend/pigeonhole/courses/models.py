@@ -141,6 +141,7 @@ class CourseMilestoneTemplate(TimestampedModel):
     submission_type = models.CharField(
         max_length=MAX_SUBMISSION_TYPE_LENGTH, choices=SubmissionType.choices
     )
+    is_published = models.BooleanField()
 
     class Meta:
         constraints = [

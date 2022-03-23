@@ -40,13 +40,5 @@ class PatchRequesterSerializer(serializers.Serializer):
     payload = serializers.JSONField(required=True, allow_null=True)
 
 
-class NameSerializer(serializers.Serializer):
-    name = serializers.CharField(required=True, max_length=255)
-
-
 class ProfileImageSerializer(serializers.Serializer):
     profile_image = serializers.CharField(required=True)
-
-
-class UserIdSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField(required=True, min_value=1)

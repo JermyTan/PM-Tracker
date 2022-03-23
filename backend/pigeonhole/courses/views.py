@@ -20,6 +20,7 @@ from .models import (
     CourseGroupMember,
     CourseMembership,
     CourseMilestone,
+    CourseMilestoneTemplate,
     PatchCourseGroupAction,
     Role,
 )
@@ -27,23 +28,28 @@ from .logic import (
     course_group_to_json,
     course_group_with_members_to_json,
     course_membership_to_json,
+    course_milestone_template_to_json,
     course_to_json,
     course_with_settings_to_json,
     course_milestone_to_json,
     create_course,
     create_course_group,
     create_course_membership,
+    create_course_milestone_template,
     update_course,
     create_course_milestone,
     update_course_group,
     update_course_group_members,
     update_course_milestone,
     update_course_membership,
+    update_course_milestone_template,
 )
 from .serializers import (
     PatchCourseGroupSerializer,
     PostCourseGroupSerializer,
+    PostCourseMilestoneTemplateSerializer,
     PostCourseSerializer,
+    PutCourseMilestoneTemplateSerializer,
     PutCourseSerializer,
     PostCourseMilestoneSerializer,
     PutCourseMilestoneSerializer,
@@ -56,6 +62,7 @@ from .middlewares import (
     check_membership,
     check_requester_membership,
     check_milestone,
+    check_template,
 )
 
 logger = logging.getLogger("main")
@@ -64,7 +71,7 @@ logger = logging.getLogger("main")
 class MyCoursesView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     def get(self, request, requester: User):
-        ## only show courses which are published or if course membership role is above member
+        ## only show courses which are published or if course membership role is above STUDENT
         visible_memberships: QuerySet[
             CourseMembership
         ] = requester.coursemembership_set.filter(
@@ -452,6 +459,8 @@ class CourseGroupsView(APIView):
         course: Course,
         requester_membership: CourseMembership,
     ):
+        ## prefetch related is used for performance optimization
+        ## reference: https://betterprogramming.pub/django-select-related-and-prefetch-related-f23043fd635d
         groups: QuerySet[CourseGroup] = course.coursegroup_set.prefetch_related(
             Prefetch(
                 lookup="coursegroupmember_set",
@@ -461,8 +470,6 @@ class CourseGroupsView(APIView):
             )
         )
 
-        ## prefetch related is used for performance optimization
-        ## reference: https://betterprogramming.pub/django-select-related-and-prefetch-related-f23043fd635d
         if (
             requester_membership.role == Role.STUDENT
             and not course.coursesettings.show_group_members_names
@@ -529,7 +536,7 @@ class SingleCourseGroupView(APIView):
         requester_membership: CourseMembership,
         group: CourseGroup,
     ):
-        ## reject if role is MEMBER and yet not part of the group
+        ## reject if role is STUDENT and yet not part of the group
         if requester_membership.role == Role.STUDENT and not any(
             group_member.member == requester_membership
             for group_member in group.coursegroupmember_set.all()
@@ -552,7 +559,7 @@ class SingleCourseGroupView(APIView):
         requester_membership: CourseMembership,
         group: CourseGroup,
     ):
-        ## reject if role is MEMBER and yet not part of the group
+        ## reject if role is STUDENT and yet not part of the group
         if requester_membership.role == Role.STUDENT and not any(
             group_member.member == requester_membership
             for group_member in group.coursegroupmember_set.all()
@@ -646,11 +653,24 @@ class CourseMilestoneTemplatesView(APIView):
         course: Course,
         requester_membership: CourseMembership,
     ):
-        return Response(status=status.HTTP_200_OK)
+        ## only show courses which are published or if course membership role is above STUDENT
+        visible_templates: QuerySet[
+            CourseMilestoneTemplate
+        ] = course.coursemilestonetemplate_set.select_related("form")
+
+        if requester_membership.role == Role.STUDENT:
+            visible_templates = visible_templates.filter(is_published=True)
+
+        data = [
+            course_milestone_template_to_json(template)
+            for template in visible_templates
+        ]
+
+        return Response(data=data, status=status.HTTP_200_OK)
 
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.INSTRUCTOR, Role.CO_OWNER)
     def post(
         self,
         request,
@@ -658,35 +678,73 @@ class CourseMilestoneTemplatesView(APIView):
         course: Course,
         requester_membership: CourseMembership,
     ):
-        return Response(status=status.HTTP_201_CREATED)
+        serializer = PostCourseMilestoneTemplateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        validated_data = serializer.validated_data
+
+        new_template = create_course_milestone_template(
+            course=course,
+            name=validated_data["name"],
+            description=validated_data["description"],
+            submission_type=validated_data["submission_type"],
+            is_published=validated_data["is_published"],
+            form_field_data=validated_data["form_field_data"],
+        )
+
+        data = course_milestone_template_to_json(new_template)
+
+        return Response(data=data, status=status.HTTP_201_CREATED)
 
 
 class SingleCourseMilestoneTemplateView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_template
     def put(
         self,
         request,
         requester: User,
         course: Course,
         requester_membership: CourseMembership,
-        template_id: int,
+        template: CourseMilestoneTemplate,
     ):
-        return Response(status=status.HTTP_200_OK)
+        serializer = PutCourseMilestoneTemplateSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+
+        updated_template = update_course_milestone_template(
+            template=template,
+            name=validated_data["name"],
+            description=validated_data["description"],
+            submission_type=validated_data["submission_type"],
+            is_published=validated_data["is_published"],
+            form_field_data=validated_data["form_field_data"],
+        )
+
+        data = course_milestone_template_to_json(updated_template)
+
+        return Response(data=data, status=status.HTTP_200_OK)
 
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
     @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_template
     def delete(
         self,
         request,
         requester: User,
         course: Course,
         requester_membership: CourseMembership,
-        template_id: int,
+        template: CourseMilestoneTemplate,
     ):
-        return Response(status=status.HTTP_200_OK)
+        data = course_milestone_template_to_json(template)
+
+        template.delete()
+
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class CourseSubmissionsView(APIView):

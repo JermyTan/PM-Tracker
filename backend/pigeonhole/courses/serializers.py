@@ -1,13 +1,15 @@
 from rest_framework import serializers
 
 from pigeonhole.common.models import MergeSerializersMixin
-from users.serializers import NameSerializer, UserIdSerializer
+from pigeonhole.common.serializers import NameSerializer, UserIdSerializer
+from forms.serializers import FormSerializer
 
 from .models import (
     Course,
     CourseGroup,
     CourseMembership,
     CourseMilestone,
+    CourseMilestoneTemplate,
     CourseSettings,
     PatchCourseGroupAction,
     Role,
@@ -63,12 +65,12 @@ class PostCourseMilestoneSerializer(serializers.ModelSerializer):
         """
         Check that start_date_time is before end_date_time.
         """
-        if (
-            data["end_date_time"] is not None
-            and data["start_date_time"] >= data["end_date_time"]
-        ):
+        start_date_time = data["start_date_time"]
+        end_date_time = data["end_date_time"]
+
+        if end_date_time is not None and start_date_time >= end_date_time:
             raise serializers.ValidationError(
-                "Start date/time must be before end date/time"
+                "Start date/time must be before end date/time."
             )
 
         return data
@@ -132,5 +134,16 @@ class PatchCourseGroupSerializer(serializers.Serializer):
         return data
 
 
-class PostCourseMilestoneTemplateSerializer(serializers.ModelSerializer):
-    pass
+class PostCourseMilestoneTemplateSerializer(
+    MergeSerializersMixin, serializers.ModelSerializer
+):
+    ## need to override auto-generated one to make it required
+    description = serializers.CharField(required=True, allow_blank=True)
+
+    class Meta:
+        model = CourseMilestoneTemplate
+        fields = ("description", "submission_type", "is_published")
+        merge_serializers = (FormSerializer,)
+
+
+PutCourseMilestoneTemplateSerializer = PostCourseMilestoneTemplateSerializer

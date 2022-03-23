@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import Optional, Sequence
 from datetime import datetime
 
 from django.db.models import QuerySet, Prefetch
@@ -24,9 +24,11 @@ from pigeonhole.common.constants import (
     USER,
     MEMBER_COUNT,
     MEMBERS,
+    SUBMISSION_TYPE,
+    FORM_FIELD_DATA,
 )
 from pigeonhole.common.parsers import to_base_json, parse_datetime_to_ms_timestamp
-from pigeonhole.common.exceptions import BadRequest
+from forms.models import Form
 from users.models import User
 from users.logic import user_to_json
 
@@ -36,9 +38,11 @@ from .models import (
     CourseGroupMember,
     CourseMembership,
     CourseMilestone,
+    CourseMilestoneTemplate,
     CourseSettings,
     PatchCourseGroupAction,
     Role,
+    SubmissionType,
 )
 
 logger = logging.getLogger("main")
@@ -123,6 +127,22 @@ def course_group_with_members_to_json(group: CourseGroup) -> dict:
     )
 
 
+def course_milestone_template_to_json(template: CourseMilestoneTemplate) -> dict:
+    data = to_base_json(template)
+
+    data.update(
+        {
+            NAME: template.form.name,
+            DESCRIPTION: template.description,
+            SUBMISSION_TYPE: template.submission_type,
+            IS_PUBLISHED: template.is_published,
+            FORM_FIELD_DATA: template.form.form_field_data,
+        }
+    )
+
+    return data
+
+
 def get_courses(*args, **kwargs) -> QuerySet[Course]:
     return Course.objects.filter(*args, **kwargs)
 
@@ -150,7 +170,7 @@ def create_course(
     )
 
     ## create course settings
-    CourseSettings.objects.create(
+    new_course.coursesettings = CourseSettings.objects.create(
         course=new_course,
         show_group_members_names=show_group_members_names,
         allow_students_to_create_groups=allow_students_to_create_groups,
@@ -319,3 +339,48 @@ def update_course_group_members(
     ).get(id=group.id)
 
     return updated_group
+
+
+@transaction.atomic
+def create_course_milestone_template(
+    course: Course,
+    name: str,
+    description: str,
+    submission_type: SubmissionType,
+    is_published: bool,
+    form_field_data: Sequence[dict],
+) -> CourseMilestoneTemplate:
+    new_form = Form.objects.create(name=name, form_field_data=form_field_data)
+
+    new_template = CourseMilestoneTemplate.objects.create(
+        course=course,
+        form=new_form,
+        description=description,
+        submission_type=submission_type,
+        is_published=is_published,
+    )
+
+    return new_template
+
+
+@transaction.atomic
+def update_course_milestone_template(
+    template: CourseMilestoneTemplate,
+    name: str,
+    description: str,
+    submission_type: SubmissionType,
+    is_published: bool,
+    form_field_data: Sequence[dict],
+) -> CourseMilestoneTemplate:
+    template.form.name = name
+    template.form.form_field_data = form_field_data
+
+    template.form.save()
+
+    template.description = description
+    template.submission_type = submission_type
+    template.is_published = is_published
+
+    template.save()
+
+    return template

@@ -30,7 +30,7 @@ class User(TimestampedModel):
         choices=AccountType.choices,
         default=AccountType.STANDARD,
     )
-    profile_image = models.ForeignKey(
+    profile_image = models.OneToOneField(
         Image, null=True, blank=True, on_delete=models.SET_NULL
     )
 

@@ -13,6 +13,7 @@ from .models import (
     CourseGroupMember,
     CourseMembership,
     CourseMilestone,
+    CourseMilestoneTemplate,
     Role,
 )
 
@@ -134,6 +135,29 @@ def check_group(view_method):
 
         return view_method(
             instance, request, course=course, group=group, *args, **kwargs
+        )
+
+    return _arguments_wrapper
+
+
+def check_template(view_method):
+    def _arguments_wrapper(
+        instance, request, template_id: int, course: Course, *args, **kwargs
+    ):
+        try:
+            template = course.coursemilestonetemplate_set.select_related("form").get(
+                id=template_id
+            )
+
+        except CourseMilestoneTemplate.DoesNotExist as e:
+            logger.warning(e)
+            raise NotFound(
+                detail="No template found.",
+                code="no_milestone_template_found",
+            )
+
+        return view_method(
+            instance, request, course=course, template=template, *args, **kwargs
         )
 
     return _arguments_wrapper

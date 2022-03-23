@@ -10,7 +10,7 @@ from users.models import User
 class Role(models.TextChoices):
     CO_OWNER = "CO-OWNER"
     INSTRUCTOR = "INSTRUCTOR"
-    MEMBER = "MEMBER"
+    STUDENT = "STUDENT"
 
 
 class SubmissionType(models.TextChoices):
@@ -46,12 +46,12 @@ class Course(TimestampedModel):
 class CourseSettings(TimestampedModel):
     course = models.OneToOneField(Course, on_delete=models.CASCADE)
     show_group_members_names = models.BooleanField()
-    allow_members_to_create_groups = models.BooleanField()
-    allow_members_to_delete_groups = models.BooleanField()
-    allow_members_to_join_groups = models.BooleanField()
-    allow_members_to_leave_groups = models.BooleanField()
-    allow_members_to_modify_group_name = models.BooleanField()
-    allow_members_to_add_or_remove_group_members = models.BooleanField()
+    allow_students_to_create_groups = models.BooleanField()
+    allow_students_to_delete_groups = models.BooleanField()
+    allow_students_to_join_groups = models.BooleanField()
+    allow_students_to_leave_groups = models.BooleanField()
+    allow_students_to_modify_group_name = models.BooleanField()
+    allow_students_to_add_or_remove_group_members = models.BooleanField()
     milestone_alias = models.CharField(max_length=255, blank=True)
 
     class Meta:
@@ -65,7 +65,7 @@ class CourseMembership(TimestampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     role = models.CharField(
-        max_length=MAX_ROLE_LENGTH, choices=Role.choices, default=Role.MEMBER
+        max_length=MAX_ROLE_LENGTH, choices=Role.choices, default=Role.STUDENT
     )
 
     class Meta:

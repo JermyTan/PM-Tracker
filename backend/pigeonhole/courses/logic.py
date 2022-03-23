@@ -11,12 +11,12 @@ from pigeonhole.common.constants import (
     DESCRIPTION,
     IS_PUBLISHED,
     SHOW_GROUP_MEMBERS_NAMES,
-    ALLOW_MEMBERS_TO_CREATE_GROUPS,
-    ALLOW_MEMBERS_TO_DELETE_GROUPS,
-    ALLOW_MEMBERS_TO_JOIN_GROUPS,
-    ALLOW_MEMBERS_TO_LEAVE_GROUPS,
-    ALLOW_MEMBERS_TO_MODIFY_GROUP_NAME,
-    ALLOW_MEMBERS_TO_ADD_OR_REMOVE_GROUP_MEMBERS,
+    ALLOW_STUDENTS_TO_CREATE_GROUPS,
+    ALLOW_STUDENTS_TO_DELETE_GROUPS,
+    ALLOW_STUDENTS_TO_JOIN_GROUPS,
+    ALLOW_STUDENTS_TO_LEAVE_GROUPS,
+    ALLOW_STUDENTS_TO_MODIFY_GROUP_NAME,
+    ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS,
     MILESTONE_ALIAS,
     START_DATE_TIME,
     END_DATE_TIME,
@@ -67,12 +67,12 @@ def course_with_settings_to_json(course: Course) -> dict:
         course=course,
         extra={
             SHOW_GROUP_MEMBERS_NAMES: course_settings.show_group_members_names,
-            ALLOW_MEMBERS_TO_CREATE_GROUPS: course_settings.allow_members_to_create_groups,
-            ALLOW_MEMBERS_TO_DELETE_GROUPS: course_settings.allow_members_to_delete_groups,
-            ALLOW_MEMBERS_TO_JOIN_GROUPS: course_settings.allow_members_to_join_groups,
-            ALLOW_MEMBERS_TO_LEAVE_GROUPS: course_settings.allow_members_to_leave_groups,
-            ALLOW_MEMBERS_TO_MODIFY_GROUP_NAME: course_settings.allow_members_to_modify_group_name,
-            ALLOW_MEMBERS_TO_ADD_OR_REMOVE_GROUP_MEMBERS: course_settings.allow_members_to_add_or_remove_group_members,
+            ALLOW_STUDENTS_TO_CREATE_GROUPS: course_settings.allow_students_to_create_groups,
+            ALLOW_STUDENTS_TO_DELETE_GROUPS: course_settings.allow_students_to_delete_groups,
+            ALLOW_STUDENTS_TO_JOIN_GROUPS: course_settings.allow_students_to_join_groups,
+            ALLOW_STUDENTS_TO_LEAVE_GROUPS: course_settings.allow_students_to_leave_groups,
+            ALLOW_STUDENTS_TO_MODIFY_GROUP_NAME: course_settings.allow_students_to_modify_group_name,
+            ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS: course_settings.allow_students_to_add_or_remove_group_members,
             MILESTONE_ALIAS: course_settings.milestone_alias,
         },
     )
@@ -134,12 +134,12 @@ def create_course(
     description: str,
     is_published: bool,
     show_group_members_names: bool,
-    allow_members_to_create_groups: bool,
-    allow_members_to_delete_groups: bool,
-    allow_members_to_join_groups: bool,
-    allow_members_to_leave_groups: bool,
-    allow_members_to_modify_group_name: bool,
-    allow_members_to_add_or_remove_group_members: bool,
+    allow_students_to_create_groups: bool,
+    allow_students_to_delete_groups: bool,
+    allow_students_to_join_groups: bool,
+    allow_students_to_leave_groups: bool,
+    allow_students_to_modify_group_name: bool,
+    allow_students_to_add_or_remove_group_members: bool,
     milestone_alias: str,
 ) -> tuple[Course, CourseMembership]:
     new_course = Course.objects.create(
@@ -153,12 +153,12 @@ def create_course(
     CourseSettings.objects.create(
         course=new_course,
         show_group_members_names=show_group_members_names,
-        allow_members_to_create_groups=allow_members_to_create_groups,
-        allow_members_to_delete_groups=allow_members_to_delete_groups,
-        allow_members_to_join_groups=allow_members_to_join_groups,
-        allow_members_to_leave_groups=allow_members_to_leave_groups,
-        allow_members_to_modify_group_name=allow_members_to_modify_group_name,
-        allow_members_to_add_or_remove_group_members=allow_members_to_add_or_remove_group_members,
+        allow_students_to_create_groups=allow_students_to_create_groups,
+        allow_students_to_delete_groups=allow_students_to_delete_groups,
+        allow_students_to_join_groups=allow_students_to_join_groups,
+        allow_students_to_leave_groups=allow_students_to_leave_groups,
+        allow_students_to_modify_group_name=allow_students_to_modify_group_name,
+        allow_students_to_add_or_remove_group_members=allow_students_to_add_or_remove_group_members,
         milestone_alias=milestone_alias.lower(),
     )
 
@@ -178,7 +178,12 @@ def update_course(
     description: str,
     is_published: bool,
     show_group_members_names: bool,
-    allow_members_to_create_groups: bool,
+    allow_students_to_create_groups: bool,
+    allow_students_to_delete_groups: bool,
+    allow_students_to_join_groups: bool,
+    allow_students_to_leave_groups: bool,
+    allow_students_to_modify_group_name: bool,
+    allow_students_to_add_or_remove_group_members: bool,
     milestone_alias: str,
 ) -> Course:
     if owner_membership is not None:
@@ -196,7 +201,16 @@ def update_course(
 
     course_settings: CourseSettings = course.coursesettings
     course_settings.show_group_members_names = show_group_members_names
-    course_settings.allow_members_to_create_groups = allow_members_to_create_groups
+    course_settings.allow_students_to_create_groups = allow_students_to_create_groups
+    course_settings.allow_students_to_delete_groups = allow_students_to_delete_groups
+    course_settings.allow_students_to_join_groups = allow_students_to_join_groups
+    course_settings.allow_students_to_leave_groups = allow_students_to_leave_groups
+    course_settings.allow_students_to_modify_group_name = (
+        allow_students_to_modify_group_name
+    )
+    course_settings.allow_students_to_add_or_remove_group_members = (
+        allow_students_to_add_or_remove_group_members
+    )
     course_settings.milestone_alias = milestone_alias.lower()
     course_settings.save()
 

@@ -11,7 +11,6 @@ from rest_framework.exceptions import PermissionDenied
 from pigeonhole.common.constants import ROLE, MILESTONE
 from pigeonhole.common.parsers import parse_ms_timestamp_to_datetime
 from pigeonhole.common.exceptions import BadRequest, InternalServerError
-from users.serializers import NameSerializer, UserIdSerializer
 from users.logic import get_users
 from users.middlewares import check_account_access
 from users.models import User, AccountType
@@ -69,7 +68,7 @@ class MyCoursesView(APIView):
         visible_memberships: QuerySet[
             CourseMembership
         ] = requester.coursemembership_set.filter(
-            ~Q(role=Role.MEMBER) | Q(course__is_published=True)
+            ~Q(role=Role.STUDENT) | Q(course__is_published=True)
         ).select_related(
             "course__owner__profile_image"
         )
@@ -94,21 +93,23 @@ class MyCoursesView(APIView):
             description=validated_data["description"],
             is_published=validated_data["is_published"],
             show_group_members_names=validated_data["show_group_members_names"],
-            allow_members_to_create_groups=validated_data[
-                "allow_members_to_create_groups"
+            allow_students_to_create_groups=validated_data[
+                "allow_students_to_create_groups"
             ],
-            allow_members_to_delete_groups=validated_data[
-                "allow_members_to_delete_groups"
+            allow_students_to_delete_groups=validated_data[
+                "allow_students_to_delete_groups"
             ],
-            allow_members_to_join_groups=validated_data["allow_members_to_join_groups"],
-            allow_members_to_leave_groups=validated_data[
-                "allow_members_to_leave_groups"
+            allow_students_to_join_groups=validated_data[
+                "allow_students_to_join_groups"
             ],
-            allow_members_to_modify_group_name=validated_data[
-                "allow_members_to_modify_group_name"
+            allow_students_to_leave_groups=validated_data[
+                "allow_students_to_leave_groups"
             ],
-            allow_members_to_add_or_remove_group_members=validated_data[
-                "allow_members_to_add_or_remove_group_members"
+            allow_students_to_modify_group_name=validated_data[
+                "allow_students_to_modify_group_name"
+            ],
+            allow_students_to_add_or_remove_group_members=validated_data[
+                "allow_students_to_add_or_remove_group_members"
             ],
             milestone_alias=validated_data["milestone_alias"],
         )
@@ -121,7 +122,7 @@ class MyCoursesView(APIView):
 class SingleCourseView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     def get(
         self,
         request,
@@ -144,8 +145,8 @@ class SingleCourseView(APIView):
         requester_membership: CourseMembership,
     ):
         serializer = PutCourseSerializer(data=request.data)
-
         serializer.is_valid(raise_exception=True)
+
         validated_data = serializer.validated_data
 
         owner_id = validated_data.get("owner_id")
@@ -175,21 +176,23 @@ class SingleCourseView(APIView):
             description=validated_data["description"],
             is_published=validated_data["is_published"],
             show_group_members_names=validated_data["show_group_members_names"],
-            allow_members_to_create_groups=validated_data[
-                "allow_members_to_create_groups"
+            allow_students_to_create_groups=validated_data[
+                "allow_students_to_create_groups"
             ],
-            allow_members_to_delete_groups=validated_data[
-                "allow_members_to_delete_groups"
+            allow_students_to_delete_groups=validated_data[
+                "allow_students_to_delete_groups"
             ],
-            allow_members_to_join_groups=validated_data["allow_members_to_join_groups"],
-            allow_members_to_leave_groups=validated_data[
-                "allow_members_to_leave_groups"
+            allow_students_to_join_groups=validated_data[
+                "allow_students_to_join_groups"
             ],
-            allow_members_to_modify_group_name=validated_data[
-                "allow_members_to_modify_group_name"
+            allow_students_to_leave_groups=validated_data[
+                "allow_students_to_leave_groups"
             ],
-            allow_members_to_add_or_remove_group_members=validated_data[
-                "allow_members_to_add_or_remove_group_members"
+            allow_students_to_modify_group_name=validated_data[
+                "allow_students_to_modify_group_name"
+            ],
+            allow_students_to_add_or_remove_group_members=validated_data[
+                "allow_students_to_add_or_remove_group_members"
             ],
             milestone_alias=validated_data["milestone_alias"],
         )
@@ -222,7 +225,7 @@ class SingleCourseView(APIView):
 class CourseMilestonesView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     def get(
         self,
         request,
@@ -331,7 +334,7 @@ class SingleCourseMilestoneView(APIView):
 class CourseMembershipsView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     def get(
         self,
         request,
@@ -441,7 +444,7 @@ class SingleCourseMembershipView(APIView):
 class CourseGroupsView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     def get(
         self,
         request,
@@ -461,7 +464,7 @@ class CourseGroupsView(APIView):
         ## prefetch related is used for performance optimization
         ## reference: https://betterprogramming.pub/django-select-related-and-prefetch-related-f23043fd635d
         if (
-            requester_membership.role == Role.MEMBER
+            requester_membership.role == Role.STUDENT
             and not course.coursesettings.show_group_members_names
         ):
             data = [
@@ -480,7 +483,7 @@ class CourseGroupsView(APIView):
 
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     def post(
         self,
         request,
@@ -489,8 +492,8 @@ class CourseGroupsView(APIView):
         requester_membership: CourseMembership,
     ):
         if (
-            requester_membership.role == Role.MEMBER
-            and not course.coursesettings.allow_members_to_create_groups
+            requester_membership.role == Role.STUDENT
+            and not course.coursesettings.allow_students_to_create_groups
         ):
             raise PermissionDenied()
 
@@ -516,7 +519,7 @@ class CourseGroupsView(APIView):
 class SingleCourseGroupView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     @check_group
     def get(
         self,
@@ -527,7 +530,7 @@ class SingleCourseGroupView(APIView):
         group: CourseGroup,
     ):
         ## reject if role is MEMBER and yet not part of the group
-        if requester_membership.role == Role.MEMBER and not any(
+        if requester_membership.role == Role.STUDENT and not any(
             group_member.member == requester_membership
             for group_member in group.coursegroupmember_set.all()
         ):
@@ -539,7 +542,7 @@ class SingleCourseGroupView(APIView):
 
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     @check_group
     def patch(
         self,
@@ -550,7 +553,7 @@ class SingleCourseGroupView(APIView):
         group: CourseGroup,
     ):
         ## reject if role is MEMBER and yet not part of the group
-        if requester_membership.role == Role.MEMBER and not any(
+        if requester_membership.role == Role.STUDENT and not any(
             group_member.member == requester_membership
             for group_member in group.coursegroupmember_set.all()
         ):
@@ -566,23 +569,13 @@ class SingleCourseGroupView(APIView):
 
         match action:
             case PatchCourseGroupAction.MODIFY:
-                serializer = NameSerializer(data=payload)
-                serializer.is_valid(raise_exception=True)
-
-                updated_course = update_course_group(
-                    group=group, name=serializer.validated_data["name"]
-                )
+                updated_course = update_course_group(group=group, name=payload["name"])
             case PatchCourseGroupAction.JOIN | PatchCourseGroupAction.LEAVE | PatchCourseGroupAction.ADD | PatchCourseGroupAction.REMOVE:
                 match action:
                     case PatchCourseGroupAction.ADD | PatchCourseGroupAction.REMOVE:
-                        serializer = UserIdSerializer(data=payload)
-                        serializer.is_valid(raise_exception=True)
-
-                        user_id = serializer.validated_data["user_id"]
-
                         try:
                             membership = course.coursemembership_set.get(
-                                user_id=user_id
+                                user_id=payload["user_id"]
                             )
                         except CourseMembership.DoesNotExist as e:
                             logger.warning(e)
@@ -619,7 +612,7 @@ class SingleCourseGroupView(APIView):
 
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     @check_group
     def delete(
         self,
@@ -630,8 +623,8 @@ class SingleCourseGroupView(APIView):
         group: CourseGroup,
     ):
         if (
-            requester_membership.role == Role.MEMBER
-            and not course.coursesettings.allow_members_to_delete_groups
+            requester_membership.role == Role.STUDENT
+            and not course.coursesettings.allow_students_to_delete_groups
         ):
             raise PermissionDenied()
 
@@ -645,7 +638,7 @@ class SingleCourseGroupView(APIView):
 class CourseMilestoneTemplatesView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     def get(
         self,
         request,
@@ -657,7 +650,7 @@ class CourseMilestoneTemplatesView(APIView):
 
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     def post(
         self,
         request,
@@ -671,7 +664,7 @@ class CourseMilestoneTemplatesView(APIView):
 class SingleCourseMilestoneTemplateView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     def put(
         self,
         request,
@@ -684,7 +677,7 @@ class SingleCourseMilestoneTemplateView(APIView):
 
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     def delete(
         self,
         request,
@@ -699,7 +692,7 @@ class SingleCourseMilestoneTemplateView(APIView):
 class CourseSubmissionsView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     def get(
         self,
         request,
@@ -711,7 +704,7 @@ class CourseSubmissionsView(APIView):
 
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     def post(
         self,
         request,
@@ -725,7 +718,7 @@ class CourseSubmissionsView(APIView):
 class SingleCourseSubmissionView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     def patch(
         self,
         request,
@@ -738,7 +731,7 @@ class SingleCourseSubmissionView(APIView):
 
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.MEMBER, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     def delete(
         self,
         request,

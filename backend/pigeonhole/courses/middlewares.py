@@ -14,6 +14,7 @@ from .models import (
     CourseMembership,
     CourseMilestone,
     CourseMilestoneTemplate,
+    CourseSubmission,
     Role,
 )
 
@@ -158,6 +159,32 @@ def check_template(view_method):
 
         return view_method(
             instance, request, course=course, template=template, *args, **kwargs
+        )
+
+    return _arguments_wrapper
+
+
+def check_submission(view_method):
+    def _arguments_wrapper(
+        instance, request, submission_id: int, course: Course, *args, **kwargs
+    ):
+        try:
+            submission = course.coursesubmission_set.select_related(
+                "milestone",
+                "group",
+                "creator__user__profile_image",
+                "editor__user__profile_image",
+            ).get(id=submission_id)
+
+        except CourseSubmission.DoesNotExist as e:
+            logger.warning(e)
+            raise NotFound(
+                detail="No submission found.",
+                code="no_submission_found",
+            )
+
+        return view_method(
+            instance, request, course=course, submission=submission, *args, **kwargs
         )
 
     return _arguments_wrapper

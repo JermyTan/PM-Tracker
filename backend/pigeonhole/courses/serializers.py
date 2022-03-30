@@ -1,7 +1,12 @@
 from rest_framework import serializers
 
 from pigeonhole.common.models import MergeSerializersMixin
-from pigeonhole.common.serializers import NameSerializer, UserIdSerializer
+from pigeonhole.common.serializers import (
+    NameSerializer,
+    UserIdSerializer,
+    IdField,
+    ObjectListField,
+)
 from forms.serializers import FormSerializer
 
 from .models import (
@@ -11,6 +16,7 @@ from .models import (
     CourseMilestone,
     CourseMilestoneTemplate,
     CourseSettings,
+    CourseSubmission,
     PatchCourseGroupAction,
     Role,
 )
@@ -47,7 +53,7 @@ class PostCourseSerializer(MergeSerializersMixin, serializers.ModelSerializer):
 
 
 class PutCourseSerializer(PostCourseSerializer):
-    owner_id = serializers.IntegerField(required=False, min_value=1)
+    owner_id = IdField(required=False)
 
     class Meta(PostCourseSerializer.Meta):
         fields = PostCourseSerializer.Meta.fields + ("owner_id",)
@@ -83,16 +89,14 @@ class PostCourseMilestoneSerializer(serializers.ModelSerializer):
 PutCourseMilestoneSerializer = PostCourseMilestoneSerializer
 
 
-class PostCourseMembershipSerializer(
-    MergeSerializersMixin, serializers.ModelSerializer
-):
+class PostCourseMembershipSerializer(serializers.ModelSerializer):
+    user_id = IdField(required=True)
     ## need to override auto-generated one to make it required
     role = serializers.ChoiceField(required=True, choices=Role.choices)
 
     class Meta:
         model = CourseMembership
         fields = ("role",)
-        merge_serializers = (UserIdSerializer,)
 
 
 class PatchCourseMembershipSerializer(serializers.ModelSerializer):
@@ -147,3 +151,34 @@ class PostCourseMilestoneTemplateSerializer(
 
 
 PutCourseMilestoneTemplateSerializer = PostCourseMilestoneTemplateSerializer
+
+
+class GetCourseSubmissionSerializer(serializers.Serializer):
+    milestone_id = IdField(required=False, default=None)
+    group_id = IdField(required=False, default=None)
+    creator_id = IdField(required=False, default=None)
+    editor_id = IdField(required=False, default=None)
+
+
+class PutCourseSubmissionSerializer(serializers.ModelSerializer):
+    group_id = IdField(required=True, allow_null=True)
+    ## need to override auto-generated one to make it required
+    description = serializers.CharField(required=True, allow_blank=True)
+    form_response_data = ObjectListField(required=True)
+
+    class Meta:
+        model = CourseSubmission
+        fields = (
+            "group_id",
+            "name",
+            "description",
+            "is_draft",
+            "form_response_data",
+        )
+
+
+class PostCourseSubmissionSerializer(PutCourseSubmissionSerializer):
+    milestone_id = IdField(required=True)
+
+    class Meta(PutCourseSubmissionSerializer.Meta):
+        fields = PutCourseSubmissionSerializer.Meta.fields + ("milestone_id",)

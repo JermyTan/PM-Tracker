@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from pigeonhole.common.serializers import NameField
+
 from .models import User, PatchUserAction
 
 
@@ -42,3 +44,7 @@ class PatchRequesterSerializer(serializers.Serializer):
 
 class ProfileImageSerializer(serializers.Serializer):
     profile_image = serializers.CharField(required=True)
+
+
+class NameSerializer(serializers.Serializer):
+    name = NameField(required=True)

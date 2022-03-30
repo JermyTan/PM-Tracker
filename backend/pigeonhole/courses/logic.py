@@ -1,4 +1,5 @@
 import logging
+from re import sub
 from typing import Optional, Sequence
 from datetime import datetime
 
@@ -26,6 +27,13 @@ from pigeonhole.common.constants import (
     MEMBERS,
     SUBMISSION_TYPE,
     FORM_FIELD_DATA,
+    IS_DRAFT,
+    CREATOR,
+    EDITOR,
+    FORM_RESPONSE_DATA,
+    GROUP,
+    MILESTONE,
+    ID,
 )
 from pigeonhole.common.parsers import to_base_json, parse_datetime_to_ms_timestamp
 from forms.models import Form
@@ -40,6 +48,7 @@ from .models import (
     CourseMilestone,
     CourseMilestoneTemplate,
     CourseSettings,
+    CourseSubmission,
     PatchCourseGroupAction,
     Role,
     SubmissionType,
@@ -48,51 +57,46 @@ from .models import (
 logger = logging.getLogger("main")
 
 
-def course_to_json(course: Course, extra: dict = {}) -> dict:
+def course_to_json(course: Course) -> dict:
     data = to_base_json(course)
 
-    data.update(
-        {
-            NAME: course.name,
-            OWNER: user_to_json(course.owner),
-            DESCRIPTION: course.description,
-            IS_PUBLISHED: course.is_published,
-        }
-    )
-
-    data.update(extra)
+    data |= {
+        NAME: course.name,
+        OWNER: user_to_json(course.owner),
+        DESCRIPTION: course.description,
+        IS_PUBLISHED: course.is_published,
+    }
 
     return data
 
 
 def course_with_settings_to_json(course: Course) -> dict:
+    data = course_to_json(course=course)
+
     course_settings: CourseSettings = course.coursesettings
-    return course_to_json(
-        course=course,
-        extra={
-            SHOW_GROUP_MEMBERS_NAMES: course_settings.show_group_members_names,
-            ALLOW_STUDENTS_TO_CREATE_GROUPS: course_settings.allow_students_to_create_groups,
-            ALLOW_STUDENTS_TO_DELETE_GROUPS: course_settings.allow_students_to_delete_groups,
-            ALLOW_STUDENTS_TO_JOIN_GROUPS: course_settings.allow_students_to_join_groups,
-            ALLOW_STUDENTS_TO_LEAVE_GROUPS: course_settings.allow_students_to_leave_groups,
-            ALLOW_STUDENTS_TO_MODIFY_GROUP_NAME: course_settings.allow_students_to_modify_group_name,
-            ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS: course_settings.allow_students_to_add_or_remove_group_members,
-            MILESTONE_ALIAS: course_settings.milestone_alias,
-        },
-    )
+    data |= {
+        SHOW_GROUP_MEMBERS_NAMES: course_settings.show_group_members_names,
+        ALLOW_STUDENTS_TO_CREATE_GROUPS: course_settings.allow_students_to_create_groups,
+        ALLOW_STUDENTS_TO_DELETE_GROUPS: course_settings.allow_students_to_delete_groups,
+        ALLOW_STUDENTS_TO_JOIN_GROUPS: course_settings.allow_students_to_join_groups,
+        ALLOW_STUDENTS_TO_LEAVE_GROUPS: course_settings.allow_students_to_leave_groups,
+        ALLOW_STUDENTS_TO_MODIFY_GROUP_NAME: course_settings.allow_students_to_modify_group_name,
+        ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS: course_settings.allow_students_to_add_or_remove_group_members,
+        MILESTONE_ALIAS: course_settings.milestone_alias,
+    }
+
+    return data
 
 
 def course_milestone_to_json(milestone: CourseMilestone) -> dict:
     data = to_base_json(milestone)
 
-    data.update(
-        {
-            NAME: milestone.name,
-            DESCRIPTION: milestone.description,
-            START_DATE_TIME: parse_datetime_to_ms_timestamp(milestone.start_date_time),
-            END_DATE_TIME: parse_datetime_to_ms_timestamp(milestone.end_date_time),
-        }
-    )
+    data |= {
+        NAME: milestone.name,
+        DESCRIPTION: milestone.description,
+        START_DATE_TIME: parse_datetime_to_ms_timestamp(milestone.start_date_time),
+        END_DATE_TIME: parse_datetime_to_ms_timestamp(milestone.end_date_time),
+    }
 
     return data
 
@@ -100,51 +104,114 @@ def course_milestone_to_json(milestone: CourseMilestone) -> dict:
 def course_membership_to_json(membership: CourseMembership) -> dict:
     data = to_base_json(membership)
 
-    data.update({USER: user_to_json(membership.user), ROLE: membership.role})
+    data |= {
+        USER: user_to_json(membership.user),
+        ROLE: membership.role,
+    }
 
     return data
 
 
-def course_group_to_json(group: CourseGroup, extra: dict = {}) -> dict:
+def course_group_to_json(group: CourseGroup) -> dict:
     data = to_base_json(group)
 
-    data.update({NAME: group.name, MEMBER_COUNT: group.coursegroupmember_set.count()})
-
-    data.update(extra)
+    data |= {NAME: group.name, MEMBER_COUNT: group.coursegroupmember_set.count()}
 
     return data
 
 
 def course_group_with_members_to_json(group: CourseGroup) -> dict:
-    return course_group_to_json(
-        group=group,
-        extra={
-            MEMBERS: [
-                course_membership_to_json(group_member.member)
-                for group_member in group.coursegroupmember_set.all()
-            ],
-        },
-    )
+    data = course_group_to_json(group=group)
+
+    data |= {
+        MEMBERS: [
+            user_to_json(group_member.member.user)
+            for group_member in group.coursegroupmember_set.all()
+        ],
+    }
+
+    return data
 
 
 def course_milestone_template_to_json(template: CourseMilestoneTemplate) -> dict:
     data = to_base_json(template)
 
-    data.update(
-        {
-            NAME: template.form.name,
-            DESCRIPTION: template.description,
-            SUBMISSION_TYPE: template.submission_type,
-            IS_PUBLISHED: template.is_published,
-            FORM_FIELD_DATA: template.form.form_field_data,
-        }
-    )
+    data |= {
+        NAME: template.form.name,
+        DESCRIPTION: template.description,
+        SUBMISSION_TYPE: template.submission_type,
+        IS_PUBLISHED: template.is_published,
+        FORM_FIELD_DATA: template.form.form_field_data,
+    }
+
+    return data
+
+
+def course_submission_summary_to_json(submission: CourseSubmission) -> dict:
+    data = to_base_json(submission)
+
+    data |= {
+        NAME: submission.name,
+        DESCRIPTION: submission.description,
+        IS_DRAFT: submission.is_draft,
+        CREATOR: user_to_json(submission.creator.user)
+        if submission.creator is not None
+        else None,
+        EDITOR: user_to_json(submission.editor.user)
+        if submission.editor is not None
+        else None,
+        MILESTONE: {ID: submission.milestone.id, NAME: submission.milestone.name}
+        if submission.milestone is not None
+        else None,
+        GROUP: {ID: submission.group.id, NAME: submission.group.name}
+        if submission.group is not None
+        else None,
+    }
+
+    return data
+
+
+def course_submission_to_json(submission: CourseSubmission) -> dict:
+    data = course_submission_summary_to_json(submission)
+
+    data |= {FORM_RESPONSE_DATA: submission.form_response_data}
 
     return data
 
 
 def get_courses(*args, **kwargs) -> QuerySet[Course]:
     return Course.objects.filter(*args, **kwargs)
+
+
+def get_requested_course_submissions(
+    course: Course,
+    milestone_id: Optional[int],
+    group_id: Optional[int],
+    creator_id: Optional[int],
+    editor_id: Optional[int],
+) -> QuerySet[CourseSubmission]:
+    submissions: QuerySet[
+        CourseSubmission
+    ] = course.coursesubmission_set.select_related(
+        "milestone",
+        "group",
+        "creator__user__profile_image",
+        "editor__user__profile_image",
+    )
+
+    if milestone_id is not None:
+        submissions = submissions.filter(milestone_id=milestone_id)
+
+    if group_id is not None:
+        submissions = submissions.filter(group_id=group_id)
+
+    if creator_id is not None:
+        submissions = submissions.filter(creator__user_id=creator_id)
+
+    if editor_id is not None:
+        submissions = submissions.filter(editor__user_id=editor_id)
+
+    return submissions
 
 
 @transaction.atomic
@@ -300,6 +367,70 @@ def create_course_group(course: Course, name: str) -> CourseGroup:
     new_group = CourseGroup.objects.create(course=course, name=name)
 
     return new_group
+
+
+def can_create_course_group(course: Course, membership: CourseMembership) -> bool:
+    return (
+        membership.role != Role.STUDENT
+        or course.coursesettings.allow_students_to_create_groups
+    )
+
+
+def can_view_course_group_members(
+    course: Course, membership: CourseMembership, group: CourseGroup
+) -> bool:
+    return (
+        membership.role != Role.STUDENT
+        or course.coursesettings.show_group_members_names
+        or any(
+            group_member.member == membership
+            for group_member in group.coursegroupmember_set.all()
+        )
+    )
+
+
+def can_update_course_group(
+    course: Course,
+    membership: CourseMembership,
+    group: CourseGroup,
+    action: PatchCourseGroupAction,
+) -> bool:
+    if membership.role != Role.STUDENT:
+        return True
+
+    if not any(
+        group_member.member == membership
+        for group_member in group.coursegroupmember_set.all()
+    ):
+        return False
+
+    course_settings: CourseSettings = course.coursesettings
+
+    match action:
+        case PatchCourseGroupAction.MODIFY:
+            return course_settings.allow_students_to_modify_group_name
+        case PatchCourseGroupAction.JOIN:
+            return course_settings.allow_students_to_join_groups
+        case PatchCourseGroupAction.LEAVE:
+            return course_settings.allow_students_to_leave_groups
+        case PatchCourseGroupAction.ADD | PatchCourseGroupAction.REMOVE:
+            return course_settings.allow_students_to_add_or_remove_group_members
+        case _:
+            return False
+
+
+def can_delete_course_group(
+    course: Course,
+    membership: CourseMembership,
+    group: CourseGroup,
+) -> bool:
+    return membership.role != Role.STUDENT or (
+        course.coursesettings.allow_students_to_delete_groups
+        and any(
+            group_member.member == membership
+            for group_member in group.coursegroupmember_set.all()
+        )
+    )
 
 
 @transaction.atomic

@@ -25,6 +25,6 @@ class MergeSerializersMixin:
             serializer = serializer_class(data=data)
             serializer.is_valid(raise_exception=True)
 
-            obj.update(serializer.validated_data)
+            obj |= serializer.validated_data
 
         return obj

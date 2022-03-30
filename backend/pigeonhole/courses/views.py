@@ -21,14 +21,21 @@ from .models import (
     CourseMembership,
     CourseMilestone,
     CourseMilestoneTemplate,
+    CourseSubmission,
     PatchCourseGroupAction,
     Role,
 )
 from .logic import (
+    can_create_course_group,
+    can_delete_course_group,
+    can_update_course_group,
+    can_view_course_group_members,
     course_group_to_json,
     course_group_with_members_to_json,
     course_membership_to_json,
     course_milestone_template_to_json,
+    course_submission_summary_to_json,
+    course_submission_to_json,
     course_to_json,
     course_with_settings_to_json,
     course_milestone_to_json,
@@ -36,6 +43,7 @@ from .logic import (
     create_course_group,
     create_course_membership,
     create_course_milestone_template,
+    get_requested_course_submissions,
     update_course,
     create_course_milestone,
     update_course_group,
@@ -45,16 +53,19 @@ from .logic import (
     update_course_milestone_template,
 )
 from .serializers import (
+    GetCourseSubmissionSerializer,
     PatchCourseGroupSerializer,
     PostCourseGroupSerializer,
     PostCourseMilestoneTemplateSerializer,
     PostCourseSerializer,
+    PostCourseSubmissionSerializer,
     PutCourseMilestoneTemplateSerializer,
     PutCourseSerializer,
     PostCourseMilestoneSerializer,
     PutCourseMilestoneSerializer,
     PostCourseMembershipSerializer,
     PatchCourseMembershipSerializer,
+    PutCourseSubmissionSerializer,
 )
 from .middlewares import (
     check_course,
@@ -62,6 +73,7 @@ from .middlewares import (
     check_membership,
     check_requester_membership,
     check_milestone,
+    check_submission,
     check_template,
 )
 
@@ -81,7 +93,7 @@ class MyCoursesView(APIView):
         )
 
         data = [
-            course_to_json(course=membership.course, extra={ROLE: membership.role})
+            course_to_json(course=membership.course) | {ROLE: membership.role}
             for membership in visible_memberships
         ]
 
@@ -121,7 +133,7 @@ class MyCoursesView(APIView):
             milestone_alias=validated_data["milestone_alias"],
         )
 
-        data = course_to_json(course=new_course, extra={ROLE: new_membership.role})
+        data = course_to_json(course=new_course) | {ROLE: new_membership.role}
 
         return Response(data=data, status=status.HTTP_201_CREATED)
 
@@ -410,6 +422,7 @@ class SingleCourseMembershipView(APIView):
         requester_membership: CourseMembership,
         membership: CourseMembership,
     ):
+        ## cannot self update membership
         if requester_membership == membership:
             raise PermissionDenied()
 
@@ -438,6 +451,7 @@ class SingleCourseMembershipView(APIView):
         requester_membership: CourseMembership,
         membership: CourseMembership,
     ):
+        ## cannot self delete membership
         if requester_membership == membership:
             raise PermissionDenied()
 
@@ -470,21 +484,14 @@ class CourseGroupsView(APIView):
             )
         )
 
-        if (
-            requester_membership.role == Role.STUDENT
-            and not course.coursesettings.show_group_members_names
-        ):
-            data = [
-                course_group_with_members_to_json(group)
-                if any(
-                    group_member.member == requester_membership
-                    for group_member in group.coursegroupmember_set.all()
-                )
-                else course_group_to_json(group)
-                for group in groups
-            ]
-        else:
-            data = [course_group_with_members_to_json(group) for group in groups]
+        data = [
+            course_group_with_members_to_json(group)
+            if can_view_course_group_members(
+                course=course, membership=requester_membership, group=group
+            )
+            else course_group_to_json(group)
+            for group in groups
+        ]
 
         return Response(data=data, status=status.HTTP_200_OK)
 
@@ -498,10 +505,7 @@ class CourseGroupsView(APIView):
         course: Course,
         requester_membership: CourseMembership,
     ):
-        if (
-            requester_membership.role == Role.STUDENT
-            and not course.coursesettings.allow_students_to_create_groups
-        ):
+        if not can_create_course_group(course=course, membership=requester_membership):
             raise PermissionDenied()
 
         serializer = PostCourseGroupSerializer(data=request.data)
@@ -536,14 +540,13 @@ class SingleCourseGroupView(APIView):
         requester_membership: CourseMembership,
         group: CourseGroup,
     ):
-        ## reject if role is STUDENT and yet not part of the group
-        if requester_membership.role == Role.STUDENT and not any(
-            group_member.member == requester_membership
-            for group_member in group.coursegroupmember_set.all()
-        ):
-            raise PermissionDenied()
-
-        data = course_group_with_members_to_json(group)
+        data = (
+            course_group_with_members_to_json(group)
+            if can_view_course_group_members(
+                course=course, membership=requester_membership, group=group
+            )
+            else course_group_to_json(group)
+        )
 
         return Response(data=data, status=status.HTTP_200_OK)
 
@@ -559,13 +562,6 @@ class SingleCourseGroupView(APIView):
         requester_membership: CourseMembership,
         group: CourseGroup,
     ):
-        ## reject if role is STUDENT and yet not part of the group
-        if requester_membership.role == Role.STUDENT and not any(
-            group_member.member == requester_membership
-            for group_member in group.coursegroupmember_set.all()
-        ):
-            raise PermissionDenied()
-
         serializer = PatchCourseGroupSerializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)
@@ -573,6 +569,11 @@ class SingleCourseGroupView(APIView):
 
         action = validated_data["action"]
         payload = validated_data["payload"]
+
+        if not can_update_course_group(
+            course=course, membership=requester_membership, group=group, action=action
+        ):
+            raise PermissionDenied()
 
         match action:
             case PatchCourseGroupAction.MODIFY:
@@ -629,9 +630,8 @@ class SingleCourseGroupView(APIView):
         requester_membership: CourseMembership,
         group: CourseGroup,
     ):
-        if (
-            requester_membership.role == Role.STUDENT
-            and not course.coursesettings.allow_students_to_delete_groups
+        if not can_delete_course_group(
+            course=course, membership=requester_membership, group=group
         ):
             raise PermissionDenied()
 
@@ -730,7 +730,7 @@ class SingleCourseMilestoneTemplateView(APIView):
 
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.INSTRUCTOR, Role.CO_OWNER)
     @check_template
     def delete(
         self,
@@ -758,7 +758,24 @@ class CourseSubmissionsView(APIView):
         course: Course,
         requester_membership: CourseMembership,
     ):
-        return Response(status=status.HTTP_200_OK)
+        serializer = GetCourseSubmissionSerializer(data=request.query_params.dict())
+
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+
+        submissions = get_requested_course_submissions(
+            course=course,
+            milestone_id=validated_data["milestone_id"],
+            group_id=validated_data["group_id"],
+            creator_id=validated_data["creator_id"],
+            editor_id=validated_data["editor_id"],
+        )
+
+        data = [
+            course_submission_summary_to_json(submission) for submission in submissions
+        ]
+
+        return Response(data, status=status.HTTP_200_OK)
 
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
@@ -770,32 +787,50 @@ class CourseSubmissionsView(APIView):
         course: Course,
         requester_membership: CourseMembership,
     ):
-        return Response(status=status.HTTP_201_CREATED)
+        serializer = PostCourseSubmissionSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+
+        return Response(data=validated_data, status=status.HTTP_201_CREATED)
 
 
 class SingleCourseSubmissionView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
     @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
-    def patch(
+    @check_submission
+    def put(
         self,
         request,
         requester: User,
         course: Course,
         requester_membership: CourseMembership,
-        submission_id: int,
+        submission: CourseSubmission,
     ):
-        return Response(status=status.HTTP_200_OK)
+        serializer = PutCourseSubmissionSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+
+        data = course_submission_to_json(submission)
+
+        return Response(data=data, status=status.HTTP_200_OK)
 
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
     @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_submission
     def delete(
         self,
         request,
         requester: User,
         course: Course,
         requester_membership: CourseMembership,
-        submission_id: int,
+        submission: CourseSubmission,
     ):
-        return Response(status=status.HTTP_200_OK)
+        data = course_submission_to_json(submission)
+
+        submission.delete()
+
+        return Response(data=data, status=status.HTTP_200_OK)

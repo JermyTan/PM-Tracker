@@ -181,7 +181,7 @@ class CourseSubmission(TimestampedModel):
     )
     parent = models.ForeignKey("self", on_delete=models.SET_NULL, blank=True, null=True)
     creator = models.ForeignKey(CourseMembership, on_delete=models.SET_NULL, null=True)
-    last_updated_by = models.ForeignKey(
+    editor = models.ForeignKey(
         CourseMembership, on_delete=models.SET_NULL, null=True, related_name="+"
     )
     name = models.CharField(max_length=255)

@@ -93,7 +93,7 @@ class PasswordAuthentication(AuthenticationMethod):
         except ValidationError as e:
             logger.warning(e)
             detail = "\n".join(e.messages) if type(e.messages) != str else e.message
-            raise BadRequest(detail=detail, code="bad_password")
+            raise BadRequest(detail=detail)
 
         auth_data.auth_id = make_password(auth_data.auth_id)
         return super().create(user, auth_data)
@@ -180,12 +180,12 @@ class AuthenticationData(ABC):
 
         ## user invite exists but not user
         if user is None:
+            image = None
+
             if self.profile_image:
                 image = Image(image_url=self.profile_image)
                 image.upload_image_to_server()
                 image.save()
-            else:
-                image = None
 
             ## create a new user and delete user invite
             user = User.objects.create(

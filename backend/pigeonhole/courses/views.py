@@ -1,6 +1,6 @@
 import logging
+from re import sub
 
-from django.db import IntegrityError
 from django.db.models import Q, QuerySet, Prefetch
 
 from rest_framework import status
@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.exceptions import PermissionDenied
 
-from pigeonhole.common.constants import ROLE, MILESTONE
+from pigeonhole.common.constants import ROLE
 from pigeonhole.common.parsers import parse_ms_timestamp_to_datetime
 from pigeonhole.common.exceptions import BadRequest, InternalServerError
 from users.logic import get_users
@@ -28,8 +28,11 @@ from .models import (
 from .logic import (
     can_create_course_group,
     can_delete_course_group,
+    can_delete_course_submission,
     can_update_course_group,
+    can_update_course_submission,
     can_view_course_group_members,
+    can_view_course_submission,
     course_group_to_json,
     course_group_with_members_to_json,
     course_membership_to_json,
@@ -43,6 +46,7 @@ from .logic import (
     create_course_group,
     create_course_membership,
     create_course_milestone_template,
+    create_course_submission,
     get_requested_course_submissions,
     update_course,
     create_course_milestone,
@@ -51,6 +55,7 @@ from .logic import (
     update_course_milestone,
     update_course_membership,
     update_course_milestone_template,
+    update_course_submission,
 )
 from .serializers import (
     GetCourseSubmissionSerializer,
@@ -175,46 +180,35 @@ class SingleCourseView(APIView):
             raise PermissionDenied()
 
         try:
-            owner_membership = (
-                None
-                if owner_id is None or owner_id == course.owner.id
-                else course.coursemembership_set.select_related(
-                    "user__profile_image"
-                ).get(user_id=owner_id)
+            updated_course = update_course(
+                course=course,
+                owner_id=owner_id,
+                name=validated_data["name"],
+                description=validated_data["description"],
+                is_published=validated_data["is_published"],
+                show_group_members_names=validated_data["show_group_members_names"],
+                allow_students_to_create_groups=validated_data[
+                    "allow_students_to_create_groups"
+                ],
+                allow_students_to_delete_groups=validated_data[
+                    "allow_students_to_delete_groups"
+                ],
+                allow_students_to_join_groups=validated_data[
+                    "allow_students_to_join_groups"
+                ],
+                allow_students_to_leave_groups=validated_data[
+                    "allow_students_to_leave_groups"
+                ],
+                allow_students_to_modify_group_name=validated_data[
+                    "allow_students_to_modify_group_name"
+                ],
+                allow_students_to_add_or_remove_group_members=validated_data[
+                    "allow_students_to_add_or_remove_group_members"
+                ],
+                milestone_alias=validated_data["milestone_alias"],
             )
-        except CourseMembership.DoesNotExist as e:
-            logger.warning(e)
-            raise BadRequest(
-                detail="New owner is not in this course.", code="invalid_owner"
-            )
-
-        updated_course = update_course(
-            course=course,
-            owner_membership=owner_membership,
-            name=validated_data["name"],
-            description=validated_data["description"],
-            is_published=validated_data["is_published"],
-            show_group_members_names=validated_data["show_group_members_names"],
-            allow_students_to_create_groups=validated_data[
-                "allow_students_to_create_groups"
-            ],
-            allow_students_to_delete_groups=validated_data[
-                "allow_students_to_delete_groups"
-            ],
-            allow_students_to_join_groups=validated_data[
-                "allow_students_to_join_groups"
-            ],
-            allow_students_to_leave_groups=validated_data[
-                "allow_students_to_leave_groups"
-            ],
-            allow_students_to_modify_group_name=validated_data[
-                "allow_students_to_modify_group_name"
-            ],
-            allow_students_to_add_or_remove_group_members=validated_data[
-                "allow_students_to_add_or_remove_group_members"
-            ],
-            milestone_alias=validated_data["milestone_alias"],
-        )
+        except ValueError as e:
+            raise BadRequest(detail=e)
 
         data = course_with_settings_to_json(updated_course)
 
@@ -285,12 +279,8 @@ class CourseMilestonesView(APIView):
                     validated_data["end_date_time"]
                 ),
             )
-        except IntegrityError as e:
-            logger.warning(e)
-            raise BadRequest(
-                detail=f"Another {course.coursesettings.milestone_alias or MILESTONE} with the same name already exists in this course.",
-                code="same_name_milestone_exists",
-            )
+        except ValueError as e:
+            raise BadRequest(detail=e)
 
         data = course_milestone_to_json(new_milestone)
 
@@ -385,24 +375,13 @@ class CourseMembershipsView(APIView):
         validated_data = serializer.validated_data
 
         try:
-            user = (
-                get_users(id=validated_data["user_id"])
-                .select_related("profile_image")
-                .get()
-            )
-        except User.DoesNotExist as e:
-            logger.warning(e)
-            raise BadRequest(detail="No user found.", code="invalid_user")
-
-        try:
             new_membership = create_course_membership(
-                user=user, course=course, role=validated_data["role"]
+                user_id=validated_data["user_id"],
+                course=course,
+                role=validated_data["role"],
             )
-        except IntegrityError as e:
-            logger.warning(e)
-            raise BadRequest(
-                detail="User already exists in this course.", code="user_exists"
-            )
+        except ValueError as e:
+            raise BadRequest(detail=e)
 
         data = course_membership_to_json(new_membership)
 
@@ -515,12 +494,8 @@ class CourseGroupsView(APIView):
 
         try:
             new_group = create_course_group(course=course, name=validated_data["name"])
-        except IntegrityError as e:
-            logger.warning(e)
-            raise BadRequest(
-                detail=f"Another group with the same name already exists in this course.",
-                code="same_name_group_exists",
-            )
+        except ValueError as e:
+            raise BadRequest(detail=e)
 
         data = course_group_to_json(new_group)
 
@@ -579,40 +554,19 @@ class SingleCourseGroupView(APIView):
             case PatchCourseGroupAction.MODIFY:
                 updated_course = update_course_group(group=group, name=payload["name"])
             case PatchCourseGroupAction.JOIN | PatchCourseGroupAction.LEAVE | PatchCourseGroupAction.ADD | PatchCourseGroupAction.REMOVE:
-                match action:
-                    case PatchCourseGroupAction.ADD | PatchCourseGroupAction.REMOVE:
-                        try:
-                            membership = course.coursemembership_set.get(
-                                user_id=payload["user_id"]
-                            )
-                        except CourseMembership.DoesNotExist as e:
-                            logger.warning(e)
-                            raise BadRequest(
-                                detail="No such user found in this course.",
-                                code="no_membership_found",
-                            )
-
-                    case PatchCourseGroupAction.JOIN | PatchCourseGroupAction.LEAVE:
-                        membership = requester_membership
-                    case _:  ## should never enter this case
-                        raise InternalServerError(
-                            detail="Invalid action.", code="invalid_action"
-                        )
-
                 try:
                     updated_course = update_course_group_members(
-                        group=group, membership=membership, action=action
-                    )
-                except IntegrityError as e:
-                    logger.warning(e)
-                    raise BadRequest(
-                        detail="User already exists in this group.", code="user_exists"
+                        course=course,
+                        requester_membership=requester_membership,
+                        group=group,
+                        user_id=payload["user_id"],
+                        action=action,
                     )
                 except ValueError as e:
                     logger.warning(e)
                     raise BadRequest(detail=e)
-            case _:
-                raise BadRequest(detail="Invalid action.", code="invalid_action")
+            case _:  ## should never enter this case
+                raise InternalServerError(detail="Invalid action.")
 
         data = course_group_with_members_to_json(updated_course)
 
@@ -792,10 +746,47 @@ class CourseSubmissionsView(APIView):
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
 
-        return Response(data=validated_data, status=status.HTTP_201_CREATED)
+        try:
+            new_submission = create_course_submission(
+                course=course,
+                requester_membership=requester_membership,
+                milestone_id=validated_data["milestone_id"],
+                group_id=validated_data["group_id"],
+                name=validated_data["name"],
+                description=validated_data["description"],
+                is_draft=validated_data["is_draft"],
+                form_response_data=validated_data["form_response_data"],
+            )
+        except ValueError as e:
+            raise BadRequest(detail=e)
+
+        data = course_submission_to_json(new_submission)
+
+        return Response(data=data, status=status.HTTP_201_CREATED)
 
 
 class SingleCourseSubmissionView(APIView):
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_submission
+    def get(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+        submission: CourseSubmission,
+    ):
+        if not can_view_course_submission(
+            requester_membership=requester_membership, submission=submission
+        ):
+            raise PermissionDenied()
+
+        data = course_submission_to_json(submission)
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
     @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
@@ -808,12 +799,31 @@ class SingleCourseSubmissionView(APIView):
         requester_membership: CourseMembership,
         submission: CourseSubmission,
     ):
+        if not can_update_course_submission(
+            requester_membership=requester_membership, submission=submission
+        ):
+            raise PermissionDenied()
+
         serializer = PutCourseSubmissionSerializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
 
-        data = course_submission_to_json(submission)
+        try:
+            updated_submission = update_course_submission(
+                submission=submission,
+                course=course,
+                requester_membership=requester_membership,
+                group_id=validated_data["group_id"],
+                name=validated_data["name"],
+                description=validated_data["description"],
+                is_draft=validated_data["is_draft"],
+                form_response_data=validated_data["form_response_data"],
+            )
+        except ValueError as e:
+            raise BadRequest(detail=e)
+
+        data = course_submission_to_json(updated_submission)
 
         return Response(data=data, status=status.HTTP_200_OK)
 
@@ -829,6 +839,11 @@ class SingleCourseSubmissionView(APIView):
         requester_membership: CourseMembership,
         submission: CourseSubmission,
     ):
+        if not can_delete_course_submission(
+            requester_membership=requester_membership, submission=submission
+        ):
+            raise PermissionDenied()
+
         data = course_submission_to_json(submission)
 
         submission.delete()

@@ -32,7 +32,7 @@ def check_course(view_method):
 
         except Course.DoesNotExist as e:
             logger.warning(e)
-            raise NotFound(detail="No course found.", code="no_course_found")
+            raise NotFound(detail="No course found.")
 
         return view_method(instance, request, course=course, *args, **kwargs)
 
@@ -53,6 +53,8 @@ def check_requester_membership(*allowed_roles: Role):
 
             if requester_membership.role not in allowed_roles:
                 raise PermissionDenied()
+
+            requester_membership.user = requester
 
             return view_method(
                 instance,
@@ -79,8 +81,7 @@ def check_milestone(view_method):
         except CourseMilestone.DoesNotExist as e:
             logger.warning(e)
             raise NotFound(
-                detail=f"No {course.coursesettings.milestone_alias or MILESTONE} found.",
-                code="no_milestone_found",
+                detail=f"No {course.coursesettings.milestone_alias or MILESTONE} found."
             )
 
         return view_method(
@@ -101,10 +102,7 @@ def check_membership(view_method):
 
         except CourseMembership.DoesNotExist as e:
             logger.warning(e)
-            raise NotFound(
-                detail="No course member found.",
-                code="no_membership_found",
-            )
+            raise NotFound(detail="No course member found.")
 
         return view_method(
             instance, request, course=course, membership=membership, *args, **kwargs
@@ -129,10 +127,7 @@ def check_group(view_method):
 
         except CourseGroup.DoesNotExist as e:
             logger.warning(e)
-            raise NotFound(
-                detail="No group found.",
-                code="no_group_found",
-            )
+            raise NotFound(detail="No group found.")
 
         return view_method(
             instance, request, course=course, group=group, *args, **kwargs
@@ -152,10 +147,7 @@ def check_template(view_method):
 
         except CourseMilestoneTemplate.DoesNotExist as e:
             logger.warning(e)
-            raise NotFound(
-                detail="No template found.",
-                code="no_milestone_template_found",
-            )
+            raise NotFound(detail="No template found.")
 
         return view_method(
             instance, request, course=course, template=template, *args, **kwargs
@@ -178,10 +170,7 @@ def check_submission(view_method):
 
         except CourseSubmission.DoesNotExist as e:
             logger.warning(e)
-            raise NotFound(
-                detail="No submission found.",
-                code="no_submission_found",
-            )
+            raise NotFound(detail="No submission found.")
 
         return view_method(
             instance, request, course=course, submission=submission, *args, **kwargs

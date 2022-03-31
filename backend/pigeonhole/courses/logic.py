@@ -1,10 +1,11 @@
 import logging
-from re import sub
 from typing import Optional, Sequence
 from datetime import datetime
 
+from django.utils.timezone import get_default_timezone
+
 from django.db.models import QuerySet, Prefetch
-from django.db import transaction
+from django.db import IntegrityError, transaction
 
 from pigeonhole.common.constants import (
     NAME,
@@ -38,7 +39,7 @@ from pigeonhole.common.constants import (
 from pigeonhole.common.parsers import to_base_json, parse_datetime_to_ms_timestamp
 from forms.models import Form
 from users.models import User
-from users.logic import user_to_json
+from users.logic import user_to_json, get_users
 
 from .models import (
     Course,
@@ -260,7 +261,7 @@ def create_course(
 @transaction.atomic
 def update_course(
     course: Course,
-    owner_membership: Optional[CourseMembership],
+    owner_id: Optional[int],
     name: str,
     description: str,
     is_published: bool,
@@ -273,6 +274,18 @@ def update_course(
     allow_students_to_add_or_remove_group_members: bool,
     milestone_alias: str,
 ) -> Course:
+    try:
+        owner_membership = (
+            None
+            if owner_id is None or owner_id == course.owner.id
+            else course.coursemembership_set.select_related("user__profile_image").get(
+                user_id=owner_id
+            )
+        )
+    except CourseMembership.DoesNotExist as e:
+        logger.warning(e)
+        raise ValueError("New owner is not in this course.")
+
     if owner_membership is not None:
         course.owner = owner_membership.user
 
@@ -312,13 +325,19 @@ def create_course_milestone(
     start_date_time: datetime,
     end_date_time: Optional[datetime],
 ) -> CourseMilestone:
-    new_milestone = CourseMilestone.objects.create(
-        course=course,
-        name=name,
-        description=description,
-        start_date_time=start_date_time,
-        end_date_time=end_date_time,
-    )
+    try:
+        new_milestone = CourseMilestone.objects.create(
+            course=course,
+            name=name,
+            description=description,
+            start_date_time=start_date_time,
+            end_date_time=end_date_time,
+        )
+    except IntegrityError as e:
+        logger.warning(e)
+        raise ValueError(
+            f"Another {course.coursesettings.milestone_alias or MILESTONE} with the same name already exists in this course."
+        )
 
     return new_milestone
 
@@ -341,13 +360,34 @@ def update_course_milestone(
     return milestone
 
 
+def is_milestone_active(
+    milestone: CourseMilestone, now: Optional[datetime] = None
+) -> bool:
+    if now is None:
+        now = datetime.now(tz=get_default_timezone())
+
+    return milestone.start_date_time <= now and (
+        milestone.end_date_time is None or now <= milestone.end_date_time
+    )
+
+
 @transaction.atomic
 def create_course_membership(
-    user: User, course: Course, role: Role
+    user_id: int, course: Course, role: Role
 ) -> CourseMembership:
-    new_membership = CourseMembership.objects.create(
-        user=user, course=course, role=role
-    )
+    try:
+        user = get_users(id=user_id).select_related("profile_image").get()
+    except User.DoesNotExist as e:
+        logger.warning(e)
+        raise ValueError("No user found.")
+
+    try:
+        new_membership = CourseMembership.objects.create(
+            user=user, course=course, role=role
+        )
+    except IntegrityError as e:
+        logger.warning(e)
+        raise ValueError("User already exists in this course.")
 
     return new_membership
 
@@ -364,7 +404,13 @@ def update_course_membership(
 
 @transaction.atomic
 def create_course_group(course: Course, name: str) -> CourseGroup:
-    new_group = CourseGroup.objects.create(course=course, name=name)
+    try:
+        new_group = CourseGroup.objects.create(course=course, name=name)
+    except IntegrityError as e:
+        logger.warning(e)
+        raise ValueError(
+            "Another group with the same name already exists in this course."
+        )
 
     return new_group
 
@@ -376,16 +422,25 @@ def can_create_course_group(course: Course, membership: CourseMembership) -> boo
     )
 
 
+def is_group_member(
+    membership: CourseMembership, group: CourseGroup, force_query_db: bool = False
+) -> bool:
+    if force_query_db:
+        return group.coursegroupmember_set.filter(member=membership).exists()
+
+    return any(
+        group_member.member == membership
+        for group_member in group.coursegroupmember_set.all()
+    )
+
+
 def can_view_course_group_members(
     course: Course, membership: CourseMembership, group: CourseGroup
 ) -> bool:
     return (
         membership.role != Role.STUDENT
         or course.coursesettings.show_group_members_names
-        or any(
-            group_member.member == membership
-            for group_member in group.coursegroupmember_set.all()
-        )
+        or is_group_member(membership=membership, group=group)
     )
 
 
@@ -398,10 +453,7 @@ def can_update_course_group(
     if membership.role != Role.STUDENT:
         return True
 
-    if not any(
-        group_member.member == membership
-        for group_member in group.coursegroupmember_set.all()
-    ):
+    if not is_group_member(membership=membership, group=group):
         return False
 
     course_settings: CourseSettings = course.coursesettings
@@ -426,10 +478,7 @@ def can_delete_course_group(
 ) -> bool:
     return membership.role != Role.STUDENT or (
         course.coursesettings.allow_students_to_delete_groups
-        and any(
-            group_member.member == membership
-            for group_member in group.coursegroupmember_set.all()
-        )
+        and is_group_member(membership=membership, group=group)
     )
 
 
@@ -443,11 +492,35 @@ def update_course_group(group: CourseGroup, name: str) -> CourseGroup:
 
 @transaction.atomic
 def update_course_group_members(
-    group: CourseGroup, membership: CourseMembership, action: PatchCourseGroupAction
+    course: Course,
+    requester_membership: CourseMembership,
+    group: CourseGroup,
+    user_id: Optional[int],
+    action: PatchCourseGroupAction,
 ) -> CourseGroup:
     match action:
+        case PatchCourseGroupAction.ADD | PatchCourseGroupAction.REMOVE:
+            try:
+                membership = course.coursemembership_set.get(user_id=user_id)
+            except CourseMembership.DoesNotExist as e:
+                logger.warning(e)
+                raise ValueError("No such user found in this course.")
+
+        case PatchCourseGroupAction.JOIN | PatchCourseGroupAction.LEAVE:
+            membership = requester_membership
+
+        case _:  ## should never enter this case
+            logger.warning(f"Invalid action: {action}")
+            raise ValueError("Invalid action.")
+
+    match action:
         case PatchCourseGroupAction.JOIN | PatchCourseGroupAction.ADD:
-            CourseGroupMember.objects.create(member=membership, group=group)
+            try:
+                CourseGroupMember.objects.create(member=membership, group=group)
+            except IntegrityError as e:
+                logger.warning(e)
+                raise ValueError("User already exists in this group.")
+
         case PatchCourseGroupAction.LEAVE | PatchCourseGroupAction.REMOVE:
             num_deleted, _ = CourseGroupMember.objects.filter(
                 member=membership, group=group
@@ -456,9 +529,10 @@ def update_course_group_members(
             if num_deleted == 0:
                 logger.warning(f"Action cannot be executed: {action}")
                 raise ValueError("User does not exist in this group.")
-        case _:
+
+        case _:  ## should never enter this case
             logger.warning(f"Invalid action: {action}")
-            raise ValueError(f"Invalid action.")
+            raise ValueError("Invalid action.")
 
     updated_group = CourseGroup.objects.prefetch_related(
         Prefetch(
@@ -515,3 +589,135 @@ def update_course_milestone_template(
     template.save()
 
     return template
+
+
+@transaction.atomic
+def create_course_submission(
+    course: Course,
+    requester_membership: CourseMembership,
+    milestone_id: int,
+    group_id: Optional[int],
+    name: str,
+    description: str,
+    is_draft: bool,
+    form_response_data: Sequence[dict],
+) -> CourseSubmission:
+    try:
+        milestone = course.coursemilestone_set.get(id=milestone_id)
+
+    except CourseMilestone.DoesNotExist as e:
+        logger.warning(e)
+        raise ValueError(
+            f"No such {course.coursesettings.milestone_alias or MILESTONE} found in this course."
+        )
+
+    if requester_membership.role == Role.STUDENT and not is_milestone_active(
+        milestone=milestone
+    ):
+        raise ValueError(
+            f"{(course.coursesettings.milestone_alias or MILESTONE).capitalize()} is not open."
+        )
+
+    group = None
+    if group_id is not None:
+        try:
+            group = course.coursegroup_set.get(id=group_id)
+
+            if requester_membership.role == Role.STUDENT and not is_group_member(
+                membership=requester_membership, group=group, force_query_db=True
+            ):
+                raise ValueError("User is not part of the group.")
+
+        except CourseGroup.DoesNotExist as e:
+            logger.warning(e)
+            raise ValueError("No such group found in this course.")
+
+    new_submission = CourseSubmission.objects.create(
+        course=course,
+        milestone=milestone,
+        group=group,
+        creator=requester_membership,
+        editor=requester_membership,
+        name=name,
+        description=description,
+        is_draft=is_draft,
+        form_response_data=form_response_data,
+    )
+
+    return new_submission
+
+
+@transaction.atomic
+def update_course_submission(
+    submission: CourseSubmission,
+    course: Course,
+    requester_membership: CourseMembership,
+    group_id: Optional[int],
+    name: str,
+    description: str,
+    is_draft: bool,
+    form_response_data: Sequence[dict],
+) -> CourseSubmission:
+    if group_id != submission.group_id:
+        group = None
+
+        if group_id is not None:
+            try:
+                group = course.coursegroup_set.get(id=group_id)
+
+                if requester_membership.role == Role.STUDENT and not is_group_member(
+                    membership=requester_membership, group=group, force_query_db=True
+                ):
+                    raise ValueError("User is not part of the group.")
+
+            except CourseGroup.DoesNotExist as e:
+                logger.warning(e)
+                raise ValueError("No such group found in this course.")
+
+        submission.group = group
+
+    submission.name = name
+    submission.description = description
+    submission.is_draft = is_draft
+    submission.form_response_data = form_response_data
+    submission.editor = requester_membership
+
+    submission.save()
+
+    return submission
+
+
+def can_view_course_submission(
+    requester_membership: CourseMembership, submission: CourseSubmission
+) -> bool:
+    if requester_membership.role != Role.STUDENT:
+        return True
+
+    if submission.group is not None:
+        return is_group_member(
+            membership=requester_membership, group=submission.group, force_query_db=True
+        )
+
+    return submission.creator == requester_membership
+
+
+def can_update_course_submission(
+    requester_membership: CourseMembership, submission: CourseSubmission
+) -> bool:
+    if not can_view_course_submission(
+        requester_membership=requester_membership, submission=submission
+    ):
+        return False
+
+    if submission.milestone is not None:
+        return is_milestone_active(milestone=submission.milestone)
+
+    return True
+
+
+def can_delete_course_submission(
+    requester_membership: CourseMembership, submission: CourseSubmission
+) -> bool:
+    return can_update_course_submission(
+        requester_membership=requester_membership, submission=submission
+    )

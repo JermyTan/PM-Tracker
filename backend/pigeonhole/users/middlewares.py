@@ -20,10 +20,7 @@ def check_account_access(*allowed_account_types: AccountType):
 
             except User.DoesNotExist as e:
                 logger.warning(e)
-                raise AuthenticationFailed(
-                    detail="Invalid user.",
-                    code="invalid_user",
-                )
+                raise AuthenticationFailed(detail="Invalid user.")
 
             if requester.account_type not in allowed_account_types:
                 raise PermissionDenied()

@@ -2,7 +2,8 @@ import os
 import requests
 import logging
 
-from rest_framework import serializers, exceptions
+from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
 
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -55,10 +56,7 @@ class GoogleAuthenticationSerializer(serializers.Serializer):
         auth_id = response_data.get("sub", "")
 
         if not all((name, email, auth_id)):
-            raise BadRequest(
-                detail="Invalid google token.",
-                code="fail_google_token_verification",
-            )
+            raise BadRequest(detail="Invalid google token.")
 
         auth_data = GoogleAuthenticationData(
             name=name,
@@ -101,24 +99,16 @@ class FacebookAuthenticationSerializer(serializers.Serializer):
                     raise ValueError("Empty error message.")
             except Exception as e:
                 logger.warning(e)
-                raise BadRequest(
-                    detail="Invalid facebook token.",
-                    code="fail_facebook_token_verification",
-                )
+                raise BadRequest(detail="Invalid facebook token.")
 
-            raise InternalServerError(
-                detail=error_message, code="fail_facebook_token_verification"
-            )
+            raise InternalServerError(detail=error_message)
 
         app_id = data.get("app_id")
         is_valid = data.get("is_valid")
         scopes = set(data.get("scopes", []))
 
         if app_id != FACEBOOK_APP_ID or not is_valid or scopes != VALID_SCOPES:
-            raise BadRequest(
-                detail="Invalid facebook token.",
-                code="fail_facebook_token_verification",
-            )
+            raise BadRequest(detail="Invalid facebook token.")
 
     def validate(self, data):
         access_token = data[ACCESS_TOKEN]
@@ -141,10 +131,7 @@ class FacebookAuthenticationSerializer(serializers.Serializer):
         auth_id = response_data.get("id", "")
 
         if not all((name, email, auth_id)):
-            raise BadRequest(
-                detail="Invalid facebook token.",
-                code="fail_facebook_token_verification",
-            )
+            raise BadRequest(detail="Invalid facebook token.")
 
         try:
             profile_image = response_data.get("picture").get("data").get("url", "")
@@ -178,14 +165,8 @@ class PasswordAuthenticationSerializer(serializers.Serializer):
 
 
 class BaseAuthenticationSerializer(serializers.Serializer):
-    default_error_messages = {"invalid_user": "Invalid user."}
-
     def raise_invalid_user(self):
-        authentication_failed_exception = exceptions.AuthenticationFailed(
-            detail=self.error_messages.get("invalid_user"),
-            code="invalid_user",
-        )
-        raise authentication_failed_exception
+        raise AuthenticationFailed(detail="Invalid user.")
 
     def authenticate(self, auth_data: AuthenticationData) -> dict:
         authenticated_user = auth_data.authenticate()
@@ -308,8 +289,7 @@ class PasswordResetSerializer(BaseAuthenticationSerializer):
 
         if new_password is None:
             raise InternalServerError(
-                detail="An error has occurred while resetting the password.",
-                code="fail_to_reset_password",
+                detail="An error has occurred while resetting the password."
             )
 
         ## send_password_reset_email(user=user, new_password=new_password)

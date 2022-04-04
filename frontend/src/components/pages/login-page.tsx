@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import { Box, Container, createStyles } from "@mantine/core";
 import Head from "next/head";
-import { useDispatch } from "react-redux";
 import ColorModeToggler from "../color-mode-toggler";
 import LoginSection from "../login-section";
 import { APP_NAME } from "../../constants";
 import resetAppState from "../../redux/thunks/reset-app-state";
 import FlexSpacer from "../flex-spacer";
 import { colorModeValue } from "../../utils/theme-utils";
+import { useAppDispatch } from "../../redux/hooks";
 
 const useStyles = createStyles((theme) => ({
   main: {
@@ -28,7 +28,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 function LoginPage() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { classes } = useStyles();
 
   useEffect(() => {

@@ -206,8 +206,7 @@ class FacebookLoginSerializer(
 class PasswordLoginSerializer(
     PasswordAuthenticationSerializer, BaseAuthenticationSerializer
 ):
-    ## TODO: to update once login process is finalized
-    name = serializers.CharField(required=False, default="New user")
+    name = serializers.CharField(required=True)
     email = serializers.EmailField(required=True)
 
     def validate(self, data):

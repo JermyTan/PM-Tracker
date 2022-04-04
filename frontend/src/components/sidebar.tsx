@@ -6,12 +6,14 @@ import {
   ScrollArea,
   Title,
 } from "@mantine/core";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { MdSpaceDashboard, MdLogout } from "react-icons/md";
 import { SiBookstack } from "react-icons/si";
-import { DASHBOARD_PATH, MY_COURSES_PATH } from "../routes/paths";
+import { DASHBOARD_PATH, LOGIN_PATH, MY_COURSES_PATH } from "../routes/paths";
 import SidebarItem from "./sidebar-item";
 import SidebarLinkItem from "./sidebar-link-item";
+import { useAppDispatch } from "../redux/hooks";
+import resetAppState from "../redux/thunks/reset-app-state";
 
 type Props = Omit<BoxProps<"nav">, "children"> & {
   isSidebarExpanded: boolean;
@@ -47,6 +49,8 @@ const useStyles = createStyles(
 function Sidebar({ isSidebarExpanded, className, ...props }: Props) {
   const { pathname } = useLocation();
   const { classes, cx } = useStyles({ isSidebarExpanded });
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   return (
     <Box<"nav">
@@ -88,6 +92,10 @@ function Sidebar({ isSidebarExpanded, className, ...props }: Props) {
           icon={MdLogout}
           label="Sign Out"
           showIconOnly={!isSidebarExpanded}
+          onClick={() => {
+            dispatch(resetAppState());
+            navigate(LOGIN_PATH);
+          }}
         />
       </div>
     </Box>

@@ -1,25 +1,15 @@
-import { Button, Title } from "@mantine/core";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import resetAppState from "../../redux/thunks/reset-app-state";
-import { LOGIN_PATH } from "../../routes/paths";
+import { Title } from "@mantine/core";
+import Head from "next/head";
+import { APP_NAME } from "../../constants";
 
 function DashboardPage() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
   return (
     <>
-      <Title>Dashboard</Title>
+      <Head>
+        <title>Dashboard | {APP_NAME}</title>
+      </Head>
 
-      <Button
-        onClick={() => {
-          dispatch(resetAppState());
-          navigate(LOGIN_PATH);
-        }}
-      >
-        Logout
-      </Button>
+      <Title>Dashboard</Title>
     </>
   );
 }

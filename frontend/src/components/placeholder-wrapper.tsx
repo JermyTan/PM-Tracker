@@ -1,11 +1,11 @@
 import {
-  Spinner,
+  Stack,
   Text,
-  VStack,
+  Loader,
   StackProps,
-  SpinnerProps,
+  LoaderProps,
   TextProps,
-} from "@chakra-ui/react";
+} from "@mantine/core";
 
 type Props = StackProps & {
   isLoading?: boolean;
@@ -13,8 +13,8 @@ type Props = StackProps & {
   showDefaultMessage?: boolean;
   defaultMessage?: string;
   isInverted?: boolean;
-  spinnerProps?: SpinnerProps;
-  textProps?: TextProps;
+  loaderProps?: LoaderProps;
+  textProps?: TextProps<"div">;
 };
 
 function PlaceholderWrapper({
@@ -24,17 +24,17 @@ function PlaceholderWrapper({
   showDefaultMessage,
   defaultMessage,
   isInverted,
-  spinnerProps,
+  loaderProps,
   textProps,
   ...props
 }: Props) {
   return isLoading || showDefaultMessage ? (
-    <VStack justify="center" {...props}>
+    <Stack justify="center" align="center" spacing="sm" {...props}>
       {isLoading && (
         <>
-          <Spinner speed="0.5s" size="xl" {...spinnerProps} />
+          <Loader size="xl" {...loaderProps} />
           {loadingMessage && (
-            <Text fontSize="xl" {...textProps}>
+            <Text size="xl" {...textProps}>
               {loadingMessage}
             </Text>
           )}
@@ -42,11 +42,11 @@ function PlaceholderWrapper({
       )}
 
       {!isLoading && showDefaultMessage && defaultMessage && (
-        <Text fontSize="xl" {...textProps}>
+        <Text size="lg" {...textProps}>
           {defaultMessage}
         </Text>
       )}
-    </VStack>
+    </Stack>
   ) : (
     <>{children}</>
   );

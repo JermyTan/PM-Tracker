@@ -1,42 +1,72 @@
 import { ReactNode } from "react";
-import { Box, useDisclosure } from "@chakra-ui/react";
+import { Box, createStyles, Divider, ScrollArea } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import Header from "./header";
 import Sidebar from "./sidebar";
+import { colorModeValue } from "../utils/theme-utils";
 
 type Props = {
   children: ReactNode;
 };
 
-const EXPANDED_SIDEBAR_WIDTH = "60";
-const COLLAPSED_SIDEBAR_WIDTH = "16";
+const useStyles = createStyles((theme) => ({
+  layout: {
+    display: "flex",
+    height: "100vh",
+  },
+  sidebar: {
+    flex: "0 0 auto",
+  },
+  mainContainer: {
+    display: "flex",
+    flexDirection: "column",
+    flex: "1 1 auto",
+    overflow: "hidden",
+  },
+  scrollArea: {
+    flex: "1 1 auto",
+    backgroundColor: colorModeValue(theme.colorScheme, {
+      lightModeValue: theme.colors.gray[0],
+      darkModeValue: theme.colors.dark[8],
+    }),
+  },
+  headerDivider: {
+    borderTopColor: colorModeValue(theme.colorScheme, {
+      darkModeValue: theme.colors.dark[4],
+    }),
+  },
+}));
 
 function AppLayout({ children }: Props) {
-  const sidebar = useDisclosure({ defaultIsOpen: true });
-  const sidebarWidth = sidebar.isOpen
-    ? EXPANDED_SIDEBAR_WIDTH
-    : COLLAPSED_SIDEBAR_WIDTH;
+  const [isSidebarExpanded, { toggle }] = useDisclosure(true);
+  const { classes } = useStyles();
 
   return (
-    <Box minH="100vh">
+    <Box className={classes.layout}>
       {/* Sidebar */}
       <Sidebar
-        isSidebarOpen={sidebar.isOpen}
-        w={sidebarWidth}
-        transition=".3s ease"
+        className={classes.sidebar}
+        isSidebarExpanded={isSidebarExpanded}
       />
 
+      <Divider orientation="vertical" />
+
       {/* Main page */}
-      <Box ml={sidebarWidth} transition=".3s ease">
+      <Box className={classes.mainContainer}>
         {/* Header */}
         <Header
-          isSiderbarOpen={sidebar.isOpen}
-          onSidebarToggle={sidebar.onToggle}
+          isSiderbarExpanded={isSidebarExpanded}
+          onSidebarToggle={toggle}
         />
 
+        <Divider className={classes.headerDivider} />
+
         {/* Main content */}
-        <Box as="main" p="4">
-          {children}
-        </Box>
+        <ScrollArea className={classes.scrollArea} scrollHideDelay={500}>
+          <Box<"main"> component="main" py="md" px="lg">
+            {children}
+          </Box>
+        </ScrollArea>
       </Box>
     </Box>
   );

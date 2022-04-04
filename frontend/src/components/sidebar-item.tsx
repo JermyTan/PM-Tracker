@@ -1,77 +1,90 @@
-import { ReactNode } from "react";
 import { IconType } from "react-icons";
 import {
-  HStack,
-  Icon,
-  Popover,
-  PopoverBody,
-  PopoverContent,
-  PopoverTrigger,
-  StackProps,
-  useColorModeValue,
-  Portal,
-  PopoverArrow,
-} from "@chakra-ui/react";
+  createStyles,
+  CSSObject,
+  Group,
+  Text,
+  Tooltip,
+  UnstyledButton,
+  UnstyledButtonProps,
+} from "@mantine/core";
 import { HiCollection } from "react-icons/hi";
-import { Link, LinkProps } from "react-router-dom";
+import { colorModeValue } from "../utils/theme-utils";
 
-type Props = StackProps &
-  LinkProps & {
-    children: ReactNode;
+export type SidebarItemProps<C> = Omit<
+  UnstyledButtonProps<C> & {
     icon?: IconType;
+    label: string;
     showIconOnly?: boolean;
     isActive?: boolean;
-  };
+  },
+  "children"
+>;
 
-function SidebarItem({
+const useStyles = createStyles(
+  (
+    theme,
+    { showIconOnly, isActive }: { showIconOnly?: boolean; isActive?: boolean },
+  ) => {
+    const activeProps: CSSObject = {
+      backgroundColor: colorModeValue(theme.colorScheme, {
+        lightModeValue: theme.colors.gray[1],
+        darkModeValue: theme.colors.dark[5],
+      }),
+      color: colorModeValue(theme.colorScheme, {
+        lightModeValue: theme.black,
+        darkModeValue: theme.colors.gray[2],
+      }),
+    };
+
+    const inactiveProps: CSSObject = {
+      color: colorModeValue(theme.colorScheme, {
+        lightModeValue: theme.colors.gray[7],
+        darkModeValue: theme.colors.gray[5],
+      }),
+    };
+
+    return {
+      button: {
+        width: "100%",
+        display: "flex",
+        justifyContent: showIconOnly ? "center" : "flex-start",
+        fontWeight: 600,
+        "&:hover": activeProps,
+        ...(isActive ? activeProps : inactiveProps),
+      },
+      content: {
+        whiteSpace: "nowrap",
+      },
+    };
+  },
+);
+
+function SidebarItem<C = "button">({
   icon = HiCollection,
   showIconOnly,
-  children,
+  label,
   isActive,
   ...props
-}: Props) {
-  const activeProps = {
-    bg: useColorModeValue("gray.100", "gray.700"),
-    color: useColorModeValue("gray.900", "gray.200"),
-  };
-  const inactiveProps = {
-    color: useColorModeValue("gray.600", "gray.400"),
-  };
+}: SidebarItemProps<C>) {
+  const { classes } = useStyles({ showIconOnly, isActive });
+  const Icon = icon;
 
   return (
-    <Popover
-      isOpen={showIconOnly ? undefined : false}
-      trigger="hover"
-      placement="right"
-    >
-      <PopoverTrigger>
-        <HStack
-          justify={showIconOnly ? "center" : undefined}
-          px="6"
-          py="3"
-          cursor="pointer"
-          fontWeight="semibold"
-          transition=".15s ease"
-          {...(isActive ? activeProps : inactiveProps)}
-          _hover={activeProps}
-          as={Link}
-          {...props}
-        >
-          <Icon boxSize={showIconOnly ? "6" : "4"} as={icon} />
-          {!showIconOnly && children}
-        </HStack>
-      </PopoverTrigger>
-      <Portal>
-        <PopoverContent
-          shadow={useColorModeValue("md", "md-dark")}
-          fontWeight="semibold"
-          width="fit-content"
-        >
-          <PopoverArrow />
-          <PopoverBody>{children}</PopoverBody>
-        </PopoverContent>
-      </Portal>
-    </Popover>
+    <Tooltip label={label} disabled={!showIconOnly} position="right" withArrow>
+      <UnstyledButton
+        className={classes.button}
+        px={showIconOnly ? "md" : "xl"}
+        py="sm"
+        {...props}
+      >
+        <Group className={classes.content} spacing="xs" noWrap>
+          <Icon size={showIconOnly ? "24px" : "20px"} aria-label={label} />
+
+          {!showIconOnly && label && <Text<"span">>{label}</Text>}
+        </Group>
+      </UnstyledButton>
+    </Tooltip>
   );
 }
 

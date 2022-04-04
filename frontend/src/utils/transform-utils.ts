@@ -4,6 +4,10 @@ import { format, isSameDay } from "date-fns";
 
 import { DATE_FORMAT, DATE_TIME_FORMAT, TIME_FORMAT } from "../constants";
 
+export function trim<T>(value: T) {
+  return typeof value === "string" ? value.trim() : value;
+}
+
 export function deepTrim<T>(value: T): T {
   const unknownValue = value as unknown;
 
@@ -18,11 +22,7 @@ export function deepTrim<T>(value: T): T {
     }, {} as Record<string, unknown>) as T;
   }
 
-  if (typeof unknownValue === "string") {
-    return unknownValue.trim() as unknown as T;
-  }
-
-  return value;
+  return trim(value) as T;
 }
 
 export function sanitizeArray(

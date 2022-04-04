@@ -1,54 +1,68 @@
 import {
-  Flex,
-  FlexProps,
-  useColorModeValue,
-  IconButton,
-  Spacer,
-  HStack,
+  Box,
+  BoxProps,
+  ActionIcon,
+  Group,
   Text,
   Avatar,
-} from "@chakra-ui/react";
+  createStyles,
+} from "@mantine/core";
 import { HiMenu } from "react-icons/hi";
 import ColorModeToggler from "./color-mode-toggler";
 import { useDeepEqualAppSelector } from "../redux/hooks";
 import { selectCurrentUserDisplayInfo } from "../redux/slices/current-user-slice";
 
-type Props = Omit<FlexProps, "children"> & {
-  isSiderbarOpen: boolean;
+type Props = Omit<BoxProps<"header">, "children"> & {
+  isSiderbarExpanded: boolean;
   onSidebarToggle: () => void;
 };
 
-function Header({ isSiderbarOpen, onSidebarToggle, ...props }: Props) {
+const useStyles = createStyles({
+  header: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+});
+
+function Header({
+  isSiderbarExpanded,
+  onSidebarToggle,
+  className,
+  ...props
+}: Props) {
   const { name, profileImage } =
     useDeepEqualAppSelector(selectCurrentUserDisplayInfo) ?? {};
+  const { classes, cx } = useStyles();
 
   return (
-    <Flex
-      as="header"
-      align="center"
-      maxW="full"
-      h="14"
-      px="4"
-      borderBottomWidth="1px"
-      bg={useColorModeValue("white", "gray.800")}
-      pos="sticky"
-      zIndex="sticky"
-      top="0"
+    <Box<"header">
+      component="header"
+      className={cx(classes.header, className)}
+      px="md"
+      py="xs"
       {...props}
     >
-      <IconButton
-        aria-label={isSiderbarOpen ? "Collapse sidebar" : "Expand sidebar"}
-        icon={<HiMenu />}
-        variant="ghost"
+      <ActionIcon
+        aria-label={isSiderbarExpanded ? "Collapse sidebar" : "Expand sidebar"}
+        variant="hover"
         onClick={onSidebarToggle}
-      />
-      <Spacer />
-      <HStack>
-        <Text as="span">{name}</Text>
-        <Avatar size="sm" name={name} src={profileImage || undefined} />
-        <ColorModeToggler variant="ghost" />
-      </HStack>
-    </Flex>
+        size="lg"
+      >
+        <HiMenu size="20px" />
+      </ActionIcon>
+
+      <Group>
+        <Text<"span"> component="span">{name}</Text>
+        <Avatar
+          size={32}
+          radius="xl"
+          alt={name}
+          src={profileImage || undefined}
+        />
+        <ColorModeToggler />
+      </Group>
+    </Box>
   );
 }
 

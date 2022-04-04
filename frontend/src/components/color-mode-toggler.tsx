@@ -1,26 +1,35 @@
-import { FaSun, FaMoon } from "react-icons/fa";
 import {
-  IconButton,
-  IconButtonProps,
-  useColorMode,
-  Icon,
-} from "@chakra-ui/react";
+  ActionIcon,
+  ActionIconProps,
+  useMantineColorScheme,
+} from "@mantine/core";
+import { IconBaseProps } from "react-icons";
+import { FaSun, FaMoon } from "react-icons/fa";
+import { colorModeValue } from "../utils/theme-utils";
 
-type Props = Omit<IconButtonProps, "onClick" | "aria-label">;
+type Props = Omit<ActionIconProps<"button">, "onClick" | "aria-label"> & {
+  iconProps?: IconBaseProps;
+};
 
-function ColorModeToggler(props: Props) {
-  const { colorMode, toggleColorMode } = useColorMode();
-
+function ColorModeToggler({ iconProps, ...props }: Props) {
+  // eslint-disable-next-line @typescript-eslint/unbound-method
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   return (
-    <IconButton
-      aria-label={
-        colorMode === "light" ? "Switch to dark mode" : "Switch to light mode"
-      }
-      onClick={toggleColorMode}
+    <ActionIcon
+      aria-label={colorModeValue(colorScheme, {
+        lightModeValue: "Switch to dark mode",
+        darkModeValue: "Switch to light mode",
+      })}
+      onClick={() => toggleColorScheme()}
+      variant="hover"
+      size="lg"
       {...props}
     >
-      {colorMode === "light" ? <Icon as={FaMoon} /> : <Icon as={FaSun} />}
-    </IconButton>
+      {colorModeValue(colorScheme, {
+        lightModeValue: <FaMoon size="20px" {...iconProps} />,
+        darkModeValue: <FaSun size="20px" {...iconProps} />,
+      })}
+    </ActionIcon>
   );
 }
 

@@ -1,5 +1,5 @@
-import { useBoolean } from "@chakra-ui/react";
-import { ReactNode, useEffect } from "react";
+import { createStyles } from "@mantine/core";
+import { ReactNode, useEffect, useState } from "react";
 import PlaceholderWrapper from "./placeholder-wrapper";
 
 type Props = {
@@ -7,18 +7,26 @@ type Props = {
   children?: ReactNode;
 };
 
+const useStyles = createStyles({
+  wrapper: {
+    minHeight: "100vh",
+  },
+});
+
 function SplashScreen({ duration, children }: Props) {
-  const [showSplashScreen, { off }] = useBoolean(true);
+  const [showSplashScreen, setShowSplashScreen] = useState(true);
+  const { classes } = useStyles();
 
   useEffect(() => {
-    setTimeout(off, duration);
-  }, [off, duration]);
+    setTimeout(() => setShowSplashScreen(false), duration);
+  }, [setShowSplashScreen, duration]);
 
   return (
     <PlaceholderWrapper
-      minH="100vh"
+      className={classes.wrapper}
       isLoading={showSplashScreen}
       loadingMessage="Loading..."
+      loaderProps={{ variant: "bars" }}
     >
       {children}
     </PlaceholderWrapper>

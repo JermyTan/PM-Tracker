@@ -1,26 +1,14 @@
-import { ReactNode } from "react";
-import get from "lodash/get";
-import {
-  Checkbox,
-  CheckboxProps,
-  FormControl,
-  FormErrorMessage,
-} from "@chakra-ui/react";
+import { Checkbox, CheckboxProps } from "@mantine/core";
 import { useFormContext } from "react-hook-form";
+import get from "lodash/get";
+import { useEffect } from "react";
+import toastUtils from "../utils/toast-utils";
 
 type Props = CheckboxProps & {
   name: string;
-  children: ReactNode;
-  errorMsg?: string;
 };
 
-function CheckboxField({
-  name,
-  isInvalid,
-  isRequired,
-  errorMsg,
-  ...props
-}: Props) {
+function CheckboxField({ name, ...props }: Props) {
   const {
     formState: { errors },
     register,
@@ -28,19 +16,13 @@ function CheckboxField({
 
   const error = get(errors, name);
 
-  return (
-    <FormControl isInvalid={error || isInvalid}>
-      <Checkbox
-        {...props}
-        isInvalid={error || isInvalid}
-        isRequired={isRequired}
-        {...register(name, { required: isRequired })}
-      />
-      {(error || isInvalid) && (errorMsg || error?.message) && (
-        <FormErrorMessage>{errorMsg ?? error?.message}</FormErrorMessage>
-      )}
-    </FormControl>
-  );
+  useEffect(() => {
+    if (error?.message) {
+      toastUtils.error({ message: error.message });
+    }
+  }, [error]);
+
+  return <Checkbox {...props} {...register(name)} />;
 }
 
 export default CheckboxField;

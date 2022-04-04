@@ -1,20 +1,26 @@
-import { Box, useBreakpointValue, useColorModeValue } from "@chakra-ui/react";
-import LoginForm from "./login-form";
+import { Paper, useMantineTheme } from "@mantine/core";
+import { useContext } from "react";
+import { LoginContext } from "../contexts/login-provider";
+import { colorModeValue } from "../utils/theme-utils";
+import LoginEmailForm from "./login-email-form";
+import LoginAccountForm from "./login-account-form";
 
 function LoginCard() {
+  const { colorScheme } = useMantineTheme();
+  const { accountDetails } = useContext(LoginContext);
+
   return (
-    <Box
-      py={{ base: "0", sm: "8" }}
-      px={{ base: "4", sm: "10" }}
-      bg={useBreakpointValue({
-        base: "transparent",
-        sm: useColorModeValue("white", "gray.800"),
+    <Paper
+      withBorder
+      shadow={colorModeValue(colorScheme, {
+        lightModeValue: "md",
+        darkModeValue: "md-dark",
       })}
-      shadow={{ base: "none", sm: useColorModeValue("md", "md-dark") }}
-      borderRadius={{ base: "none", sm: "xl" }}
+      p="xl"
+      radius="md"
     >
-      <LoginForm />
-    </Box>
+      {accountDetails ? <LoginAccountForm /> : <LoginEmailForm />}
+    </Paper>
   );
 }
 

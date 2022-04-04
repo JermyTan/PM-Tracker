@@ -1,25 +1,53 @@
-import { Text, Button, Heading, HStack, VStack, Stack } from "@chakra-ui/react";
+import { createStyles, Group, Stack, Title, Text, Anchor } from "@mantine/core";
+import { Link } from "react-router-dom";
 import { APP_NAME } from "../constants";
+import LoginProvider from "../contexts/login-provider";
+import { colorModeValue } from "../utils/theme-utils";
 import LoginCard from "./login-card";
 
+const useStyles = createStyles((theme) => ({
+  title: {
+    fontSize: "60px",
+  },
+  subtitle: {
+    fontSize: "30px",
+  },
+  meta: {
+    color: colorModeValue(theme.colorScheme, {
+      lightModeValue: theme.colors.gray[7],
+      darkModeValue: theme.colors.dark[1],
+    }),
+  },
+}));
+
 function LoginSection() {
+  const { classes } = useStyles();
+
   return (
-    <Stack spacing="8">
-      <VStack spacing="6">
-        <Heading size="3xl">{APP_NAME}</Heading>
+    <Stack spacing="xl">
+      <Stack spacing="sm" align="center">
+        <Title className={classes.title}>{APP_NAME}</Title>
 
-        <VStack spacing={{ base: "2", md: "3" }}>
-          <Heading size="lg">Log in to your account</Heading>
-          <HStack spacing="1" justify="center">
-            <Text color="muted">Don&apos;t have an account?</Text>
-            <Button variant="link" colorScheme="blue">
+        <Stack spacing="xs">
+          <Title order={2} className={classes.subtitle}>
+            Log in to your account
+          </Title>
+
+          <Group spacing={4} position="center">
+            <Text<"span"> component="span" className={classes.meta}>
+              Don&apos;t have an account?
+            </Text>
+
+            <Anchor<typeof Link> component={Link} weight={600} to="/">
               Sign up
-            </Button>
-          </HStack>
-        </VStack>
-      </VStack>
+            </Anchor>
+          </Group>
+        </Stack>
+      </Stack>
 
-      <LoginCard />
+      <LoginProvider>
+        <LoginCard />
+      </LoginProvider>
     </Stack>
   );
 }

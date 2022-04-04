@@ -1,58 +1,95 @@
 import {
   Box,
   BoxProps,
-  useColorModeValue,
-  Heading,
   Center,
-  Text,
-} from "@chakra-ui/react";
+  createStyles,
+  ScrollArea,
+  Title,
+} from "@mantine/core";
 import { useLocation } from "react-router-dom";
-import { MdSpaceDashboard } from "react-icons/md";
+import { MdSpaceDashboard, MdLogout } from "react-icons/md";
 import { SiBookstack } from "react-icons/si";
 import { DASHBOARD_PATH, MY_COURSES_PATH } from "../routes/paths";
 import SidebarItem from "./sidebar-item";
+import SidebarLinkItem from "./sidebar-link-item";
 
-type Props = Omit<BoxProps, "children"> & {
-  isSidebarOpen: boolean;
+type Props = Omit<BoxProps<"nav">, "children"> & {
+  isSidebarExpanded: boolean;
 };
 
-function Sidebar({ isSidebarOpen, ...props }: Props) {
+const EXPANDED_SIDEBAR_WIDTH = "220px";
+const COLLAPSED_SIDEBAR_WIDTH = "64px";
+
+const useStyles = createStyles(
+  (theme, { isSidebarExpanded }: { isSidebarExpanded: boolean }) => {
+    const sidebarWidth = isSidebarExpanded
+      ? EXPANDED_SIDEBAR_WIDTH
+      : COLLAPSED_SIDEBAR_WIDTH;
+
+    return {
+      sidebar: {
+        display: "flex",
+        flexDirection: "column",
+        transition: ".3s ease",
+        width: sidebarWidth,
+        overflow: "hidden",
+      },
+      title: {
+        fontSize: "30px",
+      },
+      navContainer: {
+        flex: "1 1 auto",
+      },
+    };
+  },
+);
+
+function Sidebar({ isSidebarExpanded, className, ...props }: Props) {
   const { pathname } = useLocation();
+  const { classes, cx } = useStyles({ isSidebarExpanded });
 
   return (
-    <Box
+    <Box<"nav">
       aria-label="Main navigation"
-      as="nav"
-      pos="fixed"
-      top="0"
-      left="0"
-      h="full"
-      overflowX="hidden"
-      overflowY="auto"
-      bgColor={useColorModeValue("white", "gray.800")}
-      borderRightWidth="1px"
-      whiteSpace="nowrap"
+      component="nav"
+      className={cx(classes.sidebar, className)}
+      pb="xl"
       {...props}
     >
-      <Center p="4">
-        <Heading size="lg">{isSidebarOpen ? "Pigeonhole" : "P"}</Heading>
+      <Center py="sm" px="md">
+        <Title className={classes.title}>
+          {isSidebarExpanded ? "Pigeonhole" : "P"}
+        </Title>
       </Center>
-      <SidebarItem
-        icon={MdSpaceDashboard}
-        to={DASHBOARD_PATH}
-        isActive={pathname === DASHBOARD_PATH}
-        showIconOnly={!isSidebarOpen}
+
+      <ScrollArea
+        className={classes.navContainer}
+        scrollbarSize={isSidebarExpanded ? 10 : 6}
+        scrollHideDelay={500}
       >
-        <Text as="span">Dashboard</Text>
-      </SidebarItem>
-      <SidebarItem
-        icon={SiBookstack}
-        to={MY_COURSES_PATH}
-        isActive={pathname === MY_COURSES_PATH}
-        showIconOnly={!isSidebarOpen}
-      >
-        <Text as="span">My courses</Text>
-      </SidebarItem>
+        <SidebarLinkItem
+          icon={MdSpaceDashboard}
+          label="Dashboard"
+          to={DASHBOARD_PATH}
+          isActive={pathname === DASHBOARD_PATH}
+          showIconOnly={!isSidebarExpanded}
+        />
+        <SidebarLinkItem
+          icon={SiBookstack}
+          label="My Courses"
+          to={MY_COURSES_PATH}
+          isActive={pathname === MY_COURSES_PATH}
+          showIconOnly={!isSidebarExpanded}
+        />
+      </ScrollArea>
+
+      <div>
+        <SidebarItem
+          icon={MdLogout}
+          label="Sign Out"
+          showIconOnly={!isSidebarExpanded}
+        />
+      </div>
     </Box>
   );
 }

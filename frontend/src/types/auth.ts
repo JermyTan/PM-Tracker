@@ -9,6 +9,16 @@ export type AuthenticationData = {
   };
 };
 
+export type CheckAccountPostData = {
+  [EMAIL]: string;
+};
+
+export type AccountDetails = {
+  [NAME]: string | null;
+  [EMAIL]: string;
+};
+
 export type PasswordLoginPostData = PasswordPayloadPostData & {
+  [NAME]: string;
   [EMAIL]: string;
 };

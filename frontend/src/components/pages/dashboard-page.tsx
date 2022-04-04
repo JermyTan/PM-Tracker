@@ -1,12 +1,8 @@
-import { Button, Link } from "@chakra-ui/react";
-import { useNavigate, Link as RouterLink } from "react-router-dom";
+import { Button, Title } from "@mantine/core";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import resetAppState from "../../redux/thunks/reset-app-state";
-import {
-  LOGIN_PATH,
-  MY_ACCOUNT_PATH,
-  MY_COURSES_PATH,
-} from "../../routes/paths";
+import { LOGIN_PATH } from "../../routes/paths";
 
 function DashboardPage() {
   const dispatch = useDispatch();
@@ -14,7 +10,8 @@ function DashboardPage() {
 
   return (
     <>
-      <h1>Dashboard</h1>
+      <Title>Dashboard</Title>
+
       <Button
         onClick={() => {
           dispatch(resetAppState());
@@ -23,12 +20,6 @@ function DashboardPage() {
       >
         Logout
       </Button>
-      <Link as={RouterLink} to={MY_COURSES_PATH}>
-        My courses
-      </Link>
-      <Link as={RouterLink} to={MY_ACCOUNT_PATH}>
-        My account
-      </Link>
     </>
   );
 }

@@ -39,8 +39,8 @@ from .logic import (
     course_milestone_template_to_json,
     course_submission_summary_to_json,
     course_submission_to_json,
+    course_summary_to_json,
     course_to_json,
-    course_with_settings_to_json,
     course_milestone_to_json,
     create_course,
     create_course_group,
@@ -98,7 +98,7 @@ class MyCoursesView(APIView):
         )
 
         data = [
-            course_to_json(course=membership.course) | {ROLE: membership.role}
+            course_summary_to_json(course=membership.course) | {ROLE: membership.role}
             for membership in visible_memberships
         ]
 
@@ -138,7 +138,7 @@ class MyCoursesView(APIView):
             milestone_alias=validated_data["milestone_alias"],
         )
 
-        data = course_to_json(course=new_course) | {ROLE: new_membership.role}
+        data = course_summary_to_json(course=new_course) | {ROLE: new_membership.role}
 
         return Response(data=data, status=status.HTTP_201_CREATED)
 
@@ -154,7 +154,7 @@ class SingleCourseView(APIView):
         course: Course,
         requester_membership: CourseMembership,
     ):
-        data = course_with_settings_to_json(course)
+        data = course_to_json(course)
 
         return Response(data=data, status=status.HTTP_200_OK)
 
@@ -210,7 +210,7 @@ class SingleCourseView(APIView):
         except ValueError as e:
             raise BadRequest(detail=e)
 
-        data = course_with_settings_to_json(updated_course)
+        data = course_to_json(updated_course)
 
         return Response(data=data, status=status.HTTP_200_OK)
 
@@ -228,7 +228,7 @@ class SingleCourseView(APIView):
         if course.owner != requester:
             raise PermissionDenied()
 
-        data = course_with_settings_to_json(course)
+        data = course_to_json(course)
 
         course.delete()
 

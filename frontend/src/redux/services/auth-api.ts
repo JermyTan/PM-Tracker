@@ -7,24 +7,24 @@ import {
 } from "../../types/auth";
 
 const authApi = baseApi.injectEndpoints({
-  endpoints: (builder) => ({
-    checkAccount: builder.query<AccountDetails, CheckAccountPostData>({
+  endpoints: (build) => ({
+    checkAccount: build.query<AccountDetails, CheckAccountPostData>({
       query: (data) => ({
         url: "/gateway/check/",
         method: "POST",
         body: data,
       }),
+      extraOptions: { includeAuth: false },
     }),
-    passwordLogin: builder.mutation<AuthenticationData, PasswordLoginPostData>({
+    passwordLogin: build.mutation<AuthenticationData, PasswordLoginPostData>({
       query: (data) => ({
         url: "/gateway/login/",
         method: "POST",
         body: data,
       }),
+      extraOptions: { includeAuth: false },
     }),
   }),
 });
 
 export const { usePasswordLoginMutation, useLazyCheckAccountQuery } = authApi;
-
-export default authApi;

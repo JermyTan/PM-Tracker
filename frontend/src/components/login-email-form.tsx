@@ -8,7 +8,7 @@ import TextField from "./text-field";
 import { CheckAccountPostData } from "../types/auth";
 import { trim } from "../utils/transform-utils";
 import { handleSubmitForm } from "../utils/form-utils";
-import { resolveError } from "../utils/error-utils";
+import { useResolveError } from "../utils/error-utils";
 import { EMAIL } from "../constants";
 import { useLazyCheckAccountQuery } from "../redux/services/auth-api";
 
@@ -25,6 +25,7 @@ function LoginEmailForm() {
   const { inputEmail, setAccountDetails, setInputEmail } =
     useContext(LoginContext);
   const [checkAccount] = useLazyCheckAccountQuery();
+  const resolveError = useResolveError();
 
   const methods = useForm<LoginEmailFormProps>({
     resolver: zodResolver(schema),

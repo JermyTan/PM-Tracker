@@ -63,7 +63,7 @@ function AppLayout({ children }: Props) {
 
         {/* Main content */}
         <ScrollArea className={classes.scrollArea} scrollHideDelay={500}>
-          <Box<"main"> component="main" py="md" px="lg">
+          <Box<"main"> component="main" py="md" px="xl">
             {children}
           </Box>
         </ScrollArea>

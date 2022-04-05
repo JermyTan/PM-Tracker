@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   async rewrites() {
     return [
-      // Rewrite everything to `pages/index`
+      // rewrite everything to `pages/index`
       {
         source: "/:any*",
         destination: "/",

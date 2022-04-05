@@ -12,10 +12,10 @@ const rememberMeSlice = createSlice({
   },
 });
 
-// action creators
+// Action creators
 export const { setRememberMe } = rememberMeSlice.actions;
 
-// selectors
+// Selectors
 export const selectRememberMe = ({ rememberMe }: RootState) => rememberMe;
 
 export default rememberMeSlice;

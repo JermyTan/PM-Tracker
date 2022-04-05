@@ -37,9 +37,6 @@ const useStyles = createStyles(
         width: sidebarWidth,
         overflow: "hidden",
       },
-      title: {
-        fontSize: "30px",
-      },
       navContainer: {
         flex: "1 1 auto",
       },
@@ -62,9 +59,7 @@ function Sidebar({ isSidebarExpanded, className, ...props }: Props) {
       {...props}
     >
       <Center py="sm" px="md">
-        <Title className={classes.title}>
-          {isSidebarExpanded ? "Pigeonhole" : "P"}
-        </Title>
+        <Title>{isSidebarExpanded ? "Pigeonhole" : "P"}</Title>
       </Center>
 
       <ScrollArea

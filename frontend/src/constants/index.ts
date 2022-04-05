@@ -19,3 +19,18 @@ export const DATE_FORMAT = "dd/MM/yyyy";
 export const TIME_FORMAT = "h.mm a";
 export const DATE_TIME_FORMAT = `${DATE_FORMAT} ${TIME_FORMAT}`;
 export const ACCOUNT_TYPE = "accountType";
+export const OWNER = "owner";
+export const DESCRIPTION = "description";
+export const IS_PUBLISHED = "isPublished";
+export const SHOW_GROUP_MEMBERS_NAMES = "showGroupMembersNames";
+export const ALLOW_STUDENTS_TO_CREATE_GROUPS = "allowStudentsToCreateGroups";
+export const ALLOW_STUDENTS_TO_DELETE_GROUPS = "allowStudentsToDeleteGroups";
+export const ALLOW_STUDENTS_TO_JOIN_GROUPS = "allowStudentsToJoinGroups";
+export const ALLOW_STUDENTS_TO_LEAVE_GROUPS = "allowStudentsToLeaveGroups";
+export const ALLOW_STUDENTS_TO_MODIFY_GROUP_NAME =
+  "allowStudentsToModifyGroupName";
+export const ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS =
+  "allowStudentsToAddOrRemoveGroupMembers";
+export const MILESTONE_ALIAS = "milestoneAlias";
+export const ROLE = "role";
+export const FAILED_TOKEN_REFRESH = "failedTokenRefresh";

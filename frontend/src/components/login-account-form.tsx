@@ -23,7 +23,7 @@ import { usePasswordLoginMutation } from "../redux/services/auth-api";
 import { handleSubmitForm } from "../utils/form-utils";
 import { trim } from "../utils/transform-utils";
 import { LoginContext } from "../contexts/login-provider";
-import { resolveError } from "../utils/error-utils";
+import { useResolveError } from "../utils/error-utils";
 
 const schema = z.object({
   [EMAIL]: z.preprocess(trim, z.string().min(1).email()),
@@ -69,6 +69,7 @@ function LoginAccountForm() {
     resolver: zodResolver(schema),
     defaultValues: { ...DEFAULT_VALUES, name, email, rememberMe },
   });
+  const resolveError = useResolveError();
 
   const {
     handleSubmit,

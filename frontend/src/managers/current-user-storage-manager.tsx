@@ -18,6 +18,10 @@ function CurrentUserStorageManager() {
         addAppListener({
           actionCreator: updateCurrentUser,
           effect: (_, listenerApi) => {
+            // for throttling
+            listenerApi.unsubscribe();
+            setTimeout(() => listenerApi.subscribe(), 200);
+
             const rootState = listenerApi.getState();
             const rememberMe = selectRememberMe(rootState);
             const currentUser = selectCurrentUser(rootState);

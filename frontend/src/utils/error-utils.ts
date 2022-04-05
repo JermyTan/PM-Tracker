@@ -1,6 +1,11 @@
+import { useEffect, useMemo } from "react";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/dist/query";
 import { isRecord } from "./transform-utils";
 import toastUtils from "./toast-utils";
+import type { AppDispatch } from "../redux/store";
+import { useAppDispatch } from "../redux/hooks";
+import resetAppState from "../redux/thunks/reset-app-state";
+import { FAILED_TOKEN_REFRESH } from "../constants";
 
 export function isFetchBaseQueryError(
   error: unknown,
@@ -22,9 +27,24 @@ export function isErrorWithDetail(error: unknown): error is { detail: string } {
   );
 }
 
-export function resolveError(
-  error?: unknown,
-  defaultErrorMessage: string = "An unknown error has occurred." as string,
+export function getErrorMessage(error: unknown) {
+  if (isFetchBaseQueryError(error)) {
+    return isErrorWithDetail(error.data)
+      ? error.data.detail
+      : JSON.stringify(error.data);
+  }
+
+  if (isErrorWithMessage(error)) {
+    return error.message;
+  }
+
+  return undefined;
+}
+
+function resolveError(
+  error: unknown,
+  dispatch: AppDispatch,
+  defaultErrorMessage = "An unknown error has occurred.",
 ) {
   if (!error) {
     return;
@@ -32,21 +52,39 @@ export function resolveError(
 
   console.log("Resolve error:", error);
 
-  if (isFetchBaseQueryError(error)) {
-    const message = isErrorWithDetail(error.data)
-      ? error.data.detail
-      : JSON.stringify(error.data);
+  const message = getErrorMessage(error) ?? defaultErrorMessage;
 
-    toastUtils.error({ message });
+  toastUtils.error({ message });
 
+  if (
+    !isFetchBaseQueryError(error) ||
+    error.status !== "CUSTOM_ERROR" ||
+    error.error !== FAILED_TOKEN_REFRESH
+  ) {
     return;
   }
 
-  if (isErrorWithMessage(error)) {
-    toastUtils.error({ message: error.message });
+  // kick user out
+  dispatch(resetAppState());
+}
 
-    return;
-  }
+export function useResolveError(
+  error?: unknown,
+  defaultErrorMessage = "An unknown error has occurred.",
+) {
+  const defaultUseResolveErrorMessage = defaultErrorMessage;
+  const dispatch = useAppDispatch();
 
-  toastUtils.error({ message: defaultErrorMessage });
+  useEffect(() => {
+    if (error) {
+      resolveError(error, dispatch, defaultUseResolveErrorMessage);
+    }
+  }, [error, dispatch, defaultUseResolveErrorMessage]);
+
+  return useMemo(
+    () =>
+      (error: unknown, defaultErrorMessage = defaultUseResolveErrorMessage) =>
+        resolveError(error, dispatch, defaultErrorMessage),
+    [dispatch, defaultUseResolveErrorMessage],
+  );
 }

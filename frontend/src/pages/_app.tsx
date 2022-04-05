@@ -19,6 +19,7 @@ import RememberMeStorageManager from "../managers/remember-me-storage-manager";
 import CurrentUserStorageManager from "../managers/current-user-storage-manager";
 import SafeHydrate from "../components/safe-hydrate";
 import SplashScreen from "../components/splash-screen";
+import ApiCacheManager from "../managers/api-cache-manager";
 // import { colorModeValue } from "../utils/theme-utils";
 
 // const textColor = (theme: MantineTheme) => ({
@@ -88,6 +89,11 @@ function App({ Component, pageProps }: AppProps) {
                   "#101113",
                 ],
               },
+              headings: {
+                sizes: {
+                  h1: { fontSize: 32 },
+                },
+              },
             }}
             styles={{
               Tooltip: {
@@ -101,6 +107,14 @@ function App({ Component, pageProps }: AppProps) {
                 },
                 label: {
                   cursor: "pointer",
+                },
+              },
+              Button: {
+                rightIcon: {
+                  marginLeft: 6,
+                },
+                leftIcon: {
+                  marginRight: 6,
                 },
               },
             }}
@@ -122,6 +136,7 @@ function App({ Component, pageProps }: AppProps) {
                 {/* Order matters here since useEffect will run sequentially */}
                 <RememberMeStorageManager />
                 <CurrentUserStorageManager />
+                <ApiCacheManager />
 
                 <SafeHydrate>
                   <SplashScreen duration={2000}>

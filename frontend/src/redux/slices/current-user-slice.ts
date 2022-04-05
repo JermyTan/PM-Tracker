@@ -18,10 +18,10 @@ const currentUserSlice = createSlice({
   },
 });
 
-// action creators
+// Action creators
 export const { updateCurrentUser } = currentUserSlice.actions;
 
-// selectors
+// Selectors
 export const selectCurrentUser = ({ currentUser }: RootState) => currentUser;
 export const selectIsLoggedIn = createSelector(
   selectCurrentUser,

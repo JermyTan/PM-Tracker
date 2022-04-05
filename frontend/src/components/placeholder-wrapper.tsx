@@ -32,9 +32,9 @@ function PlaceholderWrapper({
     <Stack justify="center" align="center" spacing="sm" {...props}>
       {isLoading && (
         <>
-          <Loader size="xl" {...loaderProps} />
+          <Loader size="lg" variant="bars" {...loaderProps} />
           {loadingMessage && (
-            <Text size="xl" {...textProps}>
+            <Text size="lg" {...textProps}>
               {loadingMessage}
             </Text>
           )}

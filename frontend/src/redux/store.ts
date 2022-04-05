@@ -45,7 +45,7 @@ export type AppThunk<ReturnType = void> = ThunkAction<
 >;
 
 // subscribeToStore is depreciated in favor of listenerMiddleware
-// reference: https://github.com/reduxjs/redux/issues/303#issuecomment-125184409
+// Reference: https://github.com/reduxjs/redux/issues/303#issuecomment-125184409
 export function subscribeToStore<T>(
   selector: (rootState: RootState) => T,
   onChange: (newState: T, rootState: RootState) => void,

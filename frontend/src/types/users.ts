@@ -1,3 +1,4 @@
+import { BaseData } from "./base";
 import {
   ACCOUNT_TYPE,
   EMAIL,
@@ -15,7 +16,7 @@ export enum AccountType {
   Standard = "STANDARD",
 }
 
-export type UserData = {
+export type UserData = BaseData & {
   [EMAIL]: string;
   [NAME]: string;
   [PROFILE_IMAGE]: string | null;

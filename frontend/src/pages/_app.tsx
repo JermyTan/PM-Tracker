@@ -95,6 +95,14 @@ function App({ Component, pageProps }: AppProps) {
                   display: "block",
                 },
               },
+              Checkbox: {
+                input: {
+                  cursor: "pointer",
+                },
+                label: {
+                  cursor: "pointer",
+                },
+              },
             }}
           >
             {/* Global body style override

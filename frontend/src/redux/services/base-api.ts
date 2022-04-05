@@ -4,6 +4,9 @@ import {
   BaseQueryFn,
   FetchArgs,
   FetchBaseQueryError,
+  FetchBaseQueryMeta,
+  EndpointDefinitions,
+  EndpointDefinition,
 } from "@reduxjs/toolkit/query/react";
 import { StatusCodes } from "http-status-codes";
 import { AuthenticationData } from "../../types/auth";
@@ -18,11 +21,19 @@ function isForbiddenOrNotAuthenticated(error?: FetchBaseQueryError) {
 
 const baseQuery = fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_URL });
 
-const myQuery: BaseQueryFn<
+type MyQueryType = BaseQueryFn<
   string | FetchArgs,
   unknown,
-  FetchBaseQueryError
-> = async (args, api, extraOptions) => {
+  FetchBaseQueryError,
+  { includeAuth?: boolean },
+  FetchBaseQueryMeta
+>;
+
+const myQuery: MyQueryType = async (
+  args,
+  api,
+  extraOptions = { includeAuth: true },
+) => {
   console.log("Start api call:", args);
   const result = await baseQuery(args, api, extraOptions);
 

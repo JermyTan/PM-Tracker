@@ -1,12 +1,24 @@
 import { FetchBaseQueryError } from "@reduxjs/toolkit/dist/query";
+import { isRecord } from "./transform-utils";
 import toastUtils from "./toast-utils";
 
-export function isFetchBaseQueryError(error: unknown) {
+export function isFetchBaseQueryError(
+  error: unknown,
+): error is FetchBaseQueryError {
+  return isRecord(error) && "status" in error;
+}
+
+export function isErrorWithMessage(
+  error: unknown,
+): error is { message: string } {
   return (
-    !Array.isArray(error) &&
-    typeof error === "object" &&
-    error !== null &&
-    "status" in error
+    isRecord(error) && "message" in error && typeof error.message === "string"
+  );
+}
+
+export function isErrorWithDetail(error: unknown): error is { detail: string } {
+  return (
+    isRecord(error) && "detail" in error && typeof error.detail === "string"
   );
 }
 
@@ -20,19 +32,21 @@ export function resolveError(
 
   console.log("Resolve error:", error);
 
-  try {
-    if (isFetchBaseQueryError(error)) {
-      const queryError = error as FetchBaseQueryError & { error?: string };
+  if (isFetchBaseQueryError(error)) {
+    const message = isErrorWithDetail(error.data)
+      ? error.data.detail
+      : JSON.stringify(error.data);
 
-      const { detail = queryError?.error ?? defaultErrorMessage } =
-        (queryError.data as { detail?: string } | undefined) ?? {};
+    toastUtils.error({ message });
 
-      toastUtils.error({ message: detail });
+    return;
+  }
 
-      return;
-    }
-    // eslint-disable-next-line no-empty
-  } catch {}
+  if (isErrorWithMessage(error)) {
+    toastUtils.error({ message: error.message });
+
+    return;
+  }
 
   toastUtils.error({ message: defaultErrorMessage });
 }

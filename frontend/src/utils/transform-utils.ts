@@ -4,20 +4,22 @@ import { format, isSameDay } from "date-fns";
 
 import { DATE_FORMAT, DATE_TIME_FORMAT, TIME_FORMAT } from "../constants";
 
+export function isRecord(value: unknown): value is Record<string, unknown> {
+  return !Array.isArray(value) && typeof value === "object" && value !== null;
+}
+
 export function trim<T>(value: T) {
   return typeof value === "string" ? value.trim() : value;
 }
 
 export function deepTrim<T>(value: T): T {
-  const unknownValue = value as unknown;
-
-  if (Array.isArray(unknownValue)) {
-    return unknownValue.map((item) => deepTrim(item)) as unknown as T;
+  if (Array.isArray(value)) {
+    return value.map((item) => deepTrim(item)) as unknown as T;
   }
 
-  if (typeof unknownValue === "object" && unknownValue !== null) {
-    return Object.keys(unknownValue).reduce((all, key) => {
-      all[key] = deepTrim((unknownValue as Record<string, unknown>)[key]);
+  if (isRecord(value)) {
+    return Object.keys(value).reduce((all, key) => {
+      all[key] = deepTrim(value[key]);
       return all;
     }, {} as Record<string, unknown>) as T;
   }

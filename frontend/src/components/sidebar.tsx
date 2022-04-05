@@ -14,6 +14,7 @@ import SidebarItem from "./sidebar-item";
 import SidebarLinkItem from "./sidebar-link-item";
 import { useAppDispatch } from "../redux/hooks";
 import resetAppState from "../redux/thunks/reset-app-state";
+import toastUtils from "../utils/toast-utils";
 
 type Props = Omit<BoxProps<"nav">, "children"> & {
   isSidebarExpanded: boolean;
@@ -95,6 +96,7 @@ function Sidebar({ isSidebarExpanded, className, ...props }: Props) {
           onClick={() => {
             dispatch(resetAppState());
             navigate(LOGIN_PATH);
+            toastUtils.success({ message: "Signed out successfully." });
           }}
         />
       </div>

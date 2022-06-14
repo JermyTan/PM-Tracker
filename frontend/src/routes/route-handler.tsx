@@ -8,6 +8,7 @@ import {
   MY_COURSES_PATH,
 } from "./paths";
 import AppLayout from "../components/app-layout";
+import CoursePageLayout from "../components/course-page-layout";
 import LoginPage from "../components/pages/login-page";
 import DashboardPage from "../components/pages/dashboard-page";
 import MyCoursesPage from "../components/pages/my-courses-page";
@@ -30,7 +31,24 @@ function RouteHandler() {
             }
           >
             <Route path={DASHBOARD_PATH} element={<DashboardPage />} />
-            <Route path={MY_COURSES_PATH} element={<MyCoursesPage />} />
+            <Route path={MY_COURSES_PATH}>
+              <Route path="" element={<MyCoursesPage />} />
+              <Route
+                path=":courseId"
+                element={
+                  <CoursePageLayout>
+                    <Outlet />
+                  </CoursePageLayout>
+                }
+              >
+                <Route path="" element={<div>Base course page</div>} />
+                <Route
+                  path="members"
+                  element={<div>Course members and groups</div>}
+                />
+                <Route path="settings" element={<div>Course settings</div>} />
+              </Route>
+            </Route>
             <Route path={MY_ACCOUNT_PATH} element={<MyAccountPage />} />
           </Route>
 

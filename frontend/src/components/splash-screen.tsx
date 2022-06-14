@@ -14,7 +14,7 @@ const useStyles = createStyles({
 });
 
 function SplashScreen({ duration, children }: Props) {
-  const [showSplashScreen, setShowSplashScreen] = useState(true);
+  const [showSplashScreen, setShowSplashScreen] = useState(duration > 0);
   const { classes } = useStyles();
 
   useEffect(() => {

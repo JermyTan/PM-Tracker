@@ -227,7 +227,7 @@ class AccessTokenRefreshSerializer(
     def validate(self, data):
         tokens = super().validate(data)
 
-        user_id = RefreshToken(tokens[REFRESH]).get(key=api_settings.USER_ID_CLAIM)
+        user_id = self.token_class(tokens[REFRESH]).get(key=api_settings.USER_ID_CLAIM)
 
         try:
             user = (

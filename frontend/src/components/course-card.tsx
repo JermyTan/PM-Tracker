@@ -10,6 +10,8 @@ import {
 } from "@mantine/core";
 import { CourseSummaryView } from "../types/courses";
 import CourseStatusBadge from "./course-status-badge";
+import { selectCurrentUser } from "../redux/slices/current-user-slice";
+import { useAppSelector } from "../redux/hooks";
 
 const useStyles = createStyles((theme) => ({
   card: {
@@ -41,14 +43,38 @@ const useStyles = createStyles((theme) => ({
 
 type Props = CourseSummaryView;
 
-function CourseCard({ name, description, owner, isPublished }: Props) {
+function CourseCard({
+  name,
+  description,
+  owner,
+  isPublished,
+  id: courseId,
+}: Props) {
   const { classes } = useStyles();
+  const currentUser = useAppSelector(selectCurrentUser);
+  const userIsOwner = currentUser?.user?.id == owner.id;
+
+  const userCanAccessCourse = userIsOwner || isPublished;
 
   const hasDescription = description.length > 0;
-  //   const isOwner = owner.id == ;
+
+  const redirectToCoursePage = (courseId: number) => {
+    if (!userCanAccessCourse) {
+      return;
+    }
+    // TODO: redirect to course page
+    console.log(`Course id: ${courseId}`);
+  };
 
   return (
-    <Card withBorder radius="md" p="md" className={classes.card}>
+    <Card
+      onClick={() => redirectToCoursePage(courseId)}
+      withBorder
+      radius="md"
+      p="md"
+      className={classes.card}
+      sx={{ cursor: userCanAccessCourse ? "pointer" : "not-allowed" }}
+    >
       <Stack spacing="xs">
         <Group position="apart">
           <Text size="lg" weight={500} lineClamp={2}>
@@ -57,26 +83,14 @@ function CourseCard({ name, description, owner, isPublished }: Props) {
         </Group>
 
         <Group spacing="sm">
-          <Stack spacing="xs">
-            <Text
-              size="xs"
-              color="dimmed"
-              weight={700}
-              className={classes.metaText}
-            >
-              Hosted by
-            </Text>
-            <Group>
-              <Avatar radius={20} size={20} src={owner.profileImage} />
-              <Text size="sm" weight={500} lineClamp={1}>
-                {owner.name}
-              </Text>
-            </Group>
-          </Stack>
+          <Avatar radius={20} size={20} src={owner.profileImage} />
+          <Text size="sm" weight={500} lineClamp={1}>
+            {owner.name}
+          </Text>
         </Group>
         <ScrollArea className={classes.scrollArea}>
-          <Text size="sm" lineClamp={3} color={hasDescription ? "" : "dimmed"}>
-            {description ? description : "No description."}
+          <Text size="sm" color={hasDescription ? "" : "dimmed"}>
+            {description ? description : "No description"}
           </Text>
         </ScrollArea>
         <Group>

@@ -2,6 +2,7 @@ import { Route, Routes, Navigate, Outlet } from "react-router-dom";
 import { useAppSelector } from "../redux/hooks";
 import { selectIsLoggedIn } from "../redux/slices/current-user-slice";
 import {
+  COURSES_PATH,
   DASHBOARD_PATH,
   LOGIN_PATH,
   MY_ACCOUNT_PATH,
@@ -31,8 +32,9 @@ function RouteHandler() {
             }
           >
             <Route path={DASHBOARD_PATH} element={<DashboardPage />} />
-            <Route path={MY_COURSES_PATH}>
-              <Route path="" element={<MyCoursesPage />} />
+            <Route path={MY_COURSES_PATH} element={<MyCoursesPage />} />
+            <Route path={COURSES_PATH}>
+              <Route path="" element={<div>All courses page</div>} />
               <Route
                 path=":courseId"
                 element={

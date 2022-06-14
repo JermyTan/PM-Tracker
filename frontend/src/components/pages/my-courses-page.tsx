@@ -1,12 +1,21 @@
-import { Button, Group, Title, Text, createStyles, Space } from "@mantine/core";
+import {
+  Button,
+  Group,
+  Title,
+  Text,
+  createStyles,
+  Space,
+  SimpleGrid,
+} from "@mantine/core";
 import Head from "next/head";
 import { HiViewGridAdd, HiRefresh } from "react-icons/hi";
-import { APP_NAME } from "../../constants";
+import { APP_NAME, DESCRIPTION } from "../../constants";
 import { useGetCoursesQuery } from "../../redux/services/courses-api";
 import { AccountType } from "../../types/users";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import AccountTypeRestrictedWrapper from "../account-type-restricted-wrapper";
 import { useResolveError } from "../../utils/error-utils";
+import CourseCard from "../course-card";
 
 const useStyles = createStyles({
   content: {
@@ -15,7 +24,13 @@ const useStyles = createStyles({
 });
 
 function MyCoursesPage() {
-  const { data, isLoading, isFetching, refetch, error } = useGetCoursesQuery();
+  const {
+    data: courses,
+    isLoading,
+    isFetching,
+    refetch,
+    error,
+  } = useGetCoursesQuery();
   const { classes } = useStyles();
   useResolveError(error);
 
@@ -53,8 +68,14 @@ function MyCoursesPage() {
         isLoading={isLoading}
         py={150}
         loadingMessage="Loading my courses..."
+        defaultMessage="No courses found"
+        showDefaultMessage={!isLoading && (!courses || courses?.length === 0)}
       >
-        <Text className={classes.content}>{JSON.stringify(data, null, 4)}</Text>
+        <SimpleGrid cols={3} spacing="xs">
+          {courses?.map((course) => (
+            <CourseCard {...course} key={course.id} />
+          ))}
+        </SimpleGrid>
       </PlaceholderWrapper>
     </>
   );

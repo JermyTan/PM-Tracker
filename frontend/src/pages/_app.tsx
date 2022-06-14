@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import dynamic from "next/dynamic";
 import {
   MantineProvider,
   ColorSchemeProvider,
@@ -17,9 +18,11 @@ import { APP_NAME } from "../constants";
 import store from "../redux/store";
 import RememberMeStorageManager from "../managers/remember-me-storage-manager";
 import CurrentUserStorageManager from "../managers/current-user-storage-manager";
-import SafeHydrate from "../components/safe-hydrate";
-import SplashScreen from "../components/splash-screen";
 import ApiCacheManager from "../managers/api-cache-manager";
+
+const SafeHydrate = dynamic(() => import("../components/safe-hydrate"), {
+  ssr: false,
+});
 // import { colorModeValue } from "../utils/theme-utils";
 
 // const textColor = (theme: MantineTheme) => ({
@@ -139,9 +142,7 @@ function App({ Component, pageProps }: AppProps) {
                 <ApiCacheManager />
 
                 <SafeHydrate>
-                  <SplashScreen duration={2000}>
-                    <Component {...pageProps} />
-                  </SplashScreen>
+                  <Component {...pageProps} />
                 </SafeHydrate>
               </ModalsProvider>
             </NotificationsProvider>

@@ -1,12 +1,17 @@
-import { Route, Routes, Navigate, Outlet } from "react-router-dom";
+import { Route, Routes, Navigate, Outlet, Link } from "react-router-dom";
 import { useAppSelector } from "../redux/hooks";
 import { selectIsLoggedIn } from "../redux/slices/current-user-slice";
 import {
+  ACCOUNT_PATH,
+  CATCH_ALL,
   COURSES_PATH,
+  COURSE_DETAILS_PATH,
+  COURSE_GROUPS_PATH,
+  COURSE_MILESTONES_PATH,
   DASHBOARD_PATH,
-  LOGIN_PATH,
-  MY_ACCOUNT_PATH,
   MY_COURSES_PATH,
+  ROOT_PATH,
+  SINGLE_COURSE_PATH,
 } from "./paths";
 import AppLayout from "../components/app-layout";
 import CoursePageLayout from "../components/course-page-layout";
@@ -21,43 +26,77 @@ function RouteHandler() {
   return (
     <Routes>
       {isLoggedIn ? (
-        <>
-          <Route path={LOGIN_PATH} element={<Navigate to={DASHBOARD_PATH} />} />
-
-          <Route
-            element={
-              <AppLayout>
-                <Outlet />
-              </AppLayout>
-            }
-          >
-            <Route path={DASHBOARD_PATH} element={<DashboardPage />} />
+        <Route
+          path={ROOT_PATH}
+          element={
+            <AppLayout>
+              <Outlet />
+            </AppLayout>
+          }
+        >
+          <Route index element={<Navigate to={DASHBOARD_PATH} />} />
+          <Route path={DASHBOARD_PATH} element={<DashboardPage />} />
+          <Route path={ACCOUNT_PATH} element={<MyAccountPage />} />
+          <Route path={COURSES_PATH}>
+            <Route index element={<Navigate to={MY_COURSES_PATH} />} />
             <Route path={MY_COURSES_PATH} element={<MyCoursesPage />} />
-            <Route path={COURSES_PATH}>
-              <Route path="" element={<div>All courses page</div>} />
+            <Route
+              path={SINGLE_COURSE_PATH}
+              element={
+                <CoursePageLayout>
+                  <Outlet />
+                </CoursePageLayout>
+              }
+            >
+              <Route index element={<Navigate to="milestones" />} />
               <Route
-                path=":courseId"
+                path={COURSE_MILESTONES_PATH}
                 element={
-                  <CoursePageLayout>
-                    <Outlet />
-                  </CoursePageLayout>
+                  <div>
+                    Course milestones
+                    <div>
+                      <Link to="../groups">groups</Link>
+                    </div>
+                    <div>
+                      <Link to="../details">details</Link>
+                    </div>
+                  </div>
                 }
-              >
-                <Route path="" element={<div>Base course page</div>} />
-                <Route
-                  path="members"
-                  element={<div>Course members and groups</div>}
-                />
-                <Route path="settings" element={<div>Course settings</div>} />
-              </Route>
+              />
+              <Route
+                path={COURSE_GROUPS_PATH}
+                element={
+                  <div>
+                    Course members and groups
+                    <div>
+                      <Link to="../milestones">milestones</Link>
+                    </div>
+                    <div>
+                      <Link to="../details">details</Link>
+                    </div>
+                  </div>
+                }
+              />
+              <Route
+                path={COURSE_DETAILS_PATH}
+                element={
+                  <div>
+                    Course details
+                    <div>
+                      <Link to="../milestones">milestones</Link>
+                    </div>
+                    <div>
+                      <Link to="../groups">groups</Link>
+                    </div>
+                  </div>
+                }
+              />
             </Route>
-            <Route path={MY_ACCOUNT_PATH} element={<MyAccountPage />} />
           </Route>
-
-          <Route path="*" element={<Navigate to={DASHBOARD_PATH} />} />
-        </>
+          <Route path={CATCH_ALL} element={<Navigate to={DASHBOARD_PATH} />} />
+        </Route>
       ) : (
-        <Route path="*" element={<LoginPage />} />
+        <Route path={CATCH_ALL} element={<LoginPage />} />
       )}
     </Routes>
   );

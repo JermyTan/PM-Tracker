@@ -7,7 +7,7 @@ import rememberMeSlice from "./slices/remember-me-slice";
 import listenerMiddleware from "./listener-middleware";
 
 const preloadedState = (() => {
-  // ignore if this is running in server side
+  // ignore if this is running on server side
   if (typeof window === "undefined") {
     return undefined;
   }

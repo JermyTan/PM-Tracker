@@ -19,6 +19,9 @@ import LoginPage from "../components/pages/login-page";
 import DashboardPage from "../components/pages/dashboard-page";
 import MyCoursesPage from "../components/pages/my-courses-page";
 import MyAccountPage from "../components/pages/my-account-page";
+import CourseMilestonePage from "../components/pages/course-milestone-page";
+import CourseGroupPage from "../components/pages/course-groups-page";
+import CourseDetailsPage from "../components/pages/course-details-page";
 
 function RouteHandler() {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
@@ -51,45 +54,12 @@ function RouteHandler() {
               <Route index element={<Navigate to="milestones" />} />
               <Route
                 path={COURSE_MILESTONES_PATH}
-                element={
-                  <div>
-                    Course milestones
-                    <div>
-                      <Link to="../groups">groups</Link>
-                    </div>
-                    <div>
-                      <Link to="../details">details</Link>
-                    </div>
-                  </div>
-                }
+                element={<CourseMilestonePage />}
               />
-              <Route
-                path={COURSE_GROUPS_PATH}
-                element={
-                  <div>
-                    Course members and groups
-                    <div>
-                      <Link to="../milestones">milestones</Link>
-                    </div>
-                    <div>
-                      <Link to="../details">details</Link>
-                    </div>
-                  </div>
-                }
-              />
+              <Route path={COURSE_GROUPS_PATH} element={<CourseGroupPage />} />
               <Route
                 path={COURSE_DETAILS_PATH}
-                element={
-                  <div>
-                    Course details
-                    <div>
-                      <Link to="../milestones">milestones</Link>
-                    </div>
-                    <div>
-                      <Link to="../groups">groups</Link>
-                    </div>
-                  </div>
-                }
+                element={<CourseDetailsPage />}
               />
             </Route>
           </Route>

@@ -5,6 +5,7 @@ import baseApi from "./services/base-api";
 import currentUserSlice from "./slices/current-user-slice";
 import rememberMeSlice from "./slices/remember-me-slice";
 import listenerMiddleware from "./listener-middleware";
+import { setupListeners } from "@reduxjs/toolkit/dist/query";
 
 const preloadedState = (() => {
   // ignore if this is running on server side
@@ -34,6 +35,9 @@ const store = configureStore({
       .prepend(listenerMiddleware.middleware)
       .concat(baseApi.middleware),
 });
+
+// Setup browser event listeners
+setupListeners(store.dispatch);
 
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;

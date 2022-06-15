@@ -1,4 +1,4 @@
-import { CourseSummaryView } from "../../types/courses";
+import { CourseSummaryView, Course } from "../../types/courses";
 import baseApi from "./base-api";
 
 const coursesApi = baseApi.injectEndpoints({
@@ -15,7 +15,17 @@ const coursesApi = baseApi.injectEndpoints({
         method: "POST",
       }),
     }),
+    getSingleCourse: build.query<Course, number | string>({
+      query: (courseId) => ({
+        url: `/courses/${courseId}/`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useGetCoursesQuery, useCreateCourseMutation } = coursesApi;
+export const {
+  useGetCoursesQuery,
+  useCreateCourseMutation,
+  useGetSingleCourseQuery,
+} = coursesApi;

@@ -1,11 +1,11 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
+import { setupListeners } from "@reduxjs/toolkit/query";
 import { CURRENT_USER, REMEMBER_ME } from "../constants";
 import { storage } from "../utils/storage-utils";
 import baseApi from "./services/base-api";
 import currentUserSlice from "./slices/current-user-slice";
 import rememberMeSlice from "./slices/remember-me-slice";
 import listenerMiddleware from "./listener-middleware";
-import { setupListeners } from "@reduxjs/toolkit/dist/query";
 
 const preloadedState = (() => {
   // ignore if this is running on server side

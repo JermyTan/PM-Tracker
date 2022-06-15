@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import Head from "next/head";
 import { Text, Title, Tabs, Space, TabsProps } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/query/react";
@@ -50,7 +50,11 @@ function CoursePageLayout({ children }: Props) {
   })();
 
   const onTabChange: TabsProps["onTabChange"] = (_, tabKey) => {
-    navigate(tabKey ?? "");
+    if (tabKey === undefined) {
+      return;
+    }
+
+    navigate(tabKey);
   };
 
   return (
@@ -76,7 +80,11 @@ function CoursePageLayout({ children }: Props) {
           <Tabs.Tab
             key={key}
             tabKey={key}
-            label={<Text weight={500}>{label}</Text>}
+            label={
+              <Text<typeof Link> component={Link} to={key} weight={500}>
+                {label}
+              </Text>
+            }
           >
             {children}
           </Tabs.Tab>

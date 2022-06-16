@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import Head from "next/head";
 import { HiViewGridAdd, HiRefresh } from "react-icons/hi";
-import { APP_NAME, DESCRIPTION } from "../../constants";
+import { APP_NAME } from "../../constants";
 import { useGetCoursesQuery } from "../../redux/services/courses-api";
 import { AccountType } from "../../types/users";
 import PlaceholderWrapper from "../placeholder-wrapper";

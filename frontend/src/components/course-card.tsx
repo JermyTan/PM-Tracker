@@ -8,10 +8,8 @@ import {
   Avatar,
   ScrollArea,
 } from "@mantine/core";
-import { CourseSummaryView } from "../types/courses";
+import { CourseSummaryView, Role } from "../types/courses";
 import CourseStatusBadge from "./course-status-badge";
-import { selectCurrentUser } from "../redux/slices/current-user-slice";
-import { useAppSelector } from "../redux/hooks";
 
 const useStyles = createStyles((theme) => ({
   card: {
@@ -49,12 +47,10 @@ function CourseCard({
   owner,
   isPublished,
   id: courseId,
+  role,
 }: Props) {
   const { classes } = useStyles();
-  const currentUser = useAppSelector(selectCurrentUser);
-  const userIsOwner = currentUser?.user?.id == owner.id;
-
-  const userCanAccessCourse = userIsOwner || isPublished;
+  const userCanAccessCourse = isPublished || role != Role.Student;
 
   const hasDescription = description.length > 0;
 

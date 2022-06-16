@@ -1,4 +1,11 @@
-export const LOGIN_PATH = "/";
+export const ROOT_PATH = "/";
+export const CATCH_ALL = "*";
+export const LOGIN_PATH = ROOT_PATH;
 export const DASHBOARD_PATH = "/dashboard";
-export const MY_COURSES_PATH = "/my-courses";
-export const MY_ACCOUNT_PATH = "/my-account";
+export const COURSES_PATH = "/courses";
+export const MY_COURSES_PATH = `${COURSES_PATH}/me`;
+export const SINGLE_COURSE_PATH = `${COURSES_PATH}/:courseId`;
+export const COURSE_MILESTONES_PATH = `${SINGLE_COURSE_PATH}/milestones`;
+export const COURSE_GROUPS_PATH = `${SINGLE_COURSE_PATH}/groups`;
+export const COURSE_DETAILS_PATH = `${SINGLE_COURSE_PATH}/details`;
+export const ACCOUNT_PATH = "/account";

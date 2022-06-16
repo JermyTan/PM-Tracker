@@ -19,6 +19,7 @@ import store from "../redux/store";
 import RememberMeStorageManager from "../managers/remember-me-storage-manager";
 import CurrentUserStorageManager from "../managers/current-user-storage-manager";
 import ApiCacheManager from "../managers/api-cache-manager";
+import SplashScreen from "../components/splash-screen";
 
 const SafeHydrate = dynamic(() => import("../components/safe-hydrate"), {
   ssr: false,
@@ -142,7 +143,9 @@ function App({ Component, pageProps }: AppProps) {
                 <ApiCacheManager />
 
                 <SafeHydrate>
-                  <Component {...pageProps} />
+                  <SplashScreen duration={2000}>
+                    <Component {...pageProps} />
+                  </SplashScreen>
                 </SafeHydrate>
               </ModalsProvider>
             </NotificationsProvider>

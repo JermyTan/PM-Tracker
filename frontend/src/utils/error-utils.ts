@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/dist/query";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { isRecord } from "./transform-utils";
 import toastUtils from "./toast-utils";
 import type { AppDispatch } from "../redux/store";

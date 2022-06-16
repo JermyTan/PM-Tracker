@@ -1,4 +1,5 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
+import { setupListeners } from "@reduxjs/toolkit/query";
 import { CURRENT_USER, REMEMBER_ME } from "../constants";
 import { storage } from "../utils/storage-utils";
 import baseApi from "./services/base-api";
@@ -7,7 +8,7 @@ import rememberMeSlice from "./slices/remember-me-slice";
 import listenerMiddleware from "./listener-middleware";
 
 const preloadedState = (() => {
-  // ignore if this is running in server side
+  // ignore if this is running on server side
   if (typeof window === "undefined") {
     return undefined;
   }
@@ -34,6 +35,9 @@ const store = configureStore({
       .prepend(listenerMiddleware.middleware)
       .concat(baseApi.middleware),
 });
+
+// Setup browser event listeners
+setupListeners(store.dispatch);
 
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;

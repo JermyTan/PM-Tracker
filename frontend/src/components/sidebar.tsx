@@ -9,7 +9,12 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { MdSpaceDashboard, MdLogout } from "react-icons/md";
 import { SiBookstack } from "react-icons/si";
-import { DASHBOARD_PATH, LOGIN_PATH, MY_COURSES_PATH } from "../routes/paths";
+import {
+  DASHBOARD_PATH,
+  LOGIN_PATH,
+  COURSES_PATH,
+  MY_COURSES_PATH,
+} from "../routes/paths";
 import SidebarItem from "./sidebar-item";
 import SidebarLinkItem from "./sidebar-link-item";
 import { useAppDispatch } from "../redux/hooks";
@@ -78,7 +83,7 @@ function Sidebar({ isSidebarExpanded, className, ...props }: Props) {
           icon={SiBookstack}
           label="My Courses"
           to={MY_COURSES_PATH}
-          isActive={pathname === MY_COURSES_PATH}
+          isActive={pathname.startsWith(COURSES_PATH)}
           showIconOnly={!isSidebarExpanded}
         />
       </ScrollArea>

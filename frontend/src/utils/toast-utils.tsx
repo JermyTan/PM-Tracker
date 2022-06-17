@@ -1,8 +1,15 @@
 import { showNotification, NotificationProps } from "@mantine/notifications";
 import { FaExclamation, FaCheck, FaInfo } from "react-icons/fa";
 
-export function success(notifications: NotificationProps) {
+function myShowNotification(notification: NotificationProps) {
   showNotification({
+    styles: { root: { overflowY: "auto" } },
+    ...notification,
+  });
+}
+
+export function success(notifications: NotificationProps) {
+  myShowNotification({
     color: "green",
     icon: <FaCheck />,
     ...notifications,
@@ -10,11 +17,11 @@ export function success(notifications: NotificationProps) {
 }
 
 export function info(notifications: NotificationProps) {
-  showNotification({ color: "blue", icon: <FaInfo />, ...notifications });
+  myShowNotification({ color: "blue", icon: <FaInfo />, ...notifications });
 }
 
 export function warning(notifications: NotificationProps) {
-  showNotification({
+  myShowNotification({
     color: "yellow",
     icon: <FaExclamation />,
     ...notifications,
@@ -22,7 +29,7 @@ export function warning(notifications: NotificationProps) {
 }
 
 export function error(notifications: NotificationProps) {
-  showNotification({
+  myShowNotification({
     color: "red",
     icon: <FaExclamation />,
     ...notifications,

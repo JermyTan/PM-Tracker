@@ -30,15 +30,15 @@ const tabDetails = [
 
 function CoursePageLayout({ children }: Props) {
   const { courseId } = useParams();
-  const { data: course, isLoading } = useGetSingleCourseQuery(
-    courseId ?? skipToken,
-  );
+  const { course, isLoading } = useGetSingleCourseQuery(courseId ?? skipToken, {
+    selectFromResult: ({ data, isLoading }) => ({ course: data, isLoading }),
+  });
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
   // update label during runtime
   tabDetails[0].label = pluralize(
-    capitalCase(course?.milestoneAlias ?? MILESTONE),
+    capitalCase(course?.milestoneAlias || MILESTONE),
   );
 
   const activeIndex = (() => {

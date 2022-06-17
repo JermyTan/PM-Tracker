@@ -2,8 +2,6 @@ import {
   Button,
   Group,
   Title,
-  Text,
-  createStyles,
   Space,
   SimpleGrid,
   Drawer,
@@ -21,12 +19,6 @@ import { useResolveError } from "../../utils/error-utils";
 import CourseCard from "../course-card";
 import CourseCreationForm from "../course-creation-form";
 
-const useStyles = createStyles({
-  content: {
-    whiteSpace: "break-spaces",
-  },
-});
-
 function MyCoursesPage() {
   const {
     data: courses,
@@ -35,11 +27,8 @@ function MyCoursesPage() {
     refetch,
     error,
   } = useGetCoursesQuery();
-  const { classes } = useStyles();
   useResolveError(error);
   const [isDrawerOpened, { open, close }] = useDisclosure(false);
-
-  console.log(isDrawerOpened);
 
   return (
     <>
@@ -57,7 +46,7 @@ function MyCoursesPage() {
         title={<Title order={2}>Course Creation</Title>}
       >
         <ScrollArea offsetScrollbars pr="xs" scrollbarSize={8}>
-          <CourseCreationForm />
+          <CourseCreationForm onSuccess={close} />
         </ScrollArea>
       </Drawer>
 
@@ -94,7 +83,7 @@ function MyCoursesPage() {
       >
         <SimpleGrid cols={3} spacing="xs">
           {courses?.map((course) => (
-            <CourseCard {...course} key={course.id} />
+            <CourseCard key={course.id} {...course} />
           ))}
         </SimpleGrid>
       </PlaceholderWrapper>

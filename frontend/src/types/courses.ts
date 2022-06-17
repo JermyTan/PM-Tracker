@@ -43,3 +43,9 @@ type CourseSettings = {
 export type CourseSummaryView = CourseSummary & { [ROLE]: Role };
 
 export type Course = CourseSummary & CourseSettings;
+
+export type CoursePostData = Pick<
+  CourseSummary,
+  "name" | "description" | "isPublished"
+> &
+  CourseSettings;

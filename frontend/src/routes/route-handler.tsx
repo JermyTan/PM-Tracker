@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate, Outlet, Link } from "react-router-dom";
+import { Route, Routes, Navigate, Outlet } from "react-router-dom";
 import { useAppSelector } from "../redux/hooks";
 import { selectIsLoggedIn } from "../redux/slices/current-user-slice";
 import {

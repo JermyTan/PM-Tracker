@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -12,33 +12,36 @@ import {
 import { CourseSummaryView, Role } from "../types/courses";
 import CourseStatusBadge from "./course-status-badge";
 
-const useStyles = createStyles((theme) => ({
-  card: {
-    backgroundColor:
-      theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
-    height: 300,
-  },
+const useStyles = createStyles(
+  (theme, { userCanAccessCourse }: { userCanAccessCourse?: boolean }) => ({
+    card: {
+      backgroundColor:
+        theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
+      height: 300,
+      cursor: userCanAccessCourse ? "pointer" : "not-allowed",
+    },
 
-  label: {
-    textTransform: "uppercase",
-    fontSize: theme.fontSizes.xs,
-    fontWeight: 700,
-  },
+    label: {
+      textTransform: "uppercase",
+      fontSize: theme.fontSizes.xs,
+      fontWeight: 700,
+    },
 
-  scrollArea: {
-    height: 75,
-    margin: 5,
-  },
+    scrollArea: {
+      height: 75,
+      margin: 5,
+    },
 
-  metaText: {
-    letterSpacing: -0.25,
-    textTransform: "uppercase",
-  },
+    metaText: {
+      letterSpacing: -0.25,
+      textTransform: "uppercase",
+    },
 
-  hostName: {
-    lineHeight: 1,
-  },
-}));
+    hostName: {
+      lineHeight: 1,
+    },
+  }),
+);
 
 type Props = CourseSummaryView;
 
@@ -47,32 +50,48 @@ function CourseCard({
   description,
   owner,
   isPublished,
-  id: courseId,
+  id,
   role,
 }: Props) {
-  const { classes } = useStyles();
   const navigate = useNavigate();
 
-  const userCanAccessCourse = isPublished || role != Role.Student;
+  // const selectCourse = useMemo(
+  //   () =>
+  //     createSelector(
+  //       (data?: CourseSummaryView[]) => data,
+  //       (_: unknown, id: number) => id,
+  //       (data, id) => ({
+  //         course: data?.find((course) => course.id === id),
+  //       }),
+  //     ),
+  //   [],
+  // );
+
+  // const { course } = useGetCoursesQuery(undefined, {
+  //   selectFromResult: ({ data }) => selectCourse(data, id),
+  // });
+
+  const userCanAccessCourse = isPublished || role !== Role.Student;
+
+  const { classes } = useStyles({ userCanAccessCourse });
 
   const hasDescription = description.length > 0;
 
-  const redirectToCoursePage = (courseId: number) => {
+  const redirectToCoursePage = () => {
     if (!userCanAccessCourse) {
       return;
     }
 
-    navigate(`../${courseId}`);
+    navigate(`../${id}`);
   };
 
   return (
     <Card
-      onClick={() => redirectToCoursePage(courseId)}
+      onClick={redirectToCoursePage}
       withBorder
       radius="md"
       p="md"
       className={classes.card}
-      sx={{ cursor: userCanAccessCourse ? "pointer" : "not-allowed" }}
     >
       <Stack spacing="xs">
         <Group position="apart">
@@ -89,7 +108,7 @@ function CourseCard({
         </Group>
         <ScrollArea className={classes.scrollArea}>
           <Text size="sm" color={hasDescription ? "" : "dimmed"}>
-            {description ? description : "No description"}
+            {description || "No description"}
           </Text>
         </ScrollArea>
         <Group>
@@ -100,4 +119,4 @@ function CourseCard({
   );
 }
 
-export default CourseCard;
+export default memo(CourseCard);

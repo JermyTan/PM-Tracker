@@ -8,8 +8,8 @@ import {
   Button,
   Menu,
 } from "@mantine/core";
-import { GroupSummaryView } from "../types/groups";
 import { FaChevronDown, FaEdit, FaTrashAlt } from "react-icons/fa";
+import { GroupSummaryView } from "../types/groups";
 import PlaceholderWrapper from "./placeholder-wrapper";
 import UserProfileDisplay from "./user-profile-display";
 

@@ -1,4 +1,5 @@
 import { GroupSummaryView } from "../../types/groups";
+import { UserData } from "../../types/users";
 import baseApi from "./base-api";
 
 const groupsApi = baseApi.injectEndpoints({
@@ -9,7 +10,13 @@ const groupsApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    getCourseMembers: build.query<UserData[], number | string>({
+      query: (course_id) => ({
+        url: `/courses/${course_id}/memberships/`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useGetCourseGroupsQuery } = groupsApi;
+export const { useGetCourseGroupsQuery, useGetCourseMembersQuery } = groupsApi;

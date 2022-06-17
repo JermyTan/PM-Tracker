@@ -5,6 +5,7 @@ import { useGetSingleCourseQuery } from "../../redux/services/courses-api";
 import { useGetCourseGroupsQuery } from "../../redux/services/groups-api";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import GroupCard from "../group-card";
+import CourseMembershipsList from "../course-members-list";
 
 function CourseGroupPage() {
   const { courseId } = useParams();
@@ -21,7 +22,6 @@ function CourseGroupPage() {
 
   return (
     <>
-      <Space h="md" />
       <SimpleGrid cols={2}>
         <div>
           <Text weight={700} size="lg">
@@ -42,6 +42,8 @@ function CourseGroupPage() {
             </Stack>
           </PlaceholderWrapper>
         </div>
+
+        <CourseMembershipsList courseId={courseId} />
       </SimpleGrid>
     </>
   );

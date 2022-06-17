@@ -31,8 +31,6 @@ function MyCoursesPage() {
   useResolveError(error);
   const [isDrawerOpened, { open, close }] = useDisclosure(false);
 
-  console.log(isDrawerOpened);
-
   return (
     <>
       <Head>
@@ -49,7 +47,7 @@ function MyCoursesPage() {
         title={<Title order={2}>Course Creation</Title>}
       >
         <ScrollArea offsetScrollbars pr="xs" scrollbarSize={8}>
-          <CourseCreationForm />
+          <CourseCreationForm onSuccess={close} />
         </ScrollArea>
       </Drawer>
 

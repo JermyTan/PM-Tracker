@@ -5,7 +5,9 @@ import { useGetSingleCourseQuery } from "../../redux/services/courses-api";
 
 function CourseGroupPage() {
   const { courseId } = useParams();
-  const { data: course } = useGetSingleCourseQuery(courseId ?? skipToken);
+  const { course } = useGetSingleCourseQuery(courseId ?? skipToken, {
+    selectFromResult: ({ data }) => ({ course: data }),
+  });
 
   return (
     <>

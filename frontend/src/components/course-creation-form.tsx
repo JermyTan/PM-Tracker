@@ -61,7 +61,11 @@ const DEFAULT_VALUES: CourseCreationFormProps = {
   allowStudentsToAddOrRemoveGroupMembers: false,
 };
 
-function CourseCreationForm() {
+type Props = {
+  onSuccess?: () => void;
+};
+
+function CourseCreationForm({ onSuccess }: Props) {
   const methods = useForm<CourseCreationFormProps>({
     resolver: zodResolver(schema),
     defaultValues: DEFAULT_VALUES,
@@ -83,6 +87,7 @@ function CourseCreationForm() {
     toastUtils.success({
       message: "The new course has been created successfully.",
     });
+    onSuccess?.();
   };
 
   return (

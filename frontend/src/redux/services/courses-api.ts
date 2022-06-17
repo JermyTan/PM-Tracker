@@ -1,5 +1,10 @@
-import { CourseSummaryView, Course, CoursePostData } from "../../types/courses";
-import { invalidatesList, providesList } from "./api-cache-utils";
+import {
+  CourseSummaryView,
+  Course,
+  CoursePostData,
+  CoursePutData,
+} from "../../types/courses";
+import { cacher } from "./api-cache-utils";
 import baseApi from "./base-api";
 
 const coursesApi = baseApi
@@ -11,36 +16,47 @@ const coursesApi = baseApi
           url: "/courses/",
           method: "GET",
         }),
-        providesTags: (result) => providesList(result, "Course"), // [{Course, id: 1},{Course, id: 2}, {Course, id: LIST}]
+        providesTags: (result) => cacher.providesList(result, "Course"),
       }),
+
       createCourse: build.mutation<CourseSummaryView, CoursePostData>({
         query: (coursePostData) => ({
           url: "/courses/",
           method: "POST",
           body: coursePostData,
         }),
-        invalidatesTags: invalidatesList("Course"),
+        invalidatesTags: (_, error) =>
+          error ? [] : cacher.invalidatesList("Course"),
       }),
-      getSingleCourse: build.query<Course, number | string>({
+
+      getSingleCourse: build.query<Course, string | number>({
         query: (courseId) => ({
           url: `/courses/${courseId}/`,
           method: "GET",
         }),
-        providesTags: (result, error, arg) => [{ type: "Course", id: arg }],
+        providesTags: (_, __, id) => [{ type: "Course", id }],
       }),
-      updateCourse: build.mutation<Course, number | string>({
-        query: (courseId) => ({
+
+      updateCourse: build.mutation<
+        Course,
+        CoursePutData & { courseId: string | number }
+      >({
+        query: ({ courseId, ...coursePutData }) => ({
           url: `/courses/${courseId}/`,
           method: "PUT",
+          body: coursePutData,
         }),
-        invalidatesTags: [], // [{Course, id: 2}]
+        invalidatesTags: (_, error, { courseId: id }) =>
+          error ? [] : [{ type: "Course", id }],
       }),
-      deleteCourse: build.mutation<Course, number | string>({
+
+      deleteCourse: build.mutation<Course, string | number>({
         query: (courseId) => ({
           url: `/courses/${courseId}/`,
           method: "DELETE",
         }),
-        invalidatesTags: [], // [{Course, id: 2}]
+        invalidatesTags: (_, error, id) =>
+          error ? [] : [{ type: "Course", id }],
       }),
     }),
   });

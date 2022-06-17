@@ -84,8 +84,6 @@ function CourseCreationForm({ onSuccess }: Props) {
       return;
     }
 
-    console.log(formData);
-
     await createCourse(formData).unwrap();
 
     toastUtils.success({

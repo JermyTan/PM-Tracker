@@ -12,6 +12,7 @@ import {
   ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS,
   MILESTONE_ALIAS,
   ROLE,
+  OWNER_ID,
 } from "../constants";
 import { BaseData } from "./base";
 import { UserData } from "./users";
@@ -46,6 +47,10 @@ export type Course = CourseSummary & CourseSettings;
 
 export type CoursePostData = Pick<
   CourseSummary,
-  "name" | "description" | "isPublished"
+  typeof NAME | typeof DESCRIPTION | typeof IS_PUBLISHED
 > &
   CourseSettings;
+
+export type CoursePutData = CoursePostData & {
+  [OWNER_ID]?: number;
+};

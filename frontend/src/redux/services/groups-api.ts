@@ -3,7 +3,7 @@ import baseApi from "./base-api";
 
 const groupsApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    getCourseGroups: build.query<GroupSummaryView[], number>({
+    getCourseGroups: build.query<GroupSummaryView[], number | string>({
       query: (course_id) => ({
         url: `/courses/${course_id}/groups/`,
         method: "GET",

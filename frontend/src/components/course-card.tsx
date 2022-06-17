@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   Text,
@@ -50,6 +51,8 @@ function CourseCard({
   role,
 }: Props) {
   const { classes } = useStyles();
+  const navigate = useNavigate();
+
   const userCanAccessCourse = isPublished || role != Role.Student;
 
   const hasDescription = description.length > 0;
@@ -58,8 +61,8 @@ function CourseCard({
     if (!userCanAccessCourse) {
       return;
     }
-    // TODO: redirect to course page
-    console.log(`Course id: ${courseId}`);
+
+    navigate(`../${courseId}`);
   };
 
   return (

@@ -20,6 +20,7 @@ import RememberMeStorageManager from "../managers/remember-me-storage-manager";
 import CurrentUserStorageManager from "../managers/current-user-storage-manager";
 import ApiCacheManager from "../managers/api-cache-manager";
 import SplashScreen from "../components/splash-screen";
+import { colorModeValue } from "../utils/theme-utils";
 
 const SafeHydrate = dynamic(() => import("../components/safe-hydrate"), {
   ssr: false,
@@ -72,13 +73,15 @@ function App({ Component, pageProps }: AppProps) {
             withGlobalStyles
             theme={{
               colorScheme,
-              shadows: {
-                "xs-dark": "0px 1px 3px rgba(11, 12, 17, 0.9)",
-                "sm-dark": "0px 2px 4px rgba(11, 12, 17, 0.9)",
-                "md-dark": "0px 4px 8px rgba(11, 12, 17, 0.9)",
-                "lg-dark": "0px 8px 16px rgba(11, 12, 17, 0.9)",
-                "xl-dark": "0px 16px 24px rgba(11, 12, 17, 0.9)",
-              },
+              shadows: colorModeValue(colorScheme, {
+                darkModeValue: {
+                  xs: "0px 1px 3px rgba(11, 12, 17, 0.9)",
+                  sm: "0px 2px 4px rgba(11, 12, 17, 0.9)",
+                  md: "0px 4px 8px rgba(11, 12, 17, 0.9)",
+                  lg: "0px 8px 16px rgba(11, 12, 17, 0.9)",
+                  xl: "0px 16px 24px rgba(11, 12, 17, 0.9)",
+                },
+              }),
               colors: {
                 dark: [
                   "#DBDBDB",
@@ -119,6 +122,12 @@ function App({ Component, pageProps }: AppProps) {
                 },
                 leftIcon: {
                   marginRight: 6,
+                },
+              },
+              Drawer: {
+                drawer: {
+                  display: "flex",
+                  flexDirection: "column",
                 },
               },
             }}

@@ -71,7 +71,13 @@ function SidebarItem<C = "button">({
   const Icon = icon;
 
   return (
-    <Tooltip label={label} disabled={!showIconOnly} position="right" withArrow>
+    <Tooltip
+      label={label}
+      disabled={!showIconOnly}
+      position="right"
+      transition="scale-x"
+      transitionDuration={300}
+    >
       <UnstyledButton
         className={classes.button}
         px={showIconOnly ? "md" : "xl"}

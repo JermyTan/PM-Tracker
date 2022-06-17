@@ -6,7 +6,10 @@ import {
   createStyles,
   Space,
   SimpleGrid,
+  Drawer,
+  ScrollArea,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import Head from "next/head";
 import { HiViewGridAdd, HiRefresh } from "react-icons/hi";
 import { APP_NAME } from "../../constants";
@@ -16,6 +19,7 @@ import PlaceholderWrapper from "../placeholder-wrapper";
 import AccountTypeRestrictedWrapper from "../account-type-restricted-wrapper";
 import { useResolveError } from "../../utils/error-utils";
 import CourseCard from "../course-card";
+import CourseCreationForm from "../course-creation-form";
 
 const useStyles = createStyles({
   content: {
@@ -33,12 +37,29 @@ function MyCoursesPage() {
   } = useGetCoursesQuery();
   const { classes } = useStyles();
   useResolveError(error);
+  const [isDrawerOpened, { open, close }] = useDisclosure(false);
+
+  console.log(isDrawerOpened);
 
   return (
     <>
       <Head>
         <title>My Courses | {APP_NAME}</title>
       </Head>
+
+      <Drawer
+        opened={isDrawerOpened}
+        onClose={close}
+        position="right"
+        size="xl"
+        padding="lg"
+        closeButtonLabel="Cancel course creation"
+        title={<Title order={2}>Course Creation</Title>}
+      >
+        <ScrollArea offsetScrollbars pr="xs" scrollbarSize={8}>
+          <CourseCreationForm />
+        </ScrollArea>
+      </Drawer>
 
       <Group position="apart">
         <Title>My Courses</Title>
@@ -55,7 +76,7 @@ function MyCoursesPage() {
           <AccountTypeRestrictedWrapper
             allowedAccountTypes={[AccountType.Educator, AccountType.Admin]}
           >
-            <Button color="green" leftIcon={<HiViewGridAdd />}>
+            <Button color="green" leftIcon={<HiViewGridAdd />} onClick={open}>
               Create new course
             </Button>
           </AccountTypeRestrictedWrapper>

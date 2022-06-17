@@ -5,21 +5,20 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginContext } from "../contexts/login-provider";
 import TextField from "./text-field";
-import { CheckAccountPostData } from "../types/auth";
-import { trim } from "../utils/transform-utils";
 import { handleSubmitForm } from "../utils/form-utils";
 import { useResolveError } from "../utils/error-utils";
 import { EMAIL } from "../constants";
 import { useLazyCheckAccountQuery } from "../redux/services/auth-api";
 
-type LoginEmailFormProps = CheckAccountPostData;
-
 const schema = z.object({
-  [EMAIL]: z.preprocess(
-    trim,
-    z.string().min(1, "Please enter an email").email(),
-  ),
+  [EMAIL]: z.string().trim().min(1, "Please enter an email").email(),
 });
+
+type LoginEmailFormProps = z.infer<typeof schema>;
+
+const DEFAULT_VALUES: LoginEmailFormProps = {
+  email: "",
+};
 
 function LoginEmailForm() {
   const { inputEmail, setAccountDetails, setInputEmail } =
@@ -29,7 +28,7 @@ function LoginEmailForm() {
 
   const methods = useForm<LoginEmailFormProps>({
     resolver: zodResolver(schema),
-    defaultValues: { email: inputEmail },
+    defaultValues: DEFAULT_VALUES,
   });
 
   const {

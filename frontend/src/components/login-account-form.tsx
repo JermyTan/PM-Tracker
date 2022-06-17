@@ -12,7 +12,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import toastUtils from "../utils/toast-utils";
 import { EMAIL, NAME, PASSWORD, REMEMBER_ME } from "../constants";
-import { PasswordLoginPostData } from "../types/auth";
 import TextField from "./text-field";
 import PasswordField from "./password-field";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
@@ -21,28 +20,23 @@ import CheckboxField from "./checkbox-field";
 import loggedIn from "../redux/thunks/logged-in";
 import { usePasswordLoginMutation } from "../redux/services/auth-api";
 import { handleSubmitForm } from "../utils/form-utils";
-import { trim } from "../utils/transform-utils";
 import { LoginContext } from "../contexts/login-provider";
 import { useResolveError } from "../utils/error-utils";
 
 const schema = z.object({
-  [EMAIL]: z.preprocess(trim, z.string().min(1).email()),
-  [NAME]: z.preprocess(
-    trim,
-    z
-      .string()
-      .min(1, "Please enter your name")
-      .refine((value) => !z.string().email().safeParse(value).success, {
-        message: "Please enter your name and not email",
-      }),
-  ),
-  [PASSWORD]: z.preprocess(trim, z.string().min(1, "Please enter password")),
+  [EMAIL]: z.string().trim().min(1).email(),
+  [NAME]: z
+    .string()
+    .trim()
+    .min(1, "Please enter your name")
+    .refine((value) => !z.string().email().safeParse(value).success, {
+      message: "Please enter your name and not email",
+    }),
+  [PASSWORD]: z.string().trim().min(1, "Please enter password"),
   [REMEMBER_ME]: z.boolean(),
 });
 
-type LoginAccountFormProps = PasswordLoginPostData & {
-  [REMEMBER_ME]: boolean;
-};
+type LoginAccountFormProps = z.infer<typeof schema>;
 
 const DEFAULT_VALUES: LoginAccountFormProps = {
   name: "",
@@ -114,7 +108,6 @@ function LoginAccountForm() {
                 label="Full Name"
                 autoFocus
                 autoComplete="name"
-                width="100%"
               />
             )}
 
@@ -123,7 +116,6 @@ function LoginAccountForm() {
               label="Password"
               autoComplete={name ? "current-password" : "new-password"}
               autoFocus={Boolean(name)}
-              width="100%"
             />
 
             <Group position="apart">

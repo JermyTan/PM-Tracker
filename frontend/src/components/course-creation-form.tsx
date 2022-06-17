@@ -24,6 +24,7 @@ import {
   NAME,
   SHOW_GROUP_MEMBERS_NAMES,
 } from "../constants";
+import { useCreateCourseMutation } from "../redux/services/courses-api";
 import { useResolveError } from "../utils/error-utils";
 import { handleSubmitForm } from "../utils/form-utils";
 import toastUtils from "../utils/toast-utils";
@@ -71,18 +72,21 @@ function CourseCreationForm({ onSuccess }: Props) {
     defaultValues: DEFAULT_VALUES,
   });
   const resolveError = useResolveError();
+  const [createCourse] = useCreateCourseMutation();
 
   const {
     handleSubmit,
     formState: { isSubmitting },
   } = methods;
 
-  const onSubmit = (formData: CourseCreationFormProps) => {
+  const onSubmit = async (formData: CourseCreationFormProps) => {
     if (isSubmitting) {
       return;
     }
 
     console.log(formData);
+
+    await createCourse(formData).unwrap();
 
     toastUtils.success({
       message: "The new course has been created successfully.",

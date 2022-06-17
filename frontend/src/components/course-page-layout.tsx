@@ -38,7 +38,7 @@ function CoursePageLayout({ children }: Props) {
 
   // update label during runtime
   tabDetails[0].label = pluralize(
-    capitalCase(course?.milestoneAlias ?? MILESTONE),
+    capitalCase(course?.milestoneAlias || MILESTONE),
   );
 
   const activeIndex = (() => {

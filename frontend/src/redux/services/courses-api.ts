@@ -1,5 +1,5 @@
 import {
-  CourseSummaryView,
+  CourseSummary,
   Course,
   CoursePostData,
   CoursePutData,
@@ -11,7 +11,7 @@ const coursesApi = baseApi
   .enhanceEndpoints({ addTagTypes: ["Course"] })
   .injectEndpoints({
     endpoints: (build) => ({
-      getCourses: build.query<CourseSummaryView[], void>({
+      getCourses: build.query<CourseSummary[], void>({
         query: () => ({
           url: "/courses/",
           method: "GET",
@@ -19,7 +19,7 @@ const coursesApi = baseApi
         providesTags: (result) => cacher.providesList(result, "Course"),
       }),
 
-      createCourse: build.mutation<CourseSummaryView, CoursePostData>({
+      createCourse: build.mutation<CourseSummary, CoursePostData>({
         query: (coursePostData) => ({
           url: "/courses/",
           method: "POST",
@@ -65,4 +65,6 @@ export const {
   useGetCoursesQuery,
   useCreateCourseMutation,
   useGetSingleCourseQuery,
+  useUpdateCourseMutation,
+  useDeleteCourseMutation,
 } = coursesApi;

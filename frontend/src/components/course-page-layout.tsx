@@ -31,7 +31,7 @@ const tabDetails = [
 function CoursePageLayout({ children }: Props) {
   const { courseId } = useParams();
   const { course, isLoading } = useGetSingleCourseQuery(courseId ?? skipToken, {
-    selectFromResult: ({ data, isLoading }) => ({ course: data, isLoading }),
+    selectFromResult: ({ data: course, isLoading }) => ({ course, isLoading }),
   });
   const { pathname } = useLocation();
   const navigate = useNavigate();

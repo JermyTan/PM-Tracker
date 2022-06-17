@@ -5,6 +5,7 @@ import {
   Text,
   createStyles,
   Space,
+  SimpleGrid,
   Drawer,
   ScrollArea,
 } from "@mantine/core";
@@ -17,6 +18,7 @@ import { AccountType } from "../../types/users";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import AccountTypeRestrictedWrapper from "../account-type-restricted-wrapper";
 import { useResolveError } from "../../utils/error-utils";
+import CourseCard from "../course-card";
 import CourseCreationForm from "../course-creation-form";
 
 const useStyles = createStyles({
@@ -26,7 +28,13 @@ const useStyles = createStyles({
 });
 
 function MyCoursesPage() {
-  const { data, isLoading, isFetching, refetch, error } = useGetCoursesQuery();
+  const {
+    data: courses,
+    isLoading,
+    isFetching,
+    refetch,
+    error,
+  } = useGetCoursesQuery();
   const { classes } = useStyles();
   useResolveError(error);
   const [isDrawerOpened, { open, close }] = useDisclosure(false);
@@ -79,8 +87,14 @@ function MyCoursesPage() {
         isLoading={isLoading}
         py={150}
         loadingMessage="Loading my courses..."
+        defaultMessage="No courses found"
+        showDefaultMessage={!isLoading && (!courses || courses?.length === 0)}
       >
-        <Text className={classes.content}>{JSON.stringify(data, null, 4)}</Text>
+        <SimpleGrid cols={3} spacing="xs">
+          {courses?.map((course) => (
+            <CourseCard {...course} key={course.id} />
+          ))}
+        </SimpleGrid>
       </PlaceholderWrapper>
     </>
   );

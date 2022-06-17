@@ -34,4 +34,6 @@ export const ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS =
 export const MILESTONE_ALIAS = "milestoneAlias";
 export const ROLE = "role";
 export const FAILED_TOKEN_REFRESH = "failedTokenRefresh";
+export const MEMBER_COUNT = "memberCount";
+export const MEMBERS = "members";
 export const MILESTONE = "milestone";

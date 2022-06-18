@@ -14,7 +14,6 @@ function CourseGroupPage() {
     courseId ?? skipToken,
   );
 
-  // TODO: edit based on permissions
   const { data: course } = useGetSingleCourseQuery(courseId ?? skipToken);
 
   return (
@@ -33,7 +32,7 @@ function CourseGroupPage() {
         >
           <Stack spacing="xs">
             {groups?.map((group) => (
-              <GroupCard groupId={group.id} key={group.id} />
+              <GroupCard groupId={group.id} key={group.id} course={course} />
             ))}
           </Stack>
         </PlaceholderWrapper>

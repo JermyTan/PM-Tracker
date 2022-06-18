@@ -28,19 +28,20 @@ const coursesApi = baseApi
         }),
         providesTags: (result, error, arg) => [{ type: "Course", id: arg }],
       }),
+      // TODO: check if the following 2 are implemented correctly
       updateCourse: build.mutation<Course, number | string>({
         query: (courseId) => ({
           url: `/courses/${courseId}/`,
           method: "PUT",
         }),
-        invalidatesTags: [], // [{Course, id: 2}]
+        invalidatesTags: (result, error, arg) => [{ type: "Course", id: arg }], // [{Course, id: 2}]
       }),
       deleteCourse: build.mutation<Course, number | string>({
         query: (courseId) => ({
           url: `/courses/${courseId}/`,
           method: "DELETE",
         }),
-        invalidatesTags: [], // [{Course, id: 2}]
+        invalidatesTags: invalidatesList("Course"), // [{Course, id: 2}]
       }),
     }),
   });

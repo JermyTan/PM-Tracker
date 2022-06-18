@@ -58,7 +58,7 @@ from .models import (
 logger = logging.getLogger("main")
 
 
-def course_summary_to_json(course: Course) -> dict:
+def course_summary_to_json(course: Course, membership: CourseMembership) -> dict:
     data = to_base_json(course)
 
     data |= {
@@ -66,13 +66,14 @@ def course_summary_to_json(course: Course) -> dict:
         OWNER: user_to_json(course.owner),
         DESCRIPTION: course.description,
         IS_PUBLISHED: course.is_published,
+        ROLE: membership.role,
     }
 
     return data
 
 
-def course_to_json(course: Course) -> dict:
-    data = course_summary_to_json(course=course)
+def course_to_json(course: Course, membership: CourseMembership) -> dict:
+    data = course_summary_to_json(course=course, membership=membership)
 
     course_settings: CourseSettings = course.coursesettings
     data |= {

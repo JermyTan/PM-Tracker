@@ -9,7 +9,7 @@ import {
   Menu,
 } from "@mantine/core";
 import { FaChevronDown, FaEdit, FaTrashAlt } from "react-icons/fa";
-import { MdGroup } from "react-icons/md";
+import { MdGroup, MdLogout, MdPersonAdd } from "react-icons/md";
 import { createSelector } from "@reduxjs/toolkit";
 import { useParams } from "react-router-dom";
 import { skipToken } from "@reduxjs/toolkit/dist/query";
@@ -19,8 +19,9 @@ import PlaceholderWrapper from "./placeholder-wrapper";
 import UserProfileDisplay from "./user-profile-display";
 import { useGetCourseGroupsQuery } from "../redux/services/groups-api";
 import { selectCurrentUser } from "../redux/slices/current-user-slice";
-import { Course } from "../types/courses";
+import { Course, Role } from "../types/courses";
 import { useAppSelector } from "../redux/hooks";
+import GroupCardActionsMenu from "./group-card-actions-menu";
 
 const useStyles = createStyles((theme) => ({
   card: {
@@ -60,6 +61,7 @@ function GroupCard({ groupId, course }: Props) {
   const { classes } = useStyles();
 
   const currentUser = useAppSelector(selectCurrentUser);
+  const hasAdminPermission = course?.role !== Role.Student;
 
   const selectGroup = useMemo(
     () =>
@@ -68,15 +70,16 @@ function GroupCard({ groupId, course }: Props) {
         (_: unknown, id?: number) => id,
         (data, id) => {
           const group = data?.find((group) => group.id === id);
-          // TODO: handle this
-          const userIsInGroup = false;
+          const userIsInGroup = group?.members?.some(
+            (member) => member.id === currentUser?.user?.id,
+          );
           return {
             group,
             userIsInGroup,
           };
         },
       ),
-    [],
+    [currentUser?.user?.id],
   );
 
   // TODO: find out the proper way to handle this
@@ -87,10 +90,21 @@ function GroupCard({ groupId, course }: Props) {
     },
   );
 
-  // TODO: implement the logic for this
-  const userIsNotStudent = false;
   const shouldDisplayMembers =
-    course?.showGroupMembersNames || userIsInGroup || userIsNotStudent;
+    hasAdminPermission || course.showGroupMembersNames || userIsInGroup;
+
+  const canJoinGroup =
+    hasAdminPermission || (!userIsInGroup && course.allowStudentsToJoinGroups);
+
+  const canLeaveGroup =
+    hasAdminPermission || (userIsInGroup && course.allowStudentsToLeaveGroups);
+
+  const canEditMembers =
+    hasAdminPermission ||
+    (userIsInGroup && course.allowStudentsToAddOrRemoveGroupMembers);
+
+  const canDeleteMembers =
+    hasAdminPermission || (userIsInGroup && course.allowStudentsToDeleteGroups);
 
   return (
     <Card withBorder radius="md" p="md" className={classes.card}>
@@ -105,18 +119,14 @@ function GroupCard({ groupId, course }: Props) {
               {group?.memberCount} {pluralize("members", group?.memberCount)}
             </Text>
           </div>
-
-          <Menu
-            control={
-              <ActionIcon>
-                <FaChevronDown />
-              </ActionIcon>
-            }
-            placement="end"
-          >
-            <Menu.Item icon={<FaEdit size={14} />}>Edit members</Menu.Item>
-            <Menu.Item icon={<FaTrashAlt size={14} />}>Delete group</Menu.Item>
-          </Menu>
+          <GroupCardActionsMenu
+            canJoinGroup={canJoinGroup}
+            canLeaveGroup={canLeaveGroup}
+            canDeleteMembers={canDeleteMembers}
+            canEditMembers={canEditMembers}
+            courseId={courseId}
+            groupId={group?.id}
+          />
         </Group>
         {shouldDisplayMembers && (
           <PlaceholderWrapper
@@ -124,7 +134,7 @@ function GroupCard({ groupId, course }: Props) {
             py={10}
             loadingMessage="Loading members..."
             defaultMessage="No members found"
-            showDefaultMessage={!group?.members || group?.members?.length === 0}
+            showDefaultMessage={!group?.members || group.members?.length === 0}
           >
             {group?.members?.map((member) => (
               <UserProfileDisplay {...member} />

@@ -14,7 +14,9 @@ function CourseGroupPage() {
     courseId ?? skipToken,
   );
 
-  const { data: course } = useGetSingleCourseQuery(courseId ?? skipToken);
+  const { course } = useGetSingleCourseQuery(courseId ?? skipToken, {
+    selectFromResult: ({ data: course }) => ({ course }),
+  });
 
   return (
     <SimpleGrid cols={2}>

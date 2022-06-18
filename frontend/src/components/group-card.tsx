@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Card,
   Text,
@@ -9,9 +9,13 @@ import {
   Menu,
 } from "@mantine/core";
 import { FaChevronDown, FaEdit, FaTrashAlt } from "react-icons/fa";
+import { createSelector } from "@reduxjs/toolkit";
+import { useParams } from "react-router-dom";
+import { skipToken } from "@reduxjs/toolkit/dist/query";
 import { GroupSummaryView } from "../types/groups";
 import PlaceholderWrapper from "./placeholder-wrapper";
 import UserProfileDisplay from "./user-profile-display";
+import { useGetCourseGroupsQuery } from "../redux/services/groups-api";
 
 const useStyles = createStyles((theme) => ({
   card: {
@@ -41,18 +45,43 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-type Props = GroupSummaryView;
+type Props = {
+  groupId: number;
+};
 
-function GroupCard({ name, id: groupId, memberCount, members }: Props) {
+function GroupCard({ groupId }: Props) {
+  const { courseId } = useParams();
   const { classes } = useStyles();
+
+  const selectGroup = useMemo(
+    () =>
+      createSelector(
+        (data?: GroupSummaryView[]) => data,
+        (_: unknown, id?: number) => id,
+        (data, id) => ({
+          group: data?.find((group) => group.id === id),
+        }),
+      ),
+    [],
+  );
+
+  // TODO: find out the proper way to handle this
+  const { group } = useGetCourseGroupsQuery(courseId ?? skipToken, {
+    selectFromResult: ({ data }) => selectGroup(data, groupId),
+  });
+
+  // const userIsInGroup = false;
 
   return (
     <Card withBorder radius="md" p="md" className={classes.card}>
       <Stack spacing="xs">
         <Group position="apart">
-          <Text size="lg" weight={500} lineClamp={2}>
-            {name}
+          <Text size="md" weight={500} lineClamp={1}>
+            {group?.name}
           </Text>
+          {/* <Text style="dimmed">
+              {}
+          </Text> */}
 
           <Menu
             control={
@@ -73,9 +102,9 @@ function GroupCard({ name, id: groupId, memberCount, members }: Props) {
           py={10}
           loadingMessage="Loading members..."
           defaultMessage="No members found"
-          showDefaultMessage={!members || members?.length === 0}
+          showDefaultMessage={!group?.members || group?.members?.length === 0}
         >
-          {members?.map((member) => (
+          {group?.members?.map((member) => (
             <UserProfileDisplay {...member} />
           ))}
         </PlaceholderWrapper>

@@ -8,31 +8,25 @@ type Props = {
 };
 
 function CourseMembersList({ courseId }: Props) {
-  const {
-    data: members,
-    isLoading,
-    isFetching,
-    refetch,
-    error,
-  } = useGetCourseGroupsQuery(courseId ?? skipToken);
+  const { data: members, isLoading } = useGetCourseGroupsQuery(
+    courseId ?? skipToken,
+  );
 
   return (
-    <>
-      <Stack>
-        <Text weight={700} size="lg">
-          Course Members
-        </Text>
-        <PlaceholderWrapper
-          py={10}
-          isLoading={isLoading}
-          loadingMessage="Loading members..."
-          defaultMessage="No members found."
-          showDefaultMessage={!isLoading && (!members || members?.length === 0)}
-        >
-          <Stack spacing="xs"></Stack>
-        </PlaceholderWrapper>
-      </Stack>
-    </>
+    <Stack>
+      <Text weight={700} size="lg">
+        Course Members
+      </Text>
+      <PlaceholderWrapper
+        py={10}
+        isLoading={isLoading}
+        loadingMessage="Loading members..."
+        defaultMessage="No members found."
+        showDefaultMessage={!isLoading && (!members || members?.length === 0)}
+      >
+        <Stack spacing="xs" />
+      </PlaceholderWrapper>
+    </Stack>
   );
 }
 

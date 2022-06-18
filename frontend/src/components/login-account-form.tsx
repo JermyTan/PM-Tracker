@@ -22,6 +22,7 @@ import { usePasswordLoginMutation } from "../redux/services/auth-api";
 import { handleSubmitForm } from "../utils/form-utils";
 import { LoginContext } from "../contexts/login-provider";
 import { useResolveError } from "../utils/error-utils";
+import { emptySelector } from "../redux/utils";
 
 const schema = z.object({
   [EMAIL]: z.string().trim().min(1).email(),
@@ -55,7 +56,9 @@ function LoginAccountForm() {
   const { classes } = useStyles();
   const rememberMe = useAppSelector(selectRememberMe);
   const dispatch = useAppDispatch();
-  const [passwordLogin] = usePasswordLoginMutation();
+  const [passwordLogin] = usePasswordLoginMutation({
+    selectFromResult: emptySelector,
+  });
   const { accountDetails, setAccountDetails } = useContext(LoginContext);
   const name = accountDetails?.name ?? "";
   const email = accountDetails?.email ?? "";

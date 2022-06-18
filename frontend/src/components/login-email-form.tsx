@@ -9,6 +9,7 @@ import { handleSubmitForm } from "../utils/form-utils";
 import { useResolveError } from "../utils/error-utils";
 import { EMAIL } from "../constants";
 import { useLazyCheckAccountQuery } from "../redux/services/auth-api";
+import { emptySelector } from "../redux/utils";
 
 const schema = z.object({
   [EMAIL]: z.string().trim().min(1, "Please enter an email").email(),
@@ -23,7 +24,9 @@ const DEFAULT_VALUES: LoginEmailFormProps = {
 function LoginEmailForm() {
   const { inputEmail, setAccountDetails, setInputEmail } =
     useContext(LoginContext);
-  const [checkAccount] = useLazyCheckAccountQuery();
+  const [checkAccount] = useLazyCheckAccountQuery({
+    selectFromResult: emptySelector,
+  });
   const resolveError = useResolveError();
 
   const methods = useForm<LoginEmailFormProps>({

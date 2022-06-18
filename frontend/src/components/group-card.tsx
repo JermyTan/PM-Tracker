@@ -18,7 +18,6 @@ import { GroupSummaryView } from "../types/groups";
 import PlaceholderWrapper from "./placeholder-wrapper";
 import UserProfileDisplay from "./user-profile-display";
 import { useGetCourseGroupsQuery } from "../redux/services/groups-api";
-import { selectCurrentUser } from "../redux/slices/current-user-slice";
 import { Course, Role } from "../types/courses";
 import { useAppSelector } from "../redux/hooks";
 import GroupCardActionsMenu from "./group-card-actions-menu";
@@ -60,7 +59,7 @@ function GroupCard({ groupId, course }: Props) {
   const { courseId } = useParams();
   const { classes } = useStyles();
 
-  const currentUser = useAppSelector(selectCurrentUser);
+  const userId = useAppSelector(({ currentUser }) => currentUser?.user?.id);
   const hasAdminPermission = course?.role !== Role.Student;
 
   const selectGroup = useMemo(
@@ -71,7 +70,7 @@ function GroupCard({ groupId, course }: Props) {
         (data, id) => {
           const group = data?.find((group) => group.id === id);
           const userIsInGroup = group?.members?.some(
-            (member) => member.id === currentUser?.user?.id,
+            (member) => member.id === userId,
           );
           return {
             group,
@@ -79,7 +78,7 @@ function GroupCard({ groupId, course }: Props) {
           };
         },
       ),
-    [currentUser?.user?.id],
+    [userId],
   );
 
   // TODO: find out the proper way to handle this

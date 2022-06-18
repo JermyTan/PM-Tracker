@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
-import { useDeepEqualAppSelector } from "../redux/hooks";
-import { selectCurrentUserDisplayInfo } from "../redux/slices/current-user-slice";
+import { useAppSelector } from "../redux/hooks";
 import { AccountType } from "../types/users";
 
 type Props = {
@@ -14,8 +13,9 @@ function AccountTypeRestrictedWrapper({
   allowedAccountTypes,
   fallback = null,
 }: Props) {
-  const { accountType } =
-    useDeepEqualAppSelector(selectCurrentUserDisplayInfo) ?? {};
+  const accountType = useAppSelector(
+    ({ currentUser }) => currentUser?.user?.accountType,
+  );
 
   return (
     <>

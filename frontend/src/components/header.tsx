@@ -9,8 +9,7 @@ import {
 } from "@mantine/core";
 import { HiMenu } from "react-icons/hi";
 import ColorModeToggler from "./color-mode-toggler";
-import { useDeepEqualAppSelector } from "../redux/hooks";
-import { selectCurrentUserDisplayInfo } from "../redux/slices/current-user-slice";
+import { useShallowEqualAppSelector } from "../redux/hooks";
 
 type Props = Omit<BoxProps<"header">, "children"> & {
   isSiderbarExpanded: boolean;
@@ -31,8 +30,12 @@ function Header({
   className,
   ...props
 }: Props) {
-  const { name, profileImage } =
-    useDeepEqualAppSelector(selectCurrentUserDisplayInfo) ?? {};
+  const { name, profileImage } = useShallowEqualAppSelector(
+    ({ currentUser }) => ({
+      name: currentUser?.user?.name,
+      profileImage: currentUser?.user?.profileImage,
+    }),
+  );
   const { classes, cx } = useStyles();
 
   return (

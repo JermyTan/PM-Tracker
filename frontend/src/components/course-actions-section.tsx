@@ -10,17 +10,15 @@ import { useDisclosure } from "@mantine/hooks";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { MdEdit } from "react-icons/md";
 import { useParams } from "react-router-dom";
-import { useDeepEqualAppSelector } from "../redux/hooks";
+import { useAppSelector } from "../redux/hooks";
 import { useGetSingleCourseQuery } from "../redux/services/courses-api";
-import { selectCurrentUserDisplayInfo } from "../redux/slices/current-user-slice";
 import CourseEditForm from "./course-edit-form";
 import DeleteCourseButton from "./delete-course-button";
 
 type Props = StackProps;
 
 function CourseActionsSection(props: Props) {
-  const { id: userId } =
-    useDeepEqualAppSelector(selectCurrentUserDisplayInfo) ?? {};
+  const userId = useAppSelector(({ currentUser }) => currentUser?.user?.id);
   const { courseId } = useParams();
   const { ownerId } = useGetSingleCourseQuery(courseId ?? skipToken, {
     selectFromResult: ({ data: course }) => ({ ownerId: course?.owner.id }),

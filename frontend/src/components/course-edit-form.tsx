@@ -32,6 +32,7 @@ import {
   useGetSingleCourseQuery,
   useUpdateCourseMutation,
 } from "../redux/services/courses-api";
+import { emptySelector } from "../redux/utils";
 import { useResolveError } from "../utils/error-utils";
 import { handleSubmitForm } from "../utils/form-utils";
 import toastUtils from "../utils/toast-utils";
@@ -75,7 +76,9 @@ function CourseEditForm({ onSuccess }: Props) {
     defaultValues: course,
   });
   const resolveError = useResolveError();
-  const [updateCourse] = useUpdateCourseMutation();
+  const [updateCourse] = useUpdateCourseMutation({
+    selectFromResult: emptySelector,
+  });
   const { classes } = useStyles();
 
   const {

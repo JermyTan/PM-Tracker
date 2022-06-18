@@ -31,9 +31,5 @@ export const selectCurrentUserTokens = createSelector(
   selectCurrentUser,
   (currentUser) => currentUser?.tokens,
 );
-export const selectCurrentUserDisplayInfo = createSelector(
-  selectCurrentUser,
-  (currentUser) => currentUser?.user,
-);
 
 export default currentUserSlice;

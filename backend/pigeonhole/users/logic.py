@@ -5,11 +5,8 @@ from django.db import transaction
 
 from pigeonhole.common.exceptions import InternalServerError, BadRequest
 from pigeonhole.common.constants import (
-    ID,
     NAME,
     EMAIL,
-    CREATED_AT,
-    UPDATED_AT,
     PROFILE_IMAGE,
     ACCOUNT_TYPE,
     HAS_PASSWORD_AUTH,
@@ -36,6 +33,7 @@ def user_to_json(user: User) -> dict:
         PROFILE_IMAGE: user.profile_image.image_url
         if user.profile_image is not None
         else None,
+        ACCOUNT_TYPE: user.account_type,
     }
 
     return data

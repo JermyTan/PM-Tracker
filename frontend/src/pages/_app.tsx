@@ -4,12 +4,10 @@ import {
   MantineProvider,
   ColorSchemeProvider,
   ColorScheme,
-  // Global,
-  // MantineTheme,
 } from "@mantine/core";
 import { useLocalStorage } from "@mantine/hooks";
 import { NotificationsProvider } from "@mantine/notifications";
-import { ContextModalProps, ModalsProvider } from "@mantine/modals";
+import { ModalsProvider } from "@mantine/modals";
 import Head from "next/head";
 import { AppProps } from "next/app";
 import { Provider as ReduxProvider } from "react-redux";
@@ -25,20 +23,6 @@ import { colorModeValue } from "../utils/theme-utils";
 const SafeHydrate = dynamic(() => import("../components/safe-hydrate"), {
   ssr: false,
 });
-// import { colorModeValue } from "../utils/theme-utils";
-
-// const textColor = (theme: MantineTheme) => ({
-//   color: colorModeValue(theme.colorScheme, {
-//     lightModeValue: theme.black,
-//     darkModeValue: theme.colors.gray[3],
-//   }),
-// });
-
-function TestModal({
-  context,
-  id,
-  innerProps: { modalTest },
-}: ContextModalProps<{ modalTest: string }>) {}
 
 function App({ Component, pageProps }: AppProps) {
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
@@ -138,18 +122,6 @@ function App({ Component, pageProps }: AppProps) {
               },
             }}
           >
-            {/* Global body style override
-            <Global
-              styles={(theme) => ({
-                body: {
-                  color: colorModeValue(theme.colorScheme, {
-                    lightModeValue: theme.black,
-                    darkModeValue: theme.colors.gray[3],
-                  }),
-                },
-              })}
-            /> */}
-
             <NotificationsProvider position="bottom-center" limit={3}>
               <ModalsProvider>
                 {/* Order matters here since useEffect will run sequentially */}

@@ -8,6 +8,7 @@ import {
   Space,
   Button,
   createStyles,
+  LoadingOverlay,
 } from "@mantine/core";
 import { useDidUpdate } from "@mantine/hooks";
 import { skipToken } from "@reduxjs/toolkit/query/react";
@@ -68,9 +69,15 @@ type Props = {
 
 function CourseEditForm({ onSuccess }: Props) {
   const { courseId } = useParams();
-  const { course } = useGetSingleCourseQuery(courseId ?? skipToken, {
-    selectFromResult: ({ data: course }) => ({ course }),
-  });
+  const { course, isFetching } = useGetSingleCourseQuery(
+    courseId ?? skipToken,
+    {
+      selectFromResult: ({ data: course, isFetching }) => ({
+        course,
+        isFetching,
+      }),
+    },
+  );
   const methods = useForm<CourseEditFormProps>({
     resolver: zodResolver(schema),
     defaultValues: course,
@@ -108,6 +115,7 @@ function CourseEditForm({ onSuccess }: Props) {
         onSubmit={handleSubmitForm(handleSubmit(onSubmit), resolveError)}
         autoComplete="off"
       >
+        <LoadingOverlay visible={isFetching} />
         <Stack>
           <Text size="lg" weight={500}>
             Course Details

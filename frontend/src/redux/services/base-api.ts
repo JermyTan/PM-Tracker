@@ -161,9 +161,9 @@ const baseQueryWithTokenRefresh: BaseQueryFn<
 // Reference: https://redux-toolkit.js.org/rtk-query/usage/code-splitting
 const baseApi = createApi({
   baseQuery: baseQueryWithTokenRefresh,
-  keepUnusedDataFor: 30,
+  keepUnusedDataFor: 60,
   refetchOnReconnect: true,
-  refetchOnMountOrArgChange: 30,
+  refetchOnMountOrArgChange: 60,
   endpoints: () => ({}),
 });
 

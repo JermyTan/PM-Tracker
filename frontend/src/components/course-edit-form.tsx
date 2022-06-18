@@ -12,6 +12,7 @@ import {
 } from "@mantine/core";
 import { useDidUpdate } from "@mantine/hooks";
 import { skipToken } from "@reduxjs/toolkit/query/react";
+import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FaQuestion } from "react-icons/fa";
 import { useParams } from "react-router-dom";
@@ -76,8 +77,10 @@ function CourseEditForm({ onSuccess }: Props) {
         course,
         isFetching,
       }),
+      refetchOnMountOrArgChange: true,
     },
   );
+
   const methods = useForm<CourseEditFormProps>({
     resolver: zodResolver(schema),
     defaultValues: course,
@@ -117,6 +120,7 @@ function CourseEditForm({ onSuccess }: Props) {
       >
         <LoadingOverlay visible={isFetching} />
         <Stack>
+          {/* TODO: add change of course owner, API already supports */}
           <Text size="lg" weight={500}>
             Course Details
           </Text>

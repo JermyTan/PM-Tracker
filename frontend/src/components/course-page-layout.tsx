@@ -8,6 +8,7 @@ import pluralize from "pluralize";
 import { useGetSingleCourseQuery } from "../redux/services/courses-api";
 import PlaceholderWrapper from "./placeholder-wrapper";
 import { APP_NAME, MILESTONE } from "../constants";
+import { useResolveError } from "../utils/error-utils";
 
 type Props = {
   children: ReactNode;
@@ -30,9 +31,19 @@ const tabDetails = [
 
 function CoursePageLayout({ children }: Props) {
   const { courseId } = useParams();
-  const { course, isLoading } = useGetSingleCourseQuery(courseId ?? skipToken, {
-    selectFromResult: ({ data: course, isLoading }) => ({ course, isLoading }),
-  });
+  const { course, isLoading, error } = useGetSingleCourseQuery(
+    courseId ?? skipToken,
+    {
+      selectFromResult: ({ data: course, isLoading, error }) => ({
+        course,
+        isLoading,
+        error,
+      }),
+    },
+  );
+  // important! The very first (outermost) api call needs to resolve the error
+  // subsequent api calls to the same endpoint do not need to resolve error since it is already handled here
+  useResolveError(error);
   const { pathname } = useLocation();
   const navigate = useNavigate();
 

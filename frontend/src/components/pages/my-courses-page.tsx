@@ -27,6 +27,8 @@ function MyCoursesPage() {
     refetch,
     error,
   } = useGetCoursesQuery();
+  // important! The very first (outermost) api call needs to resolve the error
+  // subsequent api calls to the same endpoint do not need to resolve error since it is already handled here
   useResolveError(error);
   const [isDrawerOpened, { open, close }] = useDisclosure(false);
 

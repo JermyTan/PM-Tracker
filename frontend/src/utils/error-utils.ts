@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { useNetwork } from "@mantine/hooks";
 import { isRecord } from "./transform-utils";
 import toastUtils from "./toast-utils";
 import type { AppDispatch } from "../redux/store";
@@ -44,7 +45,7 @@ export function getErrorMessage(error: unknown) {
 function resolveError(
   error: unknown,
   dispatch: AppDispatch,
-  defaultErrorMessage = "An unknown error has occurred.",
+  defaultErrorMessage: string,
 ) {
   if (!error) {
     return;
@@ -68,11 +69,13 @@ function resolveError(
   dispatch(resetAppState());
 }
 
-export function useResolveError(
-  error?: unknown,
-  defaultErrorMessage = "An unknown error has occurred.",
-) {
-  const defaultUseResolveErrorMessage = defaultErrorMessage;
+export function useResolveError(error?: unknown, defaultErrorMessage?: string) {
+  const networkStatus = useNetwork();
+  const defaultUseResolveErrorMessage =
+    defaultErrorMessage ??
+    (networkStatus.online
+      ? "An unknown error has occurred."
+      : "No internet connection.");
   const dispatch = useAppDispatch();
 
   useEffect(() => {

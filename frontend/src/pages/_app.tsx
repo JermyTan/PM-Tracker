@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { useLocalStorage } from "@mantine/hooks";
 import { NotificationsProvider } from "@mantine/notifications";
-import { ModalsProvider } from "@mantine/modals";
+import { ContextModalProps, ModalsProvider } from "@mantine/modals";
 import Head from "next/head";
 import { AppProps } from "next/app";
 import { Provider as ReduxProvider } from "react-redux";
@@ -33,6 +33,12 @@ const SafeHydrate = dynamic(() => import("../components/safe-hydrate"), {
 //     darkModeValue: theme.colors.gray[3],
 //   }),
 // });
+
+function TestModal({
+  context,
+  id,
+  innerProps: { modalTest },
+}: ContextModalProps<{ modalTest: string }>) {}
 
 function App({ Component, pageProps }: AppProps) {
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({

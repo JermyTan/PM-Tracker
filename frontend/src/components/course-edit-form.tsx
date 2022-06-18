@@ -9,8 +9,11 @@ import {
   Button,
   createStyles,
 } from "@mantine/core";
+import { useDidUpdate } from "@mantine/hooks";
+import { skipToken } from "@reduxjs/toolkit/query/react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FaQuestion } from "react-icons/fa";
+import { useParams } from "react-router-dom";
 import { z } from "zod";
 import {
   ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS,
@@ -25,7 +28,10 @@ import {
   NAME,
   SHOW_GROUP_MEMBERS_NAMES,
 } from "../constants";
-import { useCreateCourseMutation } from "../redux/services/courses-api";
+import {
+  useGetSingleCourseQuery,
+  useUpdateCourseMutation,
+} from "../redux/services/courses-api";
 import { useResolveError } from "../utils/error-utils";
 import { handleSubmitForm } from "../utils/form-utils";
 import toastUtils from "../utils/toast-utils";
@@ -53,49 +59,42 @@ const useStyles = createStyles({
   },
 });
 
-type CourseCreationFormProps = z.infer<typeof schema>;
-
-const DEFAULT_VALUES: CourseCreationFormProps = {
-  name: "",
-  description: "",
-  milestoneAlias: "",
-  isPublished: false,
-  showGroupMembersNames: false,
-  allowStudentsToModifyGroupName: false,
-  allowStudentsToCreateGroups: false,
-  allowStudentsToDeleteGroups: false,
-  allowStudentsToJoinGroups: false,
-  allowStudentsToLeaveGroups: false,
-  allowStudentsToAddOrRemoveGroupMembers: false,
-};
+type CourseEditFormProps = z.infer<typeof schema>;
 
 type Props = {
   onSuccess?: () => void;
 };
 
-function CourseCreationForm({ onSuccess }: Props) {
-  const methods = useForm<CourseCreationFormProps>({
+function CourseEditForm({ onSuccess }: Props) {
+  const { courseId } = useParams();
+  const { course } = useGetSingleCourseQuery(courseId ?? skipToken, {
+    selectFromResult: ({ data: course }) => ({ course }),
+  });
+  const methods = useForm<CourseEditFormProps>({
     resolver: zodResolver(schema),
-    defaultValues: DEFAULT_VALUES,
+    defaultValues: course,
   });
   const resolveError = useResolveError();
-  const [createCourse] = useCreateCourseMutation();
+  const [updateCourse] = useUpdateCourseMutation();
   const { classes } = useStyles();
 
   const {
     handleSubmit,
     formState: { isSubmitting },
+    reset,
   } = methods;
 
-  const onSubmit = async (formData: CourseCreationFormProps) => {
-    if (isSubmitting) {
+  useDidUpdate(reset, [course]);
+
+  const onSubmit = async (formData: CourseEditFormProps) => {
+    if (isSubmitting || courseId === undefined) {
       return;
     }
 
-    await createCourse(formData).unwrap();
+    await updateCourse({ ...formData, courseId }).unwrap();
 
     toastUtils.success({
-      message: "The new course has been created successfully.",
+      message: "This course has been updated successfully.",
     });
     onSuccess?.();
   };
@@ -111,13 +110,7 @@ function CourseCreationForm({ onSuccess }: Props) {
             Course Details
           </Text>
 
-          <TextField
-            name={NAME}
-            label="Course Name"
-            autoFocus
-            data-autofocus
-            required
-          />
+          <TextField name={NAME} label="Course Name" required />
 
           <TextareaField
             name={DESCRIPTION}
@@ -398,7 +391,7 @@ function CourseCreationForm({ onSuccess }: Props) {
               type="submit"
               className={classes.button}
             >
-              Create
+              Save
             </Button>
           </Group>
         </Stack>
@@ -407,4 +400,4 @@ function CourseCreationForm({ onSuccess }: Props) {
   );
 }
 
-export default CourseCreationForm;
+export default CourseEditForm;

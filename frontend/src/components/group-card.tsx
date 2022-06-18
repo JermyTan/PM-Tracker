@@ -13,12 +13,12 @@ import { MdGroup } from "react-icons/md";
 import { createSelector } from "@reduxjs/toolkit";
 import { useParams } from "react-router-dom";
 import { skipToken } from "@reduxjs/toolkit/dist/query";
+import pluralize from "pluralize";
 import { GroupSummaryView } from "../types/groups";
 import PlaceholderWrapper from "./placeholder-wrapper";
 import UserProfileDisplay from "./user-profile-display";
 import { useGetCourseGroupsQuery } from "../redux/services/groups-api";
 import { selectCurrentUser } from "../redux/slices/current-user-slice";
-import pluralize from "pluralize";
 import { Course } from "../types/courses";
 import { useAppSelector } from "../redux/hooks";
 
@@ -67,12 +67,12 @@ function GroupCard({ groupId, course }: Props) {
         (data?: GroupSummaryView[]) => data,
         (_: unknown, id?: number) => id,
         (data, id) => {
-          var group = data?.find((group) => group.id === id);
+          const group = data?.find((group) => group.id === id);
           // TODO: handle this
-          var userIsInGroup = false;
+          const userIsInGroup = false;
           return {
-            group: group,
-            userIsInGroup: userIsInGroup,
+            group,
+            userIsInGroup,
           };
         },
       ),

@@ -42,6 +42,7 @@ function LoginEmailForm() {
     }
 
     const accountDetails = await checkAccount(schema.parse(formData)).unwrap();
+
     setAccountDetails(accountDetails);
     setInputEmail(accountDetails.email);
   };

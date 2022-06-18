@@ -37,3 +37,4 @@ export const FAILED_TOKEN_REFRESH = "failedTokenRefresh";
 export const MEMBER_COUNT = "memberCount";
 export const MEMBERS = "members";
 export const MILESTONE = "milestone";
+export const OWNER_ID = "ownerId";

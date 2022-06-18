@@ -1,47 +1,62 @@
-import { CourseSummaryView, Course, CoursePostData } from "../../types/courses";
-import { invalidatesList, providesList } from "./api-cache-utils";
+import {
+  CourseSummary,
+  Course,
+  CoursePostData,
+  CoursePutData,
+} from "../../types/courses";
+import { cacher } from "./api-cache-utils";
 import baseApi from "./base-api";
 
 const coursesApi = baseApi
   .enhanceEndpoints({ addTagTypes: ["Course"] })
   .injectEndpoints({
     endpoints: (build) => ({
-      getCourses: build.query<CourseSummaryView[], void>({
+      getCourses: build.query<CourseSummary[], void>({
         query: () => ({
           url: "/courses/",
           method: "GET",
         }),
-        providesTags: (result) => providesList(result, "Course"), // [{Course, id: 1},{Course, id: 2}, {Course, id: LIST}]
+        providesTags: (result) => cacher.providesList(result, "Course"),
       }),
-      createCourse: build.mutation<CourseSummaryView, CoursePostData>({
+
+      createCourse: build.mutation<CourseSummary, CoursePostData>({
         query: (coursePostData) => ({
           url: "/courses/",
           method: "POST",
           body: coursePostData,
         }),
-        invalidatesTags: invalidatesList("Course"),
+        invalidatesTags: (_, error) =>
+          error ? [] : cacher.invalidatesList("Course"),
       }),
-      getSingleCourse: build.query<Course, number | string>({
+
+      getSingleCourse: build.query<Course, string | number>({
         query: (courseId) => ({
           url: `/courses/${courseId}/`,
           method: "GET",
         }),
-        providesTags: (result, error, arg) => [{ type: "Course", id: arg }],
+        providesTags: (_, __, id) => [{ type: "Course", id }],
       }),
-      // TODO: check if the following 2 are implemented correctly
-      updateCourse: build.mutation<Course, number | string>({
-        query: (courseId) => ({
+
+      updateCourse: build.mutation<
+        Course,
+        CoursePutData & { courseId: string | number }
+      >({
+        query: ({ courseId, ...coursePutData }) => ({
           url: `/courses/${courseId}/`,
           method: "PUT",
+          body: coursePutData,
         }),
-        invalidatesTags: (result, error, arg) => [{ type: "Course", id: arg }], // [{Course, id: 2}]
+        invalidatesTags: (_, error, { courseId: id }) =>
+          error ? [] : [{ type: "Course", id }],
       }),
-      deleteCourse: build.mutation<Course, number | string>({
+
+      deleteCourse: build.mutation<Course, string | number>({
         query: (courseId) => ({
           url: `/courses/${courseId}/`,
           method: "DELETE",
         }),
-        invalidatesTags: invalidatesList("Course"), // [{Course, id: 2}]
+        invalidatesTags: (_, error, id) =>
+          error ? [] : [{ type: "Course", id }],
       }),
     }),
   });
@@ -50,4 +65,6 @@ export const {
   useGetCoursesQuery,
   useCreateCourseMutation,
   useGetSingleCourseQuery,
+  useUpdateCourseMutation,
+  useDeleteCourseMutation,
 } = coursesApi;

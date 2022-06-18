@@ -9,7 +9,7 @@ import {
   Avatar,
   ScrollArea,
 } from "@mantine/core";
-import { CourseSummaryView, Role } from "../types/courses";
+import { CourseSummary, Role } from "../types/courses";
 import CourseStatusBadge from "./course-status-badge";
 
 const useStyles = createStyles(
@@ -29,7 +29,10 @@ const useStyles = createStyles(
 
     scrollArea: {
       height: 75,
-      margin: 5,
+    },
+
+    description: {
+      whiteSpace: "break-spaces",
     },
 
     metaText: {
@@ -43,7 +46,7 @@ const useStyles = createStyles(
   }),
 );
 
-type Props = CourseSummaryView;
+type Props = CourseSummary;
 
 function CourseCard({
   name,
@@ -58,7 +61,7 @@ function CourseCard({
   // const selectCourse = useMemo(
   //   () =>
   //     createSelector(
-  //       (data?: CourseSummaryView[]) => data,
+  //       (data?: CourseSummary[]) => data,
   //       (_: unknown, id: number) => id,
   //       (data, id) => ({
   //         course: data?.find((course) => course.id === id),
@@ -106,8 +109,12 @@ function CourseCard({
             {owner.name}
           </Text>
         </Group>
-        <ScrollArea className={classes.scrollArea}>
-          <Text size="sm" color={hasDescription ? "" : "dimmed"}>
+        <ScrollArea offsetScrollbars className={classes.scrollArea}>
+          <Text
+            className={classes.description}
+            size="sm"
+            color={hasDescription ? "" : "dimmed"}
+          >
             {description || "No description"}
           </Text>
         </ScrollArea>

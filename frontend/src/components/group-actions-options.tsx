@@ -15,13 +15,6 @@ import toastUtils from "../utils/toast-utils";
 import TextField from "./text-field";
 
 type Props = {
-  course?: Course;
-  group?: GroupSummaryView;
-  hasAdminPermission?: boolean;
-  userIsInGroup?: boolean;
-};
-
-type OptionProps = {
   hidden: boolean;
   course?: Course;
   group?: GroupSummaryView;
@@ -33,7 +26,7 @@ const schema = z.object({
 
 type CourseGroupRenameProps = z.infer<typeof schema>;
 
-function RenameGroupOption({ hidden, group, course }: OptionProps) {
+function RenameGroupOption({ hidden, group, course }: Props) {
   const modals = useModals();
   const [renameGroup, { isLoading }] = useRenameCourseGroupMutation();
 

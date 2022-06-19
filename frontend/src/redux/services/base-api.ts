@@ -112,6 +112,7 @@ const baseQueryWithTokenRefresh: BaseQueryFn<
   console.log("Start api call:", args, api, extraOptions);
 
   // NOTE: rtk-query bug (extra options is not accessed at all in baseQuery)
+  // see https://github.com/reduxjs/redux-toolkit/blob/master/packages/toolkit/src/query/fetchBaseQuery.ts#L184
   // current fix is to manually merge extraOptions to api.extra
   const queryApi = { ...api, extra: extraOptions };
 

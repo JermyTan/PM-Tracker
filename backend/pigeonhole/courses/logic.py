@@ -454,20 +454,25 @@ def can_update_course_group(
     if membership.role != Role.STUDENT:
         return True
 
-    if not is_group_member(membership=membership, group=group):
-        return False
-
     course_settings: CourseSettings = course.coursesettings
 
     match action:
         case PatchCourseGroupAction.MODIFY:
-            return course_settings.allow_students_to_modify_group_name
+            return (
+                course_settings.allow_students_to_modify_group_name
+                and is_group_member(membership=membership, group=group)
+            )
         case PatchCourseGroupAction.JOIN:
             return course_settings.allow_students_to_join_groups
         case PatchCourseGroupAction.LEAVE:
-            return course_settings.allow_students_to_leave_groups
+            return course_settings.allow_students_to_leave_groups and is_group_member(
+                membership=membership, group=group
+            )
         case PatchCourseGroupAction.ADD | PatchCourseGroupAction.REMOVE:
-            return course_settings.allow_students_to_add_or_remove_group_members
+            return (
+                course_settings.allow_students_to_add_or_remove_group_members
+                and is_group_member(membership=membership, group=group)
+            )
         case _:
             return False
 

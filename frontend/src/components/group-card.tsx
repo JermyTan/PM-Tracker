@@ -92,19 +92,6 @@ function GroupCard({ groupId, course }: Props) {
   const shouldDisplayMembers =
     hasAdminPermission || course.showGroupMembersNames || userIsInGroup;
 
-  const canJoinGroup =
-    hasAdminPermission || (!userIsInGroup && course.allowStudentsToJoinGroups);
-
-  const canLeaveGroup =
-    hasAdminPermission || (userIsInGroup && course.allowStudentsToLeaveGroups);
-
-  const canEditMembers =
-    hasAdminPermission ||
-    (userIsInGroup && course.allowStudentsToAddOrRemoveGroupMembers);
-
-  const canDeleteGroup =
-    hasAdminPermission || (userIsInGroup && course.allowStudentsToDeleteGroups);
-
   return (
     <Card withBorder radius="md" p="md" className={classes.card}>
       <Stack spacing="xs">
@@ -119,12 +106,12 @@ function GroupCard({ groupId, course }: Props) {
             </Text>
           </div>
           <GroupCardActionsMenu
-            canJoinGroup={canJoinGroup}
-            canLeaveGroup={canLeaveGroup}
-            canDeleteGroup={canDeleteGroup}
-            canEditMembers={canEditMembers}
+            course={course}
             courseId={courseId}
             groupId={group?.id}
+            groupName={group?.name}
+            hasAdminPermission={hasAdminPermission}
+            userIsInGroup={userIsInGroup}
           />
         </Group>
         {shouldDisplayMembers && (

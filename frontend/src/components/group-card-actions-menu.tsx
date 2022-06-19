@@ -1,14 +1,18 @@
 import { Menu, ActionIcon } from "@mantine/core";
 import { FaChevronDown, FaEdit, FaTrashAlt } from "react-icons/fa";
-import { MdGroup, MdLogout, MdPersonAdd } from "react-icons/md";
-import { useUpdateCourseGroupMutation } from "../redux/services/groups-api";
+import { MdLogout, MdPersonAdd } from "react-icons/md";
+import {
+  useDeleteCourseGroupMutation,
+  useUpdateCourseGroupMutation,
+} from "../redux/services/groups-api";
+import { GroupPatchAction } from "../types/groups";
 import toastUtils from "../utils/toast-utils";
 
 type Props = {
   canJoinGroup?: boolean;
   canEditMembers?: boolean;
   canLeaveGroup?: boolean;
-  canDeleteMembers?: boolean;
+  canDeleteGroup?: boolean;
   courseId?: number | string;
   groupId?: number;
 };
@@ -17,13 +21,17 @@ function GroupCardActionsMenu({
   canJoinGroup,
   canEditMembers,
   canLeaveGroup,
-  canDeleteMembers,
+  canDeleteGroup,
   courseId,
   groupId,
 }: Props) {
   const [updateGroup] = useUpdateCourseGroupMutation();
+  const [deleteGroup] = useDeleteCourseGroupMutation();
 
-  const handleUpdateGroup = async (action: string, userId: number | null) => {
+  const onJoinOrLeaveGroup = async (
+    action: GroupPatchAction,
+    userId: number | null,
+  ) => {
     if (courseId === undefined || groupId === undefined) {
       return;
     }
@@ -36,10 +44,23 @@ function GroupCardActionsMenu({
     };
     await updateGroup({ ...groupPutData, courseId, groupId }).unwrap();
 
+    // TODO: update message for diff actions and handle error cases
     toastUtils.success({
-      message: "This group has been updated successfully.",
+      message: "The group has been updated successfully.",
     });
     // onSuccess?.();
+  };
+
+  const onDeleteCourseGroup = async () => {
+    if (courseId === undefined || groupId === undefined) {
+      return;
+    }
+
+    await deleteGroup({ courseId, groupId }).unwrap();
+
+    toastUtils.success({
+      message: "The group has been successfully deleted.",
+    });
   };
 
   return (
@@ -55,8 +76,7 @@ function GroupCardActionsMenu({
         <Menu.Item
           icon={<MdPersonAdd size={14} />}
           onClick={() => {
-            console.log("JOIN GROUP");
-            handleUpdateGroup("JOIN", null);
+            onJoinOrLeaveGroup(GroupPatchAction.Join, null);
           }}
         >
           Join group
@@ -66,10 +86,20 @@ function GroupCardActionsMenu({
         <Menu.Item icon={<FaEdit size={14} />}>Edit members</Menu.Item>
       )}
       {canLeaveGroup && (
-        <Menu.Item icon={<MdLogout size={14} />}>Leave group</Menu.Item>
+        <Menu.Item
+          icon={<MdLogout size={14} />}
+          onClick={() => {
+            onJoinOrLeaveGroup(GroupPatchAction.Leave, null);
+          }}
+        >
+          Leave group
+        </Menu.Item>
       )}
-      {canDeleteMembers && (
-        <Menu.Item icon={<FaTrashAlt size={14} color="red" />}>
+      {canDeleteGroup && (
+        <Menu.Item
+          icon={<FaTrashAlt size={14} color="red" />}
+          onClick={onDeleteCourseGroup}
+        >
           Delete group
         </Menu.Item>
       )}

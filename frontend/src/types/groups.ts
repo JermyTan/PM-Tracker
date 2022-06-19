@@ -15,9 +15,17 @@ export type GroupSummaryView = BaseData & {
   [MEMBERS]: UserData[];
 };
 
-export type GroupPutData = {
+export type GroupPatchData = {
   [ACTION]: string;
   [PAYLOAD]: {
-    [USER_ID]?: number;
+    [USER_ID]: number | null;
   };
 };
+
+export enum GroupPatchAction {
+  Join = "JOIN",
+  Leave = "LEAVE",
+  Modify = "MODIFY",
+  Add = "ADD",
+  Remove = "REMOVE",
+}

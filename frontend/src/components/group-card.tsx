@@ -102,7 +102,7 @@ function GroupCard({ groupId, course }: Props) {
     hasAdminPermission ||
     (userIsInGroup && course.allowStudentsToAddOrRemoveGroupMembers);
 
-  const canDeleteMembers =
+  const canDeleteGroup =
     hasAdminPermission || (userIsInGroup && course.allowStudentsToDeleteGroups);
 
   return (
@@ -121,7 +121,7 @@ function GroupCard({ groupId, course }: Props) {
           <GroupCardActionsMenu
             canJoinGroup={canJoinGroup}
             canLeaveGroup={canLeaveGroup}
-            canDeleteMembers={canDeleteMembers}
+            canDeleteGroup={canDeleteGroup}
             canEditMembers={canEditMembers}
             courseId={courseId}
             groupId={group?.id}

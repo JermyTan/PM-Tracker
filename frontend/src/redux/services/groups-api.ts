@@ -1,6 +1,6 @@
-import { GroupSummaryView, GroupPutData } from "../../types/groups";
+import { GroupSummaryView, GroupPatchData } from "../../types/groups";
 import { UserData } from "../../types/users";
-import { providesList } from "./api-cache-utils";
+import { providesList, cacher } from "./api-cache-utils";
 import baseApi from "./base-api";
 
 const groupsApi = baseApi
@@ -12,7 +12,7 @@ const groupsApi = baseApi
           url: `/courses/${course_id}/groups/`,
           method: "GET",
         }),
-        providesTags: (result) => providesList(result, "Group"),
+        providesTags: (result) => cacher.providesList(result, "Group"),
       }),
       // TODO: remove this and separate out into a separate course-members api
       getCourseMembers: build.query<UserData[], number | string>({
@@ -21,10 +21,9 @@ const groupsApi = baseApi
           method: "GET",
         }),
       }),
-
       updateCourseGroup: build.mutation<
         GroupSummaryView,
-        GroupPutData & { courseId: number | string; groupId: number }
+        GroupPatchData & { courseId: number | string; groupId: number }
       >({
         query: ({ courseId, groupId, ...groupPutData }) => ({
           url: `/courses/${courseId}/groups/${groupId}/`,
@@ -34,6 +33,18 @@ const groupsApi = baseApi
         invalidatesTags: (_, error, { groupId: id }) =>
           error ? [] : [{ type: "Group", id }],
       }),
+
+      deleteCourseGroup: build.mutation<
+        GroupSummaryView,
+        { courseId: number | string; groupId: number }
+      >({
+        query: ({ courseId, groupId }) => ({
+          url: `/courses/${courseId}/groups/${groupId}/`,
+          method: "DELETE",
+        }),
+        invalidatesTags: (_, error) =>
+          error ? [] : cacher.invalidatesList("Group"),
+      }),
     }),
   });
 
@@ -41,4 +52,5 @@ export const {
   useGetCourseGroupsQuery,
   useGetCourseMembersQuery,
   useUpdateCourseGroupMutation,
+  useDeleteCourseGroupMutation,
 } = groupsApi;

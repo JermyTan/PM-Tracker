@@ -1,15 +1,6 @@
 import React, { memo, useMemo } from "react";
-import {
-  Card,
-  Text,
-  Group,
-  createStyles,
-  Stack,
-  ActionIcon,
-  Menu,
-} from "@mantine/core";
-import { FaChevronDown, FaEdit, FaTrashAlt } from "react-icons/fa";
-import { MdGroup, MdLogout, MdPersonAdd } from "react-icons/md";
+import { Card, Text, Group, createStyles, Stack } from "@mantine/core";
+import { MdGroup } from "react-icons/md";
 import { createSelector } from "@reduxjs/toolkit";
 import { useParams } from "react-router-dom";
 import { skipToken } from "@reduxjs/toolkit/dist/query";
@@ -108,8 +99,7 @@ function GroupCard({ groupId, course }: Props) {
           <GroupCardActionsMenu
             course={course}
             courseId={courseId}
-            groupId={group?.id}
-            groupName={group?.name}
+            group={group}
             hasAdminPermission={hasAdminPermission}
             userIsInGroup={userIsInGroup}
           />

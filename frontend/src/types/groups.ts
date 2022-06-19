@@ -16,9 +16,18 @@ export type GroupSummaryView = BaseData & {
 };
 
 export type GroupPatchData = {
-  [ACTION]: string;
+  [ACTION]: GroupPatchAction;
+};
+
+export type JoinOrLeaveGroupData = {
   [PAYLOAD]: {
     [USER_ID]: number | null;
+  };
+};
+
+export type RenameGroupData = {
+  [PAYLOAD]: {
+    [NAME]: string;
   };
 };
 

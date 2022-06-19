@@ -1,37 +1,121 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Menu, ActionIcon, Text } from "@mantine/core";
 import { useModals } from "@mantine/modals";
+import { FormProvider, useForm } from "react-hook-form";
 import { FaChevronDown, FaEdit, FaTrashAlt } from "react-icons/fa";
-import { MdLogout, MdPersonAdd } from "react-icons/md";
+import { MdLogout, MdPersonAdd, MdPeopleAlt } from "react-icons/md";
+import { z } from "zod";
+import { NAME } from "../constants";
 
 import {
   useDeleteCourseGroupMutation,
-  useUpdateCourseGroupMutation,
+  useJoinOrLeaveCourseGroupMutation,
+  useRenameCourseGroupMutation,
 } from "../redux/services/groups-api";
 import { Course } from "../types/courses";
-import { GroupPatchAction } from "../types/groups";
+import { GroupPatchAction, GroupSummaryView } from "../types/groups";
+import { useResolveError } from "../utils/error-utils";
+import { handleSubmitForm } from "../utils/form-utils";
 import toastUtils from "../utils/toast-utils";
+import TextField from "./text-field";
 
 type Props = {
   course?: Course;
   courseId?: number | string;
-  groupId?: number;
-  groupName?: string;
+  group?: GroupSummaryView;
   hasAdminPermission?: boolean;
   userIsInGroup?: boolean;
 };
 
+type OptionProps = {
+  hidden: boolean;
+  courseId?: number | string;
+  group?: GroupSummaryView;
+};
+
+const schema = z.object({
+  [NAME]: z.string().trim().min(1, "Please enter a group name"),
+});
+
+type CourseGroupRenameProps = z.infer<typeof schema>;
+
+function RenameGroupOption({ hidden, group, courseId }: OptionProps) {
+  const modals = useModals();
+  const [renameGroup, { isLoading }] = useRenameCourseGroupMutation();
+
+  const methods = useForm<CourseGroupRenameProps>({
+    resolver: zodResolver(schema),
+    defaultValues: { [NAME]: `${group ? group?.name : ""}` },
+  });
+  const resolveError = useResolveError();
+
+  const {
+    handleSubmit,
+    formState: { isSubmitting },
+  } = methods;
+
+  const onRenameCourseGroup = async (formData: CourseGroupRenameProps) => {
+    if (
+      courseId === undefined ||
+      group?.id === undefined ||
+      isLoading ||
+      isSubmitting
+    ) {
+      return;
+    }
+    const groupId = group?.id;
+
+    const renameData = {
+      action: GroupPatchAction.Modify,
+      payload: {
+        name: formData[NAME],
+      },
+    };
+
+    await renameGroup({ ...renameData, courseId, groupId }).unwrap();
+  };
+
+  const openRenameGroupModal = () =>
+    modals.openConfirmModal({
+      title: "Rename group",
+      closeButtonLabel: "Cancel renaming group",
+      centered: true,
+      children: (
+        <FormProvider {...methods}>
+          <TextField name={NAME} />
+        </FormProvider>
+      ),
+      labels: { confirm: "Save changes", cancel: "Cancel" },
+      confirmProps: { color: "green", loading: isLoading },
+      onConfirm: () => {
+        console.log("SUBMIT");
+        handleSubmitForm(handleSubmit(onRenameCourseGroup), resolveError);
+      },
+    });
+
+  return (
+    <Menu.Item
+      icon={<FaEdit size={14} />}
+      hidden={hidden}
+      onClick={openRenameGroupModal}
+    >
+      Rename group
+    </Menu.Item>
+  );
+}
+
 function GroupCardActionsMenu({
   course,
   courseId,
-  groupId,
-  groupName,
+  group,
   hasAdminPermission,
   userIsInGroup,
 }: Props) {
-  const [updateGroup, { isLoading: isJoiningOrLeavingGroup }] =
-    useUpdateCourseGroupMutation();
+  const [joinOrLeaveGroup, { isLoading: isJoiningOrLeavingGroup }] =
+    useJoinOrLeaveCourseGroupMutation();
   const [deleteGroup, { isLoading: isDeletingGroup }] =
     useDeleteCourseGroupMutation();
+
   const modals = useModals();
 
   const canJoinGroup =
@@ -52,25 +136,31 @@ function GroupCardActionsMenu({
     hasAdminPermission ||
     (userIsInGroup && course?.allowStudentsToModifyGroupName);
 
-  const onJoinOrLeaveGroup = async (
-    action: GroupPatchAction,
-    userId: number | null,
-  ) => {
+  const hasAvailableActions =
+    canJoinGroup ||
+    canLeaveGroup ||
+    canEditMembers ||
+    canDeleteGroup ||
+    canModifyGroupName;
+
+  const onJoinOrLeaveGroup = async (action: GroupPatchAction) => {
     if (
       isJoiningOrLeavingGroup ||
       courseId === undefined ||
-      groupId === undefined
+      group?.id === undefined
     ) {
       return;
     }
 
+    const groupId = group?.id;
+
     const groupPutData = {
       action,
       payload: {
-        userId,
+        userId: null,
       },
     };
-    await updateGroup({ ...groupPutData, courseId, groupId }).unwrap();
+    await joinOrLeaveGroup({ ...groupPutData, courseId, groupId }).unwrap();
 
     // TODO: update message for diff actions and handle error cases
     toastUtils.success({
@@ -80,9 +170,10 @@ function GroupCardActionsMenu({
   };
 
   const onDeleteCourseGroup = async () => {
-    if (courseId === undefined || groupId === undefined) {
+    if (courseId === undefined || group?.id === undefined || isDeletingGroup) {
       return;
     }
+    const groupId = group?.id;
 
     await deleteGroup({ courseId, groupId }).unwrap();
 
@@ -90,6 +181,8 @@ function GroupCardActionsMenu({
       message: `The group has been successfully deleted.`,
     });
   };
+
+  // TODO: refactor these openModal commands?
 
   const openDeleteGroupModal = () =>
     modals.openConfirmModal({
@@ -127,7 +220,7 @@ function GroupCardActionsMenu({
       labels: { confirm: "Join group", cancel: "Cancel" },
       confirmProps: { color: "green", loading: isJoiningOrLeavingGroup },
       onConfirm: () => {
-        onJoinOrLeaveGroup(GroupPatchAction.Join, null);
+        onJoinOrLeaveGroup(GroupPatchAction.Join);
       },
     });
 
@@ -150,11 +243,9 @@ function GroupCardActionsMenu({
       labels: { confirm: "Leave group", cancel: "Cancel" },
       confirmProps: { color: "red", loading: isJoiningOrLeavingGroup },
       onConfirm: () => {
-        onJoinOrLeaveGroup(GroupPatchAction.Leave, null);
+        onJoinOrLeaveGroup(GroupPatchAction.Leave);
       },
     });
-
-  // TODO: disable menu if no items
 
   return (
     <Menu
@@ -164,31 +255,37 @@ function GroupCardActionsMenu({
         </ActionIcon>
       }
       placement="end"
+      hidden={!hasAvailableActions}
     >
-      {canJoinGroup && (
-        <Menu.Item
-          icon={<MdPersonAdd size={14} />}
-          onClick={openJoinGroupModal}
-        >
-          Join group
-        </Menu.Item>
-      )}
-      {canEditMembers && (
-        <Menu.Item icon={<FaEdit size={14} />}>Edit members</Menu.Item>
-      )}
-      {canLeaveGroup && (
-        <Menu.Item icon={<MdLogout size={14} />} onClick={openLeaveGroupModal}>
-          Leave group
-        </Menu.Item>
-      )}
-      {canDeleteGroup && (
-        <Menu.Item
-          icon={<FaTrashAlt size={14} color="red" />}
-          onClick={openDeleteGroupModal}
-        >
-          Delete group
-        </Menu.Item>
-      )}
+      <RenameGroupOption
+        hidden={!canModifyGroupName}
+        courseId={courseId}
+        group={group}
+      />
+      <Menu.Item
+        icon={<MdPersonAdd size={14} />}
+        onClick={openJoinGroupModal}
+        hidden={!canJoinGroup}
+      >
+        Join group
+      </Menu.Item>
+      <Menu.Item icon={<MdPeopleAlt size={14} />} hidden={!canEditMembers}>
+        Edit members
+      </Menu.Item>
+      <Menu.Item
+        icon={<MdLogout size={14} />}
+        onClick={openLeaveGroupModal}
+        hidden={canLeaveGroup}
+      >
+        Leave group
+      </Menu.Item>
+      <Menu.Item
+        icon={<FaTrashAlt size={14} color="red" />}
+        onClick={openDeleteGroupModal}
+        hidden={!canDeleteGroup}
+      >
+        Delete group
+      </Menu.Item>
     </Menu>
   );
 }

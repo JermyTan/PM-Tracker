@@ -1,4 +1,9 @@
-import { GroupSummaryView, GroupPatchData } from "../../types/groups";
+import {
+  GroupSummaryView,
+  GroupPatchData,
+  JoinOrLeaveGroupData,
+  RenameGroupData,
+} from "../../types/groups";
 import { UserData } from "../../types/users";
 import { providesList, cacher } from "./api-cache-utils";
 import baseApi from "./base-api";
@@ -21,9 +26,24 @@ const groupsApi = baseApi
           method: "GET",
         }),
       }),
-      updateCourseGroup: build.mutation<
+      joinOrLeaveCourseGroup: build.mutation<
         GroupSummaryView,
-        GroupPatchData & { courseId: number | string; groupId: number }
+        GroupPatchData &
+          JoinOrLeaveGroupData & { courseId: number | string; groupId: number }
+      >({
+        query: ({ courseId, groupId, ...groupPutData }) => ({
+          url: `/courses/${courseId}/groups/${groupId}/`,
+          method: "PATCH",
+          body: groupPutData,
+        }),
+        invalidatesTags: (_, error, { groupId: id }) =>
+          error ? [] : [{ type: "Group", id }],
+      }),
+
+      renameCourseGroup: build.mutation<
+        GroupSummaryView,
+        GroupPatchData &
+          RenameGroupData & { courseId: number | string; groupId: number }
       >({
         query: ({ courseId, groupId, ...groupPutData }) => ({
           url: `/courses/${courseId}/groups/${groupId}/`,
@@ -51,6 +71,7 @@ const groupsApi = baseApi
 export const {
   useGetCourseGroupsQuery,
   useGetCourseMembersQuery,
-  useUpdateCourseGroupMutation,
+  useJoinOrLeaveCourseGroupMutation,
+  useRenameCourseGroupMutation,
   useDeleteCourseGroupMutation,
 } = groupsApi;

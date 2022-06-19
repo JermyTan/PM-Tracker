@@ -8,6 +8,7 @@ import {
   Space,
   Button,
   createStyles,
+  Title,
 } from "@mantine/core";
 import { FormProvider, useForm } from "react-hook-form";
 import { FaQuestion } from "react-icons/fa";
@@ -95,7 +96,7 @@ function CourseCreationForm({ onSuccess }: Props) {
       return;
     }
 
-    await createCourse(formData).unwrap();
+    await createCourse(schema.parse(formData)).unwrap();
 
     toastUtils.success({
       message: "The new course has been created successfully.",
@@ -110,9 +111,7 @@ function CourseCreationForm({ onSuccess }: Props) {
         autoComplete="off"
       >
         <Stack>
-          <Text size="lg" weight={500}>
-            Course Details
-          </Text>
+          <Title order={4}>Course Details</Title>
 
           <TextField
             name={NAME}
@@ -176,9 +175,7 @@ function CourseCreationForm({ onSuccess }: Props) {
             />
           </Group>
 
-          <Text size="lg" weight={500}>
-            Group Settings
-          </Text>
+          <Title order={4}>Group Settings</Title>
 
           <Group spacing="lg" position="apart">
             <Indicator

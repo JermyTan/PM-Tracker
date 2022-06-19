@@ -4,7 +4,7 @@ import {
   Center,
   createStyles,
   ScrollArea,
-  Title,
+  Text,
 } from "@mantine/core";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MdSpaceDashboard, MdLogout } from "react-icons/md";
@@ -42,6 +42,9 @@ const useStyles = createStyles(
         width: sidebarWidth,
         overflow: "hidden",
       },
+      appName: {
+        fontSize: "32px",
+      },
       navContainer: {
         flex: "1 1 auto",
       },
@@ -64,7 +67,9 @@ function Sidebar({ isSidebarExpanded, className, ...props }: Props) {
       {...props}
     >
       <Center py="sm" px="md">
-        <Title>{isSidebarExpanded ? "Pigeonhole" : "P"}</Title>
+        <Text className={classes.appName} weight={700}>
+          {isSidebarExpanded ? "Pigeonhole" : "P"}
+        </Text>
       </Center>
 
       <ScrollArea

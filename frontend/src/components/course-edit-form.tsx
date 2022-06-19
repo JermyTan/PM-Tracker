@@ -9,10 +9,10 @@ import {
   Button,
   createStyles,
   LoadingOverlay,
+  Title,
 } from "@mantine/core";
 import { useDidUpdate } from "@mantine/hooks";
 import { skipToken } from "@reduxjs/toolkit/query/react";
-import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FaQuestion } from "react-icons/fa";
 import { useParams } from "react-router-dom";
@@ -77,6 +77,7 @@ function CourseEditForm({ onSuccess }: Props) {
         course,
         isFetching,
       }),
+      // get the most updated course data before editing
       refetchOnMountOrArgChange: true,
     },
   );
@@ -97,6 +98,7 @@ function CourseEditForm({ onSuccess }: Props) {
     reset,
   } = methods;
 
+  // populate the form with the most updated course data (if any)
   useDidUpdate(reset, [course]);
 
   const onSubmit = async (formData: CourseEditFormProps) => {
@@ -104,7 +106,7 @@ function CourseEditForm({ onSuccess }: Props) {
       return;
     }
 
-    await updateCourse({ ...formData, courseId }).unwrap();
+    await updateCourse({ ...schema.parse(formData), courseId }).unwrap();
 
     toastUtils.success({
       message: "This course has been updated successfully.",
@@ -121,9 +123,7 @@ function CourseEditForm({ onSuccess }: Props) {
         <LoadingOverlay visible={isFetching} />
         <Stack>
           {/* TODO: add change of course owner, API already supports */}
-          <Text size="lg" weight={500}>
-            Course Details
-          </Text>
+          <Title order={4}>Course Details</Title>
 
           <TextField name={NAME} label="Course Name" required />
 
@@ -181,9 +181,7 @@ function CourseEditForm({ onSuccess }: Props) {
             />
           </Group>
 
-          <Text size="lg" weight={500}>
-            Group Settings
-          </Text>
+          <Title order={4}>Group Settings</Title>
 
           <Group spacing="lg" position="apart">
             <Indicator

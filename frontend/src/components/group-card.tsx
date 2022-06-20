@@ -113,7 +113,7 @@ function GroupCard({ groupId, course }: Props) {
             showDefaultMessage={!group?.members || group.members?.length === 0}
           >
             {group?.members?.map((member) => (
-              <UserProfileDisplay {...member} />
+              <UserProfileDisplay key={member.id} {...member} />
             ))}
           </PlaceholderWrapper>
         )}

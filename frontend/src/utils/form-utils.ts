@@ -5,6 +5,7 @@ export function handleSubmitForm(
   onError?: (error: unknown) => void,
 ): FormEventHandler<HTMLFormElement> {
   return async (e) => {
+    console.log(e);
     try {
       await onSubmit(e);
     } catch (error) {

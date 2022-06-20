@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Menu, ActionIcon, Text } from "@mantine/core";
 import { useModals } from "@mantine/modals";
+import { useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FaChevronDown, FaEdit, FaTrashAlt } from "react-icons/fa";
 import { MdLogout, MdPersonAdd, MdPeopleAlt } from "react-icons/md";
@@ -48,13 +49,17 @@ function RenameGroupOption({ hidden, group, courseId }: OptionProps) {
     defaultValues: { [NAME]: `${group ? group?.name : ""}` },
   });
   const resolveError = useResolveError();
+  const renameFormRef = useRef<HTMLFormElement>(null);
 
   const {
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = methods;
 
+  console.log("error", errors[NAME]);
+
   const onRenameCourseGroup = async (formData: CourseGroupRenameProps) => {
+    console.log("start of call");
     if (
       courseId === undefined ||
       group?.id === undefined ||
@@ -63,6 +68,8 @@ function RenameGroupOption({ hidden, group, courseId }: OptionProps) {
     ) {
       return;
     }
+
+    console.log("make call");
     const groupId = group?.id;
 
     const renameData = {
@@ -80,16 +87,36 @@ function RenameGroupOption({ hidden, group, courseId }: OptionProps) {
       title: "Rename group",
       closeButtonLabel: "Cancel renaming group",
       centered: true,
+      closeOnConfirm: false,
       children: (
         <FormProvider {...methods}>
-          <TextField name={NAME} />
+          <form
+            autoComplete="off"
+            ref={renameFormRef}
+            onSubmit={handleSubmitForm(
+              handleSubmit(onRenameCourseGroup),
+              resolveError,
+            )}
+          >
+            <TextField name={NAME} required />
+          </form>
         </FormProvider>
       ),
       labels: { confirm: "Save changes", cancel: "Cancel" },
       confirmProps: { color: "green", loading: isLoading },
       onConfirm: () => {
-        console.log("SUBMIT");
-        handleSubmitForm(handleSubmit(onRenameCourseGroup), resolveError);
+        const form = renameFormRef.current;
+        console.log(form);
+        if (!form) {
+          return;
+        }
+
+        console.log("hello");
+        console.log(form.checkValidity());
+        console.log(form.reportValidity());
+        form.dispatchEvent(
+          new Event("submit", { cancelable: true, bubbles: true }),
+        );
       },
     });
 

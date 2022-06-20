@@ -1,15 +1,6 @@
 import React, { memo, useMemo } from "react";
-import {
-  Card,
-  Text,
-  Group,
-  createStyles,
-  Stack,
-  ActionIcon,
-  Menu,
-} from "@mantine/core";
-import { FaChevronDown, FaEdit, FaTrashAlt } from "react-icons/fa";
-import { MdGroup, MdLogout, MdPersonAdd } from "react-icons/md";
+import { Card, Text, Group, createStyles, Stack } from "@mantine/core";
+import { MdGroup } from "react-icons/md";
 import { createSelector } from "@reduxjs/toolkit";
 import { useParams } from "react-router-dom";
 import { skipToken } from "@reduxjs/toolkit/dist/query";
@@ -92,19 +83,6 @@ function GroupCard({ groupId, course }: Props) {
   const shouldDisplayMembers =
     hasAdminPermission || course.showGroupMembersNames || userIsInGroup;
 
-  const canJoinGroup =
-    hasAdminPermission || (!userIsInGroup && course.allowStudentsToJoinGroups);
-
-  const canLeaveGroup =
-    hasAdminPermission || (userIsInGroup && course.allowStudentsToLeaveGroups);
-
-  const canEditMembers =
-    hasAdminPermission ||
-    (userIsInGroup && course.allowStudentsToAddOrRemoveGroupMembers);
-
-  const canDeleteMembers =
-    hasAdminPermission || (userIsInGroup && course.allowStudentsToDeleteGroups);
-
   return (
     <Card withBorder radius="md" p="md" className={classes.card}>
       <Stack spacing="xs">
@@ -119,12 +97,11 @@ function GroupCard({ groupId, course }: Props) {
             </Text>
           </div>
           <GroupCardActionsMenu
-            canJoinGroup={canJoinGroup}
-            canLeaveGroup={canLeaveGroup}
-            canDeleteMembers={canDeleteMembers}
-            canEditMembers={canEditMembers}
+            course={course}
             courseId={courseId}
-            groupId={group?.id}
+            group={group}
+            hasAdminPermission={hasAdminPermission}
+            userIsInGroup={userIsInGroup}
           />
         </Group>
         {shouldDisplayMembers && (

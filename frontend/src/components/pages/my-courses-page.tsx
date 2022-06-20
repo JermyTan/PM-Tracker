@@ -67,7 +67,7 @@ function MyCoursesPage() {
           <AccountTypeRestrictedWrapper
             allowedAccountTypes={[AccountType.Educator, AccountType.Admin]}
           >
-            <Button color="green" leftIcon={<HiViewGridAdd />} onClick={open}>
+            <Button color="teal" leftIcon={<HiViewGridAdd />} onClick={open}>
               Create new course
             </Button>
           </AccountTypeRestrictedWrapper>

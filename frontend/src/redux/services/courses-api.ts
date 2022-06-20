@@ -61,6 +61,9 @@ const coursesApi = baseApi
     }),
   });
 
+export const useGetSingleCourseQueryState =
+  coursesApi.endpoints.getSingleCourse.useQueryState;
+
 export const {
   useGetCoursesQuery,
   useCreateCourseMutation,

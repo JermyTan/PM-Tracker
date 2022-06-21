@@ -8,6 +8,7 @@ import {
   COURSE_DETAILS_PATH,
   COURSE_GROUPS_PATH,
   COURSE_MILESTONES_PATH,
+  COURSE_MILESTONE_TEMPLATES_PATH,
   DASHBOARD_PATH,
   MY_COURSES_PATH,
   ROOT_PATH,
@@ -19,9 +20,12 @@ import LoginPage from "../components/pages/login-page";
 import DashboardPage from "../components/pages/dashboard-page";
 import MyCoursesPage from "../components/pages/my-courses-page";
 import MyAccountPage from "../components/pages/my-account-page";
-import CourseMilestonePage from "../components/pages/course-milestone-page";
+import CourseMilestonesPage from "../components/pages/course-milestones-page";
 import CourseGroupPage from "../components/pages/course-groups-page";
 import CourseDetailsPage from "../components/pages/course-details-page";
+import CourseMilestoneTemplatesPage from "../components/pages/course-milestone-templates-page";
+import RoleRestrictedWrapper from "../components/role-restricted-wrapper";
+import { Role } from "../types/courses";
 
 function RouteHandler() {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
@@ -37,11 +41,11 @@ function RouteHandler() {
             </AppLayout>
           }
         >
-          <Route index element={<Navigate to={DASHBOARD_PATH} />} />
+          <Route index element={<Navigate to={DASHBOARD_PATH} replace />} />
           <Route path={DASHBOARD_PATH} element={<DashboardPage />} />
           <Route path={ACCOUNT_PATH} element={<MyAccountPage />} />
           <Route path={COURSES_PATH}>
-            <Route index element={<Navigate to={MY_COURSES_PATH} />} />
+            <Route index element={<Navigate to={MY_COURSES_PATH} replace />} />
             <Route path={MY_COURSES_PATH} element={<MyCoursesPage />} />
             <Route
               path={SINGLE_COURSE_PATH}
@@ -51,10 +55,21 @@ function RouteHandler() {
                 </CoursePageLayout>
               }
             >
-              <Route index element={<Navigate to="milestones" />} />
+              <Route index element={<Navigate to="milestones" replace />} />
               <Route
                 path={COURSE_MILESTONES_PATH}
-                element={<CourseMilestonePage />}
+                element={<CourseMilestonesPage />}
+              />
+              <Route
+                path={COURSE_MILESTONE_TEMPLATES_PATH}
+                element={
+                  <RoleRestrictedWrapper
+                    allowedRoles={[Role.CoOwner, Role.Instructor]}
+                    fallback={<Navigate to={DASHBOARD_PATH} replace />}
+                  >
+                    <CourseMilestoneTemplatesPage />
+                  </RoleRestrictedWrapper>
+                }
               />
               <Route path={COURSE_GROUPS_PATH} element={<CourseGroupPage />} />
               <Route
@@ -63,7 +78,10 @@ function RouteHandler() {
               />
             </Route>
           </Route>
-          <Route path={CATCH_ALL} element={<Navigate to={DASHBOARD_PATH} />} />
+          <Route
+            path={CATCH_ALL}
+            element={<Navigate to={DASHBOARD_PATH} replace />}
+          />
         </Route>
       ) : (
         <Route path={CATCH_ALL} element={<LoginPage />} />

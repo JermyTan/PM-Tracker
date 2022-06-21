@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import Head from "next/head";
-import { Text, Title, Tabs, Space, TabsProps } from "@mantine/core";
+import { Text, Title, Tabs, Space } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { capitalCase } from "change-case";
 import pluralize from "pluralize";
@@ -45,7 +45,6 @@ function CoursePageLayout({ children }: Props) {
   // subsequent api calls to the same endpoint do not need to resolve error since it is already handled here
   useResolveError(error);
   const { pathname } = useLocation();
-  const navigate = useNavigate();
 
   // update label during runtime
   tabDetails[0].label = pluralize(
@@ -59,14 +58,6 @@ function CoursePageLayout({ children }: Props) {
     const index = tabDetails.findIndex(({ key }) => key === componentName);
     return index >= 0 ? index : 0;
   })();
-
-  const onTabChange: TabsProps["onTabChange"] = (_, tabKey) => {
-    if (tabKey === undefined) {
-      return;
-    }
-
-    navigate(tabKey);
-  };
 
   return (
     <PlaceholderWrapper
@@ -86,7 +77,7 @@ function CoursePageLayout({ children }: Props) {
 
       <Space h="md" />
 
-      <Tabs tabPadding="md" active={activeIndex} onTabChange={onTabChange}>
+      <Tabs tabPadding="md" active={activeIndex}>
         {tabDetails.map(({ key, label }) => (
           <Tabs.Tab
             key={key}

@@ -98,7 +98,6 @@ function GroupCard({ groupId, course }: Props) {
           </div>
           <GroupCardActionsMenu
             course={course}
-            courseId={courseId}
             group={group}
             hasAdminPermission={hasAdminPermission}
             userIsInGroup={userIsInGroup}
@@ -113,7 +112,7 @@ function GroupCard({ groupId, course }: Props) {
             showDefaultMessage={!group?.members || group.members?.length === 0}
           >
             {group?.members?.map((member) => (
-              <UserProfileDisplay {...member} />
+              <UserProfileDisplay key={member.id} {...member} />
             ))}
           </PlaceholderWrapper>
         )}

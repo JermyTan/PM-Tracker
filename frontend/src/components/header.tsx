@@ -57,12 +57,7 @@ function Header({
 
       <Group>
         <Text<"span"> component="span">{name}</Text>
-        <Avatar
-          size={32}
-          radius="xl"
-          alt={name}
-          src={profileImage || undefined}
-        />
+        <Avatar size={36} radius={36} alt="" src={profileImage || undefined} />
         <ColorModeToggler />
       </Group>
     </Box>

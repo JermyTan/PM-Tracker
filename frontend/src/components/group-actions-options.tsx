@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Menu } from "@mantine/core";
 import { useModals } from "@mantine/modals";
+import { useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FaEdit } from "react-icons/fa";
 import { z } from "zod";
@@ -11,7 +12,6 @@ import { Course } from "../types/courses";
 import { GroupPatchAction, GroupSummaryView } from "../types/groups";
 import { useResolveError } from "../utils/error-utils";
 import { handleSubmitForm } from "../utils/form-utils";
-import toastUtils from "../utils/toast-utils";
 import TextField from "./text-field";
 
 type Props = {
@@ -35,17 +35,19 @@ function RenameGroupOption({ hidden, group, course }: Props) {
     defaultValues: { [NAME]: `${group ? group?.name : ""}` },
   });
   const resolveError = useResolveError();
+  const renameFormRef = useRef<HTMLFormElement>(null);
 
   const {
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = methods;
+
+  console.log("error", errors[NAME]);
 
   const onRenameCourseGroup = async (formData: CourseGroupRenameProps) => {
     const groupId = group?.id;
     const courseId = course?.id;
 
-    console.log("onRenameCourseGroup");
     if (
       courseId === undefined ||
       groupId === undefined ||
@@ -55,8 +57,6 @@ function RenameGroupOption({ hidden, group, course }: Props) {
       return;
     }
 
-    console.log("send API req");
-
     const renameData = {
       action: GroupPatchAction.Modify,
       payload: {
@@ -65,28 +65,43 @@ function RenameGroupOption({ hidden, group, course }: Props) {
     };
 
     await renameGroup({ ...renameData, courseId, groupId }).unwrap();
-
-    toastUtils.success({
-      message: "Successfully renamed group",
-    });
   };
 
-  // TODO: Fix this issue
   const openRenameGroupModal = () =>
     modals.openConfirmModal({
       title: "Rename group",
       closeButtonLabel: "Cancel renaming group",
       centered: true,
+      closeOnConfirm: false,
       children: (
         <FormProvider {...methods}>
-          <TextField name={NAME} />
+          <form
+            autoComplete="off"
+            ref={renameFormRef}
+            onSubmit={handleSubmitForm(
+              handleSubmit(onRenameCourseGroup),
+              resolveError,
+            )}
+          >
+            <TextField name={NAME} required />
+          </form>
         </FormProvider>
       ),
       labels: { confirm: "Save changes", cancel: "Cancel" },
       confirmProps: { color: "green", loading: isLoading },
       onConfirm: () => {
-        console.log("SUBMIT");
-        handleSubmitForm(handleSubmit(onRenameCourseGroup), resolveError);
+        const form = renameFormRef.current;
+        console.log(form);
+        if (!form) {
+          return;
+        }
+
+        console.log("hello");
+        console.log(form.checkValidity());
+        console.log(form.reportValidity());
+        form.dispatchEvent(
+          new Event("submit", { cancelable: true, bubbles: true }),
+        );
       },
     });
 

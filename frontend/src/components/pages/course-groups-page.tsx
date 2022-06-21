@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { skipToken } from "@reduxjs/toolkit/query/react";
-import { Text, Stack, Space, SimpleGrid } from "@mantine/core";
+import { Text, Stack, Space, SimpleGrid, Button, Group } from "@mantine/core";
+import { MdAdd } from "react-icons/md";
 import { useGetSingleCourseQuery } from "../../redux/services/courses-api";
 import { useGetCourseGroupsQuery } from "../../redux/services/groups-api";
 import PlaceholderWrapper from "../placeholder-wrapper";
@@ -21,9 +22,17 @@ function CourseGroupPage() {
   return (
     <SimpleGrid cols={2}>
       <div>
-        <Text weight={700} size="lg">
-          My Groups
-        </Text>
+        <Group position="apart">
+          <Text weight={700} size="lg">
+            My Groups
+          </Text>
+          <Button
+            hidden={!course?.allowStudentsToCreateGroups}
+            leftIcon={<MdAdd />}
+          >
+            Create group
+          </Button>
+        </Group>
         <Space h="md" />
         <PlaceholderWrapper
           py={150}

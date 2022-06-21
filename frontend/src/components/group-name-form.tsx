@@ -32,6 +32,10 @@ function GroupNameForm({ onSuccess, defaultValue, onSubmit }: Props) {
   } = methods;
 
   const processData = async (formData: GroupNameData) => {
+    if (isSubmitting) {
+      return;
+    }
+
     const parsedData = schema.parse(formData);
 
     await onSubmit?.(parsedData);

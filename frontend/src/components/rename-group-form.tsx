@@ -79,9 +79,9 @@ function RenameGroupForm({ group, course, onSuccess }: Props) {
           <TextField name={NAME} />
           <Group>
             <Button
+              type="submit"
               disabled={isSubmitting}
               loading={isSubmitting}
-              type="submit"
             >
               Save changes
             </Button>

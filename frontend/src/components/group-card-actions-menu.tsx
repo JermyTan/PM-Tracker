@@ -1,13 +1,8 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Menu, ActionIcon, Text } from "@mantine/core";
 import { useModals } from "@mantine/modals";
-import { useRef } from "react";
-import { FormProvider, useForm } from "react-hook-form";
 import { FaChevronDown, FaEdit, FaTrashAlt } from "react-icons/fa";
 import { MdLogout, MdPersonAdd, MdPeopleAlt } from "react-icons/md";
-import { z } from "zod";
 import { NAME } from "../constants";
-
 import {
   useDeleteCourseGroupMutation,
   useJoinOrLeaveCourseGroupMutation,
@@ -15,11 +10,8 @@ import {
 } from "../redux/services/groups-api";
 import { Course } from "../types/courses";
 import { GroupPatchAction, GroupSummaryView } from "../types/groups";
-import { useResolveError } from "../utils/error-utils";
-import { handleSubmitForm } from "../utils/form-utils";
 import toastUtils from "../utils/toast-utils";
-import RenameGroupForm from "./rename-group-form";
-import TextField from "./text-field";
+import GroupNameForm, { GroupNameData } from "./group-name-form";
 
 type Props = {
   course?: Course;
@@ -38,6 +30,8 @@ function GroupCardActionsMenu({
     useJoinOrLeaveCourseGroupMutation();
   const [deleteGroup, { isLoading: isDeletingGroup }] =
     useDeleteCourseGroupMutation();
+
+  const [renameGroup] = useRenameCourseGroupMutation();
 
   const modals = useModals();
   const courseId = course?.id;
@@ -165,13 +159,30 @@ function GroupCardActionsMenu({
       },
     });
 
+  const handleRenameRequest = async (parsedData: GroupNameData) => {
+    if (courseId === undefined || groupId === undefined) {
+      return;
+    }
+
+    const renameData = {
+      action: GroupPatchAction.Modify,
+      payload: {
+        name: parsedData[NAME],
+      },
+    };
+
+    await renameGroup({ ...renameData, courseId, groupId }).unwrap();
+
+    toastUtils.success({ message: "Succesfully renamed group." });
+  };
+
   const openRenameGroupModal = () => {
     const id = modals.openModal({
       title: "Rename group",
       children: (
-        <RenameGroupForm
-          group={group}
-          course={course}
+        <GroupNameForm
+          defaultValue={group?.name ?? ""}
+          onSubmit={handleRenameRequest}
           onSuccess={() => {
             modals.closeModal(id);
           }}

@@ -18,7 +18,7 @@ import { GroupPatchAction, GroupSummaryView } from "../types/groups";
 import { useResolveError } from "../utils/error-utils";
 import { handleSubmitForm } from "../utils/form-utils";
 import toastUtils from "../utils/toast-utils";
-import RenameGroupOption from "./group-actions-options";
+import RenameGroupForm from "./rename-group-form";
 import TextField from "./text-field";
 
 type Props = {
@@ -165,6 +165,21 @@ function GroupCardActionsMenu({
       },
     });
 
+  const openRenameGroupModal = () => {
+    const id = modals.openModal({
+      title: "Rename group",
+      children: (
+        <RenameGroupForm
+          group={group}
+          course={course}
+          onSuccess={() => {
+            modals.closeModal(id);
+          }}
+        />
+      ),
+    });
+  };
+
   return (
     <Menu
       control={
@@ -175,11 +190,13 @@ function GroupCardActionsMenu({
       placement="end"
       hidden={!hasAvailableActions}
     >
-      <RenameGroupOption
+      <Menu.Item
+        icon={<FaEdit size={14} />}
+        onClick={openRenameGroupModal}
         hidden={!canModifyGroupName}
-        course={course}
-        group={group}
-      />
+      >
+        Rename group
+      </Menu.Item>
       <Menu.Item
         icon={<MdPersonAdd size={14} />}
         onClick={openJoinGroupModal}

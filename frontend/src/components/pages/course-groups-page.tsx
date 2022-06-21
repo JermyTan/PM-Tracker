@@ -1,14 +1,31 @@
 import { useParams } from "react-router-dom";
 import { skipToken } from "@reduxjs/toolkit/query/react";
-import { Text, Stack, Space, SimpleGrid, Button, Group } from "@mantine/core";
+import {
+  Text,
+  Stack,
+  Space,
+  SimpleGrid,
+  Button,
+  Group,
+  Modal,
+} from "@mantine/core";
 import { MdAdd } from "react-icons/md";
+import { useState } from "react";
 import { useGetSingleCourseQuery } from "../../redux/services/courses-api";
-import { useGetCourseGroupsQuery } from "../../redux/services/groups-api";
+import {
+  useCreateCourseGroupMutation,
+  useGetCourseGroupsQuery,
+} from "../../redux/services/groups-api";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import GroupCard from "../group-card";
 import CourseMembershipsList from "../course-members-list";
+import GroupNameForm, { GroupNameData } from "../group-name-form";
+import toastUtils from "../../utils/toast-utils";
 
 function CourseGroupPage() {
+  const [isCreateGroupModalOpen, setCreateGroupModalOpen] = useState(false);
+  const [createGroup] = useCreateCourseGroupMutation();
+
   const { courseId } = useParams();
 
   const { data: groups, isLoading } = useGetCourseGroupsQuery(
@@ -19,38 +36,70 @@ function CourseGroupPage() {
     selectFromResult: ({ data: course }) => ({ course }),
   });
 
-  return (
-    <SimpleGrid cols={2}>
-      <div>
-        <Group position="apart">
-          <Text weight={700} size="lg">
-            My Groups
-          </Text>
-          <Button
-            hidden={!course?.allowStudentsToCreateGroups}
-            leftIcon={<MdAdd />}
-          >
-            Create group
-          </Button>
-        </Group>
-        <Space h="md" />
-        <PlaceholderWrapper
-          py={150}
-          isLoading={isLoading}
-          loadingMessage="Loading courses..."
-          defaultMessage="No courses found."
-          showDefaultMessage={!isLoading && (!groups || groups?.length === 0)}
-        >
-          <Stack spacing="xs">
-            {groups?.map((group) => (
-              <GroupCard groupId={group.id} key={group.id} course={course} />
-            ))}
-          </Stack>
-        </PlaceholderWrapper>
-      </div>
+  const openCreateGroupModal = () => {
+    setCreateGroupModalOpen(true);
+  };
 
-      <CourseMembershipsList courseId={courseId} />
-    </SimpleGrid>
+  const handleCreateGroupRequest = async (parsedData: GroupNameData) => {
+    const courseId = course?.id;
+    if (courseId === undefined) {
+      return;
+    }
+
+    await createGroup({ ...parsedData, courseId }).unwrap();
+
+    toastUtils.success({ message: "Succesfully created group." });
+    setCreateGroupModalOpen(false);
+  };
+
+  return (
+    <>
+      <Modal
+        title="Create a New Group"
+        opened={isCreateGroupModalOpen}
+        onClose={() => {
+          setCreateGroupModalOpen(false);
+        }}
+      >
+        <GroupNameForm
+          defaultValue=""
+          onSubmit={handleCreateGroupRequest}
+          confirmButtonName="Create new group"
+        />
+      </Modal>
+      <SimpleGrid cols={2}>
+        <div>
+          <Group position="apart">
+            <Text weight={700} size="lg">
+              My Groups
+            </Text>
+            <Button
+              hidden={!course?.allowStudentsToCreateGroups}
+              leftIcon={<MdAdd />}
+              onClick={openCreateGroupModal}
+            >
+              Create group
+            </Button>
+          </Group>
+          <Space h="md" />
+          <PlaceholderWrapper
+            py={150}
+            isLoading={isLoading}
+            loadingMessage="Loading courses..."
+            defaultMessage="No courses found."
+            showDefaultMessage={!isLoading && (!groups || groups?.length === 0)}
+          >
+            <Stack spacing="xs">
+              {groups?.map((group) => (
+                <GroupCard groupId={group.id} key={group.id} course={course} />
+              ))}
+            </Stack>
+          </PlaceholderWrapper>
+        </div>
+
+        <CourseMembershipsList courseId={courseId} />
+      </SimpleGrid>
+    </>
   );
 }
 

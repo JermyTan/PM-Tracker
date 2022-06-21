@@ -28,7 +28,7 @@ const groupsApi = baseApi
         }),
       }),
 
-      createCourse: build.mutation<
+      createCourseGroup: build.mutation<
         GroupData,
         GroupPostData & { courseId: number | string }
       >({
@@ -86,6 +86,7 @@ const groupsApi = baseApi
 export const {
   useGetCourseGroupsQuery,
   useGetCourseMembersQuery,
+  useCreateCourseGroupMutation,
   useJoinOrLeaveCourseGroupMutation,
   useRenameCourseGroupMutation,
   useDeleteCourseGroupMutation,

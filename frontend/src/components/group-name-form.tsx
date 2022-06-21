@@ -11,6 +11,7 @@ type Props = {
   onSuccess?: () => void;
   defaultValue: string;
   onSubmit?: (data: GroupNameData) => Promise<void>;
+  confirmButtonName: string;
 };
 
 const schema = z.object({
@@ -19,7 +20,12 @@ const schema = z.object({
 
 export type GroupNameData = z.infer<typeof schema>;
 
-function GroupNameForm({ onSuccess, defaultValue, onSubmit }: Props) {
+function GroupNameForm({
+  onSuccess,
+  defaultValue,
+  onSubmit,
+  confirmButtonName,
+}: Props) {
   const methods = useForm<GroupNameData>({
     resolver: zodResolver(schema),
     defaultValues: { [NAME]: defaultValue },
@@ -50,14 +56,14 @@ function GroupNameForm({ onSuccess, defaultValue, onSubmit }: Props) {
         onSubmit={handleSubmitForm(handleSubmit(processData), resolveError)}
       >
         <Stack>
-          <TextField name={NAME} />
+          <TextField name={NAME} description="Group name" />
           <Group>
             <Button
               type="submit"
               disabled={isSubmitting}
               loading={isSubmitting}
             >
-              Save changes
+              {confirmButtonName}
             </Button>
           </Group>
         </Stack>

@@ -184,8 +184,10 @@ function GroupCardActionsMenu({
           defaultValue={group?.name ?? ""}
           onSubmit={handleRenameRequest}
           onSuccess={() => {
+            // TODO: Remove onSuccess and try to refactor
             modals.closeModal(id);
           }}
+          confirmButtonName="Save changes"
         />
       ),
     });

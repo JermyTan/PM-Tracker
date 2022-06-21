@@ -9,10 +9,17 @@ import {
 import { BaseData } from "./base";
 import { UserData } from "./users";
 
-export type GroupSummaryView = BaseData & {
+export type GroupSummary = BaseData & {
   [NAME]: string;
   [MEMBER_COUNT]: number;
+};
+
+export type GroupData = GroupSummary & {
   [MEMBERS]: UserData[];
+};
+
+export type GroupPostData = {
+  [NAME]: string;
 };
 
 export type GroupPatchData = {

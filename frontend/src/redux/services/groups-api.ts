@@ -1,5 +1,6 @@
 import {
-  GroupSummaryView,
+  GroupData,
+  GroupPostData,
   GroupPatchData,
   JoinOrLeaveGroupData,
   RenameGroupData,
@@ -12,22 +13,36 @@ const groupsApi = baseApi
   .enhanceEndpoints({ addTagTypes: ["Group"] })
   .injectEndpoints({
     endpoints: (build) => ({
-      getCourseGroups: build.query<GroupSummaryView[], number | string>({
-        query: (course_id) => ({
-          url: `/courses/${course_id}/groups/`,
+      getCourseGroups: build.query<GroupData[], number | string>({
+        query: (courseId) => ({
+          url: `/courses/${courseId}/groups/`,
           method: "GET",
         }),
         providesTags: (result) => cacher.providesList(result, "Group"),
       }),
       // TODO: remove this and separate out into a separate course-members api
       getCourseMembers: build.query<UserData[], number | string>({
-        query: (course_id) => ({
-          url: `/courses/${course_id}/memberships/`,
+        query: (courseId) => ({
+          url: `/courses/${courseId}/memberships/`,
           method: "GET",
         }),
       }),
+
+      createCourse: build.mutation<
+        GroupData,
+        GroupPostData & { courseId: number | string }
+      >({
+        query: ({ courseId, ...groupPostData }) => ({
+          url: `/courses/${courseId}/groups/`,
+          method: "POST",
+          body: groupPostData,
+        }),
+        invalidatesTags: (_, error) =>
+          error ? [] : cacher.invalidatesList("Group"),
+      }),
+
       joinOrLeaveCourseGroup: build.mutation<
-        GroupSummaryView,
+        GroupData,
         GroupPatchData &
           JoinOrLeaveGroupData & { courseId: number | string; groupId: number }
       >({
@@ -41,7 +56,7 @@ const groupsApi = baseApi
       }),
 
       renameCourseGroup: build.mutation<
-        GroupSummaryView,
+        GroupData,
         GroupPatchData &
           RenameGroupData & { courseId: number | string; groupId: number }
       >({
@@ -55,7 +70,7 @@ const groupsApi = baseApi
       }),
 
       deleteCourseGroup: build.mutation<
-        GroupSummaryView,
+        GroupData,
         { courseId: number | string; groupId: number }
       >({
         query: ({ courseId, groupId }) => ({

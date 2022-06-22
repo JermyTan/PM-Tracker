@@ -1,7 +1,6 @@
 import { Space, Stack, Text } from "@mantine/core";
-import { Role } from "../types/courses";
+import { Role, CoursePersonnelData } from "../types/courses";
 
-import { CoursePersonnelData } from "../types/courses";
 import UserProfileDisplay from "./user-profile-display";
 
 type Props = {

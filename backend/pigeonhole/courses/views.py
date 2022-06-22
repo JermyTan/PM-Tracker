@@ -246,9 +246,12 @@ class CourseMilestonesView(APIView):
         course: Course,
         requester_membership: CourseMembership,
     ):
-        milestones: QuerySet[CourseMilestone] = course.coursemilestone_set.all()
+        visible_milestones: QuerySet[CourseMilestone] = course.coursemilestone_set.all()
 
-        data = [course_milestone_to_json(milestone) for milestone in milestones]
+        if requester_membership.role == Role.STUDENT:
+            visible_milestones = visible_milestones.filter(is_published=True)
+
+        data = [course_milestone_to_json(milestone) for milestone in visible_milestones]
 
         return Response(data=data, status=status.HTTP_200_OK)
 

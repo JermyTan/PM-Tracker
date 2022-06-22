@@ -1,37 +1,48 @@
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { Text, Stack } from "@mantine/core";
 import PlaceholderWrapper from "./placeholder-wrapper";
-import { Role, CoursePersonnelData } from "../types/courses";
+import { Role, CoursePersonnelData, roles } from "../types/courses";
 import { useGetCourseMembershipsQuery } from "../redux/services/members-api";
-import CourseMemberCategoryList from "./course-member-category-list";
+import CourseRoleGroupList from "./course-member-category-list";
+import { useMemo } from "react";
+import { sort } from "../utils/transform-utils";
+import { EMAIL, NAME, USER } from "../constants";
 
 type Props = {
   courseId: number | string | undefined;
 };
 
-const orderedRoles = [Role.CoOwner, Role.Instructor, Role.Student];
+const orderedRoles = sort(roles);
 
 function CoursePersonnelList({ courseId }: Props) {
   const { data: coursePersonnel, isLoading } = useGetCourseMembershipsQuery(
     courseId ?? skipToken,
   );
 
-  // TODO: might be possible to refactor this into a selector
-  const getPersonnelSortedByCategory = (personnel?: CoursePersonnelData[]) => {
+  const sortedPersonnel = useMemo(() => {
     const sortedPersonnel = new Map<Role, CoursePersonnelData[]>();
 
+    // group same role personnel together
     orderedRoles.forEach((role) => {
       sortedPersonnel.set(role, []);
     });
 
-    personnel?.forEach((person) => {
+    coursePersonnel?.forEach((person) => {
       sortedPersonnel.get(person.role)?.push(person);
     });
 
-    return sortedPersonnel;
-  };
+    // within each role group, sort personnel by name and email
+    orderedRoles.forEach((role) => {
+      sortedPersonnel.set(
+        role,
+        sort(sortedPersonnel.get(role) ?? [], {
+          props: [`${USER}.${NAME}`, `${USER}.${EMAIL}`],
+        }),
+      );
+    });
 
-  const sortedPersonnel = getPersonnelSortedByCategory(coursePersonnel);
+    return sortedPersonnel;
+  }, [coursePersonnel]);
 
   return (
     <Stack>
@@ -51,10 +62,7 @@ function CoursePersonnelList({ courseId }: Props) {
           {orderedRoles.map((role) => {
             const personnel = sortedPersonnel.get(role);
             return (
-              <CourseMemberCategoryList
-                role={role}
-                personnel={personnel ?? []}
-              />
+              <CourseRoleGroupList role={role} personnel={personnel ?? []} />
             );
           })}
         </Stack>

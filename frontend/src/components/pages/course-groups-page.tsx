@@ -18,7 +18,7 @@ import {
 } from "../../redux/services/groups-api";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import GroupCard from "../group-card";
-import CourseMembershipsList from "../course-members-list";
+import CourseMembershipsList from "../course-personnel-list";
 import GroupNameForm, { GroupNameData } from "../group-name-form";
 import toastUtils from "../../utils/toast-utils";
 
@@ -67,7 +67,7 @@ function CourseGroupPage() {
           confirmButtonName="Create new group"
         />
       </Modal>
-      <SimpleGrid cols={2}>
+      <SimpleGrid cols={2} spacing="lg">
         <div>
           <Group position="apart">
             <Text weight={700} size="lg">

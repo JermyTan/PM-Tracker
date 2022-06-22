@@ -24,6 +24,8 @@ export enum Role {
   Student = "STUDENT",
 }
 
+export const roles = Object.values(Role);
+
 export type CourseSummary = BaseData & {
   [NAME]: string;
   [OWNER]: UserData;

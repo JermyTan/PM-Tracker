@@ -8,7 +8,7 @@ type Props = {
   personnel: CoursePersonnelData[];
 };
 
-const CourseMemberCategoryList = ({ personnel, role }: Props) => (
+const CourseRoleGroupList = ({ personnel, role }: Props) => (
   <div>
     <Text size="md" weight={500}>
       {role}
@@ -22,4 +22,4 @@ const CourseMemberCategoryList = ({ personnel, role }: Props) => (
   </div>
 );
 
-export default CourseMemberCategoryList;
+export default CourseRoleGroupList;

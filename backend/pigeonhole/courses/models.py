@@ -116,6 +116,7 @@ class CourseMilestone(TimestampedModel):
     description = models.TextField(blank=True)
     start_date_time = models.DateTimeField()
     end_date_time = models.DateTimeField(blank=True, null=True)
+    is_published = models.BooleanField()
 
     class Meta:
         constraints = [

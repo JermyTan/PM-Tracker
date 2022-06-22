@@ -98,6 +98,7 @@ def course_milestone_to_json(milestone: CourseMilestone) -> dict:
         DESCRIPTION: milestone.description,
         START_DATE_TIME: parse_datetime_to_ms_timestamp(milestone.start_date_time),
         END_DATE_TIME: parse_datetime_to_ms_timestamp(milestone.end_date_time),
+        IS_PUBLISHED: milestone.is_published,
     }
 
     return data

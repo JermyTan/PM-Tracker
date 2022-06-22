@@ -5,8 +5,7 @@ import {
   JoinOrLeaveGroupData,
   RenameGroupData,
 } from "../../types/groups";
-import { UserData } from "../../types/users";
-import { providesList, cacher } from "./api-cache-utils";
+import { cacher } from "./api-cache-utils";
 import baseApi from "./base-api";
 
 const groupsApi = baseApi
@@ -20,14 +19,6 @@ const groupsApi = baseApi
         }),
         providesTags: (result) => cacher.providesList(result, "Group"),
       }),
-      // TODO: remove this and separate out into a separate course-members api
-      getCourseMembers: build.query<UserData[], number | string>({
-        query: (courseId) => ({
-          url: `/courses/${courseId}/memberships/`,
-          method: "GET",
-        }),
-      }),
-
       createCourseGroup: build.mutation<
         GroupData,
         GroupPostData & { courseId: number | string }
@@ -85,7 +76,6 @@ const groupsApi = baseApi
 
 export const {
   useGetCourseGroupsQuery,
-  useGetCourseMembersQuery,
   useCreateCourseGroupMutation,
   useJoinOrLeaveCourseGroupMutation,
   useRenameCourseGroupMutation,

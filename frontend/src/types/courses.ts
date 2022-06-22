@@ -13,6 +13,7 @@ import {
   MILESTONE_ALIAS,
   ROLE,
   OWNER_ID,
+  USER,
 } from "../constants";
 import { BaseData } from "./base";
 import { UserData } from "./users";
@@ -52,4 +53,9 @@ export type CoursePostData = Pick<
 
 export type CoursePutData = CoursePostData & {
   [OWNER_ID]?: number;
+};
+
+export type CoursePersonnelData = BaseData & {
+  [ROLE]: Role;
+  [USER]: UserData;
 };

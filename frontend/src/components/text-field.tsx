@@ -14,8 +14,6 @@ function TextField({ name, ...props }: Props) {
 
   const error = get(errors, name);
 
-  console.log(error);
-
   return <TextInput error={error?.message} {...props} {...register(name)} />;
 }
 

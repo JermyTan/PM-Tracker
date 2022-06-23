@@ -13,7 +13,7 @@ import {
   useJoinOrLeaveCourseGroupMutation,
   useRenameCourseGroupMutation,
 } from "../redux/services/groups-api";
-import { Course } from "../types/courses";
+import { CourseData } from "../types/courses";
 import { GroupPatchAction, GroupSummaryView } from "../types/groups";
 import { useResolveError } from "../utils/error-utils";
 import { handleSubmitForm } from "../utils/form-utils";
@@ -21,7 +21,7 @@ import toastUtils from "../utils/toast-utils";
 import TextField from "./text-field";
 
 type Props = {
-  course?: Course;
+  course?: CourseData;
   courseId?: number | string;
   group?: GroupSummaryView;
   hasAdminPermission?: boolean;

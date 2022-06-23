@@ -1,8 +1,4 @@
 import arraySort from "array-sort";
-import { format, isSameDay } from "date-fns";
-// import { StringifiableRecord } from "query-string";
-
-import { DATE_FORMAT, DATE_TIME_FORMAT, TIME_FORMAT } from "../constants";
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return !Array.isArray(value) && typeof value === "object" && value !== null;
@@ -38,58 +34,41 @@ export function sanitizeArray(
   return strings.map((s) => s.trim()).filter((s) => s);
 }
 
-export function displayDateTime(
-  inputDateTime: string | number | Date,
-  dateTimeFormat: string = DATE_TIME_FORMAT,
-): string {
-  try {
-    const dateTime =
-      typeof inputDateTime === "string"
-        ? parseInt(inputDateTime, 10)
-        : inputDateTime;
+// export function displayDateTime(
+//   inputDateTime: string | number | Date,
+//   dateTimeFormat: string = DATE_TIME_FORMAT,
+// ): string {
+//   try {
+//     const dateTime =
+//       typeof inputDateTime === "string"
+//         ? parseInt(inputDateTime, 10)
+//         : inputDateTime;
 
-    return format(dateTime, dateTimeFormat);
-  } catch {
-    return "";
-  }
-}
-
-export function displayDateTimeRange(
-  inputStartDateTime: string | number | Date,
-  inputEndDateTime: string | number | Date,
-) {
-  const startDateTime =
-    typeof inputStartDateTime === "string"
-      ? parseInt(inputStartDateTime, 10)
-      : inputStartDateTime;
-  const endDateTime =
-    typeof inputEndDateTime === "string"
-      ? parseInt(inputEndDateTime, 10)
-      : inputEndDateTime;
-
-  return isSameDay(startDateTime, endDateTime)
-    ? `${displayDateTime(startDateTime, DATE_FORMAT)} ${displayDateTime(
-        startDateTime,
-        TIME_FORMAT,
-      )} - ${displayDateTime(endDateTime, TIME_FORMAT)}`
-    : `${displayDateTime(startDateTime)} - ${displayDateTime(endDateTime)}`;
-}
-
-// export function changeKeyCase(
-//   caseChanger: (input: string) => string,
-//   object?: StringifiableRecord,
-// ) {
-//   if (!object) {
-//     return object;
+//     return format(dateTime, dateTimeFormat);
+//   } catch {
+//     return "";
 //   }
+// }
 
-//   const newObject: StringifiableRecord = {};
+// export function displayDateTimeRange(
+//   inputStartDateTime: string | number | Date,
+//   inputEndDateTime: string | number | Date,
+// ) {
+//   const startDateTime =
+//     typeof inputStartDateTime === "string"
+//       ? parseInt(inputStartDateTime, 10)
+//       : inputStartDateTime;
+//   const endDateTime =
+//     typeof inputEndDateTime === "string"
+//       ? parseInt(inputEndDateTime, 10)
+//       : inputEndDateTime;
 
-//   Object.entries(object).forEach(([key, value]) => {
-//     newObject[caseChanger(key)] = value;
-//   });
-
-//   return newObject;
+//   return isSameDay(startDateTime, endDateTime)
+//     ? `${displayDateTime(startDateTime, DATE_FORMAT)} ${displayDateTime(
+//         startDateTime,
+//         TIME_FORMAT,
+//       )} - ${displayDateTime(endDateTime, TIME_FORMAT)}`
+//     : `${displayDateTime(startDateTime)} - ${displayDateTime(endDateTime)}`;
 // }
 
 export function sort<T>(

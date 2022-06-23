@@ -22,7 +22,7 @@ function CourseMembersList({ courseId }: Props) {
         isLoading={isLoading}
         loadingMessage="Loading members..."
         defaultMessage="No members found."
-        showDefaultMessage={!isLoading && (!members || members?.length === 0)}
+        showDefaultMessage={!members || members?.length === 0}
       >
         <Stack spacing="xs" />
       </PlaceholderWrapper>

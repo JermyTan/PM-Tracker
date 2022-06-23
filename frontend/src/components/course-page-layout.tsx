@@ -9,6 +9,7 @@ import { useGetSingleCourseQuery } from "../redux/services/courses-api";
 import PlaceholderWrapper from "./placeholder-wrapper";
 import { APP_NAME, MILESTONE } from "../constants";
 import { useResolveError } from "../utils/error-utils";
+import { useGetMilestoneAlias } from "../custom-hooks/use-get-milestone-alias";
 
 type Props = {
   children: ReactNode;
@@ -45,11 +46,10 @@ function CoursePageLayout({ children }: Props) {
   // subsequent api calls to the same endpoint do not need to resolve error since it is already handled here
   useResolveError(error);
   const { pathname } = useLocation();
+  const milestoneAlias = useGetMilestoneAlias();
 
   // update label during runtime
-  tabDetails[0].label = pluralize(
-    capitalCase(course?.milestoneAlias || MILESTONE),
-  );
+  tabDetails[0].label = pluralize(capitalCase(milestoneAlias));
 
   const activeIndex = (() => {
     // get the course tab component name from pathname

@@ -3,13 +3,13 @@ import { Card, Text, Group, createStyles, Stack } from "@mantine/core";
 import { MdGroup } from "react-icons/md";
 import { createSelector } from "@reduxjs/toolkit";
 import { useParams } from "react-router-dom";
-import { skipToken } from "@reduxjs/toolkit/dist/query";
+import { skipToken } from "@reduxjs/toolkit/query/react";
 import pluralize from "pluralize";
 import { GroupSummaryView } from "../types/groups";
 import PlaceholderWrapper from "./placeholder-wrapper";
 import UserProfileDisplay from "./user-profile-display";
 import { useGetCourseGroupsQuery } from "../redux/services/groups-api";
-import { Course, Role } from "../types/courses";
+import { CourseData, Role } from "../types/courses";
 import { useAppSelector } from "../redux/hooks";
 import GroupCardActionsMenu from "./group-card-actions-menu";
 
@@ -43,7 +43,7 @@ const useStyles = createStyles((theme) => ({
 
 type Props = {
   groupId: number;
-  course?: Course;
+  course?: CourseData;
 };
 
 function GroupCard({ groupId, course }: Props) {
@@ -106,7 +106,6 @@ function GroupCard({ groupId, course }: Props) {
         </Group>
         {shouldDisplayMembers && (
           <PlaceholderWrapper
-            isLoading={false}
             py={10}
             loadingMessage="Loading members..."
             defaultMessage="No members found"

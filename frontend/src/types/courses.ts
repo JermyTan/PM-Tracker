@@ -23,7 +23,7 @@ export enum Role {
   Student = "STUDENT",
 }
 
-export type CourseSummary = BaseData & {
+export type CourseSummaryData = BaseData & {
   [NAME]: string;
   [OWNER]: UserData;
   [DESCRIPTION]: string;
@@ -31,7 +31,7 @@ export type CourseSummary = BaseData & {
   [ROLE]: Role;
 };
 
-export type CourseSettings = {
+type CourseSettings = {
   [SHOW_GROUP_MEMBERS_NAMES]: boolean;
   [ALLOW_STUDENTS_TO_CREATE_GROUPS]: boolean;
   [ALLOW_STUDENTS_TO_DELETE_GROUPS]: boolean;
@@ -42,10 +42,10 @@ export type CourseSettings = {
   [MILESTONE_ALIAS]: string;
 };
 
-export type Course = CourseSummary & CourseSettings;
+export type CourseData = CourseSummaryData & CourseSettings;
 
 export type CoursePostData = Pick<
-  CourseSummary,
+  CourseSummaryData,
   typeof NAME | typeof DESCRIPTION | typeof IS_PUBLISHED
 > &
   CourseSettings;

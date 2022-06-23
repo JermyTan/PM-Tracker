@@ -81,7 +81,7 @@ function MyCoursesPage() {
         py={150}
         loadingMessage="Loading my courses..."
         defaultMessage="No courses found"
-        showDefaultMessage={!isLoading && (!courses || courses?.length === 0)}
+        showDefaultMessage={!courses || courses.length === 0}
       >
         <SimpleGrid cols={3} spacing="xs">
           {courses?.map((course) => (

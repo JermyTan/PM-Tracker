@@ -41,3 +41,5 @@ export const OWNER_ID = "ownerId";
 export const USER_ID = "userId";
 export const ACTION = "action";
 export const PAYLOAD = "payload";
+export const START_DATE_TIME = "startDateTime";
+export const END_DATE_TIME = "endDateTime";

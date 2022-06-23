@@ -1,15 +1,15 @@
 import React, { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Card,
   Text,
   Group,
   createStyles,
   Stack,
   Avatar,
   ScrollArea,
+  Paper,
 } from "@mantine/core";
-import { CourseSummary, Role } from "../types/courses";
+import { CourseSummaryData, Role } from "../types/courses";
 import CourseStatusBadge from "./course-status-badge";
 
 const useStyles = createStyles(
@@ -46,7 +46,7 @@ const useStyles = createStyles(
   }),
 );
 
-type Props = CourseSummary;
+type Props = CourseSummaryData;
 
 function CourseCard({
   name,
@@ -57,22 +57,6 @@ function CourseCard({
   role,
 }: Props) {
   const navigate = useNavigate();
-
-  // const selectCourse = useMemo(
-  //   () =>
-  //     createSelector(
-  //       (data?: CourseSummary[]) => data,
-  //       (_: unknown, id: number) => id,
-  //       (data, id) => ({
-  //         course: data?.find((course) => course.id === id),
-  //       }),
-  //     ),
-  //   [],
-  // );
-
-  // const { course } = useGetCoursesQuery(undefined, {
-  //   selectFromResult: ({ data }) => selectCourse(data, id),
-  // });
 
   const userCanAccessCourse = isPublished || role !== Role.Student;
 
@@ -89,7 +73,7 @@ function CourseCard({
   };
 
   return (
-    <Card
+    <Paper
       onClick={redirectToCoursePage}
       withBorder
       radius="md"
@@ -122,7 +106,7 @@ function CourseCard({
           <CourseStatusBadge isPublished={isPublished} />
         </Group>
       </Stack>
-    </Card>
+    </Paper>
   );
 }
 

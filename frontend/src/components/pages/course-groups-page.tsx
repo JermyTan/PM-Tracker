@@ -8,6 +8,7 @@ import {
   Button,
   Group,
   Modal,
+  ScrollArea,
 } from "@mantine/core";
 import { MdAdd } from "react-icons/md";
 import { useState } from "react";
@@ -18,14 +19,14 @@ import {
 } from "../../redux/services/groups-api";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import GroupCard from "../group-card";
-import CourseMembershipsList from "../course-personnel-list";
+import CourseMembershipsList from "../course-memberships-list";
 import GroupNameForm, { GroupNameData } from "../group-name-form";
 import toastUtils from "../../utils/toast-utils";
+import { Role } from "../../types/courses";
 
 function CourseGroupPage() {
   const [isCreateGroupModalOpen, setCreateGroupModalOpen] = useState(false);
   const [createGroup] = useCreateCourseGroupMutation();
-
   const { courseId } = useParams();
 
   const { data: groups, isLoading } = useGetCourseGroupsQuery(
@@ -35,6 +36,11 @@ function CourseGroupPage() {
   const { course } = useGetSingleCourseQuery(courseId ?? skipToken, {
     selectFromResult: ({ data: course }) => ({ course }),
   });
+
+  const hasAdminPermission = course?.role !== Role.Student;
+
+  const userCanCreateGroup =
+    hasAdminPermission || course?.allowStudentsToCreateGroups;
 
   const openCreateGroupModal = () => {
     setCreateGroupModalOpen(true);
@@ -74,7 +80,7 @@ function CourseGroupPage() {
               My Groups
             </Text>
             <Button
-              hidden={!course?.allowStudentsToCreateGroups}
+              hidden={!userCanCreateGroup}
               leftIcon={<MdAdd />}
               onClick={openCreateGroupModal}
             >
@@ -89,15 +95,24 @@ function CourseGroupPage() {
             defaultMessage="No courses found."
             showDefaultMessage={!isLoading && (!groups || groups?.length === 0)}
           >
-            <Stack spacing="xs">
-              {groups?.map((group) => (
-                <GroupCard groupId={group.id} key={group.id} course={course} />
-              ))}
-            </Stack>
+            <ScrollArea style={{ height: 250 }}>
+              <Stack spacing="xs">
+                {groups?.map((group) => (
+                  <GroupCard
+                    groupId={group.id}
+                    key={group.id}
+                    course={course}
+                  />
+                ))}
+              </Stack>
+            </ScrollArea>
           </PlaceholderWrapper>
         </div>
 
-        <CourseMembershipsList courseId={courseId} />
+        <CourseMembershipsList
+          courseId={courseId}
+          makeAdminOptionsAvailable={hasAdminPermission}
+        />
       </SimpleGrid>
     </>
   );

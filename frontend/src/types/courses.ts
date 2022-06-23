@@ -57,7 +57,11 @@ export type CoursePutData = CoursePostData & {
   [OWNER_ID]?: number;
 };
 
-export type CoursePersonnelData = BaseData & {
+export type CourseMemberData = BaseData & {
   [ROLE]: Role;
   [USER]: UserData;
+};
+
+export type CourseMembershipPatchData = {
+  [ROLE]: Role;
 };

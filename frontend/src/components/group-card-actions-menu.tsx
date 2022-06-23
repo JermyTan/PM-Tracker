@@ -8,7 +8,6 @@ import {
   useJoinOrLeaveCourseGroupMutation,
   useRenameCourseGroupMutation,
 } from "../redux/services/groups-api";
-import { Course } from "../types/courses";
 import { GroupPatchAction, GroupData } from "../types/groups";
 import toastUtils from "../utils/toast-utils";
 import GroupNameForm, { GroupNameData } from "./group-name-form";

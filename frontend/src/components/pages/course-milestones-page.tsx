@@ -1,41 +1,58 @@
-import { Button, Group, Stack } from "@mantine/core";
-import { skipToken } from "@reduxjs/toolkit/dist/query";
+import { Button, Group, SimpleGrid, Stack } from "@mantine/core";
+import { skipToken } from "@reduxjs/toolkit/query/react";
+import pluralize from "pluralize";
 import { MdOutlineLibraryAdd } from "react-icons/md";
 import { ImFilesEmpty } from "react-icons/im";
 import { Link, useParams } from "react-router-dom";
 import { capitalCase } from "change-case";
-import { MILESTONE } from "../../constants";
-import { useGetSingleCourseQueryState } from "../../redux/services/courses-api";
 import { Role } from "../../types/courses";
 import RoleRestrictedWrapper from "../role-restricted-wrapper";
+import PlaceholderWrapper from "../placeholder-wrapper";
+import { useGetMilestonesQuery } from "../../redux/services/milestones-api";
+import { useResolveError } from "../../utils/error-utils";
+import { useGetMilestoneAlias } from "../../custom-hooks/use-get-milestone-alias";
+import MilestoneCard from "../milestone-card";
 
 function CourseMilestonesPage() {
   const { courseId } = useParams();
-  const { milestoneAlias } = useGetSingleCourseQueryState(
-    courseId ?? skipToken,
-    {
-      selectFromResult: ({ data: course }) => ({
-        milestoneAlias: course?.milestoneAlias,
-      }),
-    },
-  );
+  const {
+    data: milestones,
+    isLoading,
+    error,
+  } = useGetMilestonesQuery(courseId ?? skipToken);
+  useResolveError(error);
+  const milestoneAlias = useGetMilestoneAlias();
+
   return (
     <Stack>
       <RoleRestrictedWrapper allowedRoles={[Role.CoOwner, Role.Instructor]}>
         <Group position="right">
           <Button color="teal" leftIcon={<MdOutlineLibraryAdd />}>
-            Create new {milestoneAlias || MILESTONE}
+            Create new {milestoneAlias}
           </Button>
           <Button<typeof Link>
             component={Link}
             to="../templates"
             leftIcon={<ImFilesEmpty />}
           >
-            {capitalCase(milestoneAlias || MILESTONE)} templates
+            {capitalCase(milestoneAlias)} templates
           </Button>
         </Group>
       </RoleRestrictedWrapper>
-      <div>Hello</div>
+
+      <PlaceholderWrapper
+        isLoading={isLoading}
+        py={150}
+        loadingMessage={`Loading ${pluralize(milestoneAlias)}...`}
+        defaultMessage={`No ${pluralize(milestoneAlias)} found`}
+        showDefaultMessage={!milestones || milestones.length === 0}
+      >
+        <SimpleGrid cols={3} spacing="xs">
+          {milestones?.map((milestone) => (
+            <MilestoneCard key={milestone.id} {...milestone} />
+          ))}
+        </SimpleGrid>
+      </PlaceholderWrapper>
     </Stack>
   );
 }

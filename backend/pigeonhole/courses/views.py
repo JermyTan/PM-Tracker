@@ -404,8 +404,8 @@ class SingleCourseMembershipView(APIView):
         requester_membership: CourseMembership,
         membership: CourseMembership,
     ):
-        ## cannot self update membership
-        if requester_membership == membership:
+        ## cannot update owner membership or self update membership
+        if course.owner == membership.user or requester_membership == membership:
             raise PermissionDenied()
 
         serializer = PatchCourseMembershipSerializer(data=request.data)
@@ -433,8 +433,8 @@ class SingleCourseMembershipView(APIView):
         requester_membership: CourseMembership,
         membership: CourseMembership,
     ):
-        ## cannot self delete membership
-        if requester_membership == membership:
+        ## cannot delete owner or self delete membership
+        if course.owner == membership.user or requester_membership == membership:
             raise PermissionDenied()
 
         data = course_membership_to_json(membership)

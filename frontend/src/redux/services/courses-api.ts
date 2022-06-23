@@ -1,6 +1,6 @@
 import {
-  CourseSummary,
-  Course,
+  CourseSummaryData,
+  CourseData,
   CoursePostData,
   CoursePutData,
 } from "../../types/courses";
@@ -11,7 +11,7 @@ const coursesApi = baseApi
   .enhanceEndpoints({ addTagTypes: ["Course"] })
   .injectEndpoints({
     endpoints: (build) => ({
-      getCourses: build.query<CourseSummary[], void>({
+      getCourses: build.query<CourseSummaryData[], void>({
         query: () => ({
           url: "/courses/",
           method: "GET",
@@ -19,7 +19,7 @@ const coursesApi = baseApi
         providesTags: (result) => cacher.providesList(result, "Course"),
       }),
 
-      createCourse: build.mutation<CourseSummary, CoursePostData>({
+      createCourse: build.mutation<CourseSummaryData, CoursePostData>({
         query: (coursePostData) => ({
           url: "/courses/",
           method: "POST",
@@ -29,7 +29,7 @@ const coursesApi = baseApi
           error ? [] : cacher.invalidatesList("Course"),
       }),
 
-      getSingleCourse: build.query<Course, string | number>({
+      getSingleCourse: build.query<CourseData, string | number>({
         query: (courseId) => ({
           url: `/courses/${courseId}/`,
           method: "GET",
@@ -38,7 +38,7 @@ const coursesApi = baseApi
       }),
 
       updateCourse: build.mutation<
-        Course,
+        CourseData,
         CoursePutData & { courseId: string | number }
       >({
         query: ({ courseId, ...coursePutData }) => ({
@@ -50,7 +50,7 @@ const coursesApi = baseApi
           error ? [] : [{ type: "Course", id }],
       }),
 
-      deleteCourse: build.mutation<Course, string | number>({
+      deleteCourse: build.mutation<CourseData, string | number>({
         query: (courseId) => ({
           url: `/courses/${courseId}/`,
           method: "DELETE",
@@ -71,3 +71,5 @@ export const {
   useUpdateCourseMutation,
   useDeleteCourseMutation,
 } = coursesApi;
+
+export default coursesApi;

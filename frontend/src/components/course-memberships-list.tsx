@@ -25,7 +25,9 @@ function CourseMembershipsList({ courseId, makeAdminOptionsAvailable }: Props) {
   const { course } = useGetSingleCourseQuery(courseId ?? skipToken, {
     selectFromResult: ({ data: course }) => ({ course }),
   });
-  const courseOwnerId = course?.owner.id;
+
+  const courseOwner = course?.owner;
+  const courseOwnerId = courseOwner?.id;
 
   const sortedPersonnel = useMemo(() => {
     const sortedPersonnel = new Map<Role, CourseMemberData[]>();

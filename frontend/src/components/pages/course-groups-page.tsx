@@ -95,17 +95,11 @@ function CourseGroupPage() {
             defaultMessage="No courses found."
             showDefaultMessage={!isLoading && (!groups || groups?.length === 0)}
           >
-            <ScrollArea style={{ height: 250 }}>
-              <Stack spacing="xs">
-                {groups?.map((group) => (
-                  <GroupCard
-                    groupId={group.id}
-                    key={group.id}
-                    course={course}
-                  />
-                ))}
-              </Stack>
-            </ScrollArea>
+            <Stack spacing="xs">
+              {groups?.map((group) => (
+                <GroupCard groupId={group.id} key={group.id} course={course} />
+              ))}
+            </Stack>
           </PlaceholderWrapper>
         </div>
 

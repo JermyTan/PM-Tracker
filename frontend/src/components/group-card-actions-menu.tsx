@@ -8,12 +8,13 @@ import {
   useJoinOrLeaveCourseGroupMutation,
   useRenameCourseGroupMutation,
 } from "../redux/services/groups-api";
+import { CourseData } from "../types/courses";
 import { GroupPatchAction, GroupData } from "../types/groups";
 import toastUtils from "../utils/toast-utils";
 import GroupNameForm, { GroupNameData } from "./group-name-form";
 
 type Props = {
-  course?: Course;
+  course?: CourseData;
   group?: GroupData;
   hasAdminPermission?: boolean;
   userIsInGroup?: boolean;

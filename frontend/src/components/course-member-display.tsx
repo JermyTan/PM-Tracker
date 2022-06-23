@@ -14,6 +14,7 @@ import { useDeleteCourseMembershipMutation } from "../redux/services/members-api
 import { CourseMemberData } from "../types/courses";
 import { useResolveError } from "../utils/error-utils";
 import toastUtils from "../utils/toast-utils";
+import CourseMemberEditRoleMenu from "./course-member-edit-role-menu";
 import CourseMemberRemoveConfirmation from "./course-member-remove-confirmation";
 
 import UserProfileDisplay from "./user-profile-display";
@@ -24,35 +25,10 @@ type Props = {
 };
 
 function CourseMemberDisplay({ member, makeAdminOptionsAvailable }: Props) {
-  const { courseId } = useParams();
-  const membershipId = member.id;
   const [isRemoveMemberModalOpen, setRemoveMemberModalOpen] = useState(false);
-
-  const resolveError = useResolveError();
-
-  const [deleteCourseMember, { isLoading }] =
-    useDeleteCourseMembershipMutation();
-
-  const onDeleteCourseMember = async () => {
-    if (isLoading || courseId === undefined) {
-      return;
-    }
-
-    try {
-      await deleteCourseMember({
-        courseId,
-        membershipId,
-      }).unwrap();
-
-      toastUtils.success({
-        message: "The course has been successfully deleted.",
-      });
-
-      setRemoveMemberModalOpen(false);
-    } catch (error) {
-      resolveError(error);
-    }
-  };
+  const [isEditMemberRoleModalOpen, setEditMemberRoleModalOpen] =
+    useState(false);
+  useState(false);
 
   return (
     <>
@@ -66,6 +42,18 @@ function CourseMemberDisplay({ member, makeAdminOptionsAvailable }: Props) {
           onSuccess={() => setRemoveMemberModalOpen(false)}
         />
       </Modal>
+
+      <Modal
+        title="Edit member's role in course"
+        opened={isEditMemberRoleModalOpen}
+        onClose={() => setEditMemberRoleModalOpen(false)}
+      >
+        <CourseMemberEditRoleMenu
+          member={member}
+          onSuccess={() => setEditMemberRoleModalOpen(false)}
+        />
+      </Modal>
+
       <Group position="apart">
         <UserProfileDisplay {...member.user} />
         <Menu
@@ -77,7 +65,12 @@ function CourseMemberDisplay({ member, makeAdminOptionsAvailable }: Props) {
           placement="end"
           hidden={!makeAdminOptionsAvailable}
         >
-          <Menu.Item icon={<FaUserEdit />}>Edit role</Menu.Item>
+          <Menu.Item
+            icon={<FaUserEdit />}
+            onClick={() => setEditMemberRoleModalOpen(true)}
+          >
+            Edit role
+          </Menu.Item>
           <Menu.Item
             icon={<FaTrashAlt color="red" />}
             onClick={() => setRemoveMemberModalOpen(true)}

@@ -43,7 +43,7 @@ function CourseMemberRemoveConfirmation({ member, onSuccess }: Props) {
       }).unwrap();
 
       toastUtils.success({
-        message: "The course has been successfully deleted.",
+        message: "The member has been successfully removed from the course.",
       });
 
       onSuccess?.();

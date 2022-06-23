@@ -14,19 +14,17 @@ import { useDeleteCourseMembershipMutation } from "../redux/services/members-api
 import { CourseMemberData } from "../types/courses";
 import { useResolveError } from "../utils/error-utils";
 import toastUtils from "../utils/toast-utils";
-import CourseMemberRemoveConfirmation from "./course-member-remove-confirmation";
 
 import UserProfileDisplay from "./user-profile-display";
 
 type Props = {
   member: CourseMemberData;
-  makeAdminOptionsAvailable: boolean;
+  onSuccess?: () => void;
 };
 
-function CourseMemberDisplay({ member, makeAdminOptionsAvailable }: Props) {
+function CourseMemberRemoveConfirmation({ member, onSuccess }: Props) {
   const { courseId } = useParams();
   const membershipId = member.id;
-  const [isRemoveMemberModalOpen, setRemoveMemberModalOpen] = useState(false);
 
   const resolveError = useResolveError();
 
@@ -48,7 +46,7 @@ function CourseMemberDisplay({ member, makeAdminOptionsAvailable }: Props) {
         message: "The course has been successfully deleted.",
       });
 
-      setRemoveMemberModalOpen(false);
+      onSuccess?.();
     } catch (error) {
       resolveError(error);
     }
@@ -56,38 +54,29 @@ function CourseMemberDisplay({ member, makeAdminOptionsAvailable }: Props) {
 
   return (
     <>
-      <Modal
-        title="Remove member from course"
-        opened={isRemoveMemberModalOpen}
-        onClose={() => setRemoveMemberModalOpen(false)}
-      >
-        <CourseMemberRemoveConfirmation
-          member={member}
-          onSuccess={() => setRemoveMemberModalOpen(false)}
-        />
-      </Modal>
-      <Group position="apart">
-        <UserProfileDisplay {...member.user} />
-        <Menu
-          control={
-            <ActionIcon>
-              <FaEdit />
-            </ActionIcon>
-          }
-          placement="end"
-          hidden={!makeAdminOptionsAvailable}
+      <Text size="sm">
+        Are you sure you want to remove this member from the course?
+        <br />
+        <strong>This action is irreversible.</strong>
+      </Text>
+      <Space h="md" />
+      <UserProfileDisplay {...member.user} />
+      <Space h="md" />
+      <Group position="right">
+        <Button color="gray" onClick={onSuccess}>
+          Cancel
+        </Button>
+        <Button
+          color="red"
+          disabled={isLoading}
+          loading={isLoading}
+          onClick={onDeleteCourseMember}
         >
-          <Menu.Item icon={<FaUserEdit />}>Edit role</Menu.Item>
-          <Menu.Item
-            icon={<FaTrashAlt color="red" />}
-            onClick={() => setRemoveMemberModalOpen(true)}
-          >
-            Remove from course
-          </Menu.Item>
-        </Menu>
+          Remove member
+        </Button>
       </Group>
     </>
   );
 }
 
-export default CourseMemberDisplay;
+export default CourseMemberRemoveConfirmation;

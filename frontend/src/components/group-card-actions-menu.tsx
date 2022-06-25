@@ -1,4 +1,5 @@
-import { Menu, ActionIcon, Text } from "@mantine/core";
+import { useState } from "react";
+import { Menu, ActionIcon, Text, Modal } from "@mantine/core";
 import { useModals } from "@mantine/modals";
 import { FaChevronDown, FaEdit, FaTrashAlt } from "react-icons/fa";
 import { MdLogout, MdPersonAdd, MdPeopleAlt } from "react-icons/md";
@@ -11,6 +12,7 @@ import {
 import { CourseData } from "../types/courses";
 import { GroupPatchAction, GroupData } from "../types/groups";
 import toastUtils from "../utils/toast-utils";
+import GroupDeleteOption from "./group-delete-option";
 import GroupNameForm, { GroupNameData } from "./group-name-form";
 
 type Props = {
@@ -96,22 +98,18 @@ function GroupCardActionsMenu({
     });
   };
 
-  const openDeleteGroupModal = () =>
-    modals.openConfirmModal({
+  const openDeleteGroupModal = () => {
+    const id = modals.openModal({
       title: "Delete group",
-      closeButtonLabel: "Cancel group deletion",
-      centered: true,
       children: (
-        <Text size="sm">
-          Are you sure you want to delete this group?
-          <br />
-          <strong>This action is irreversible.</strong>
-        </Text>
+        <GroupDeleteOption
+          course={course}
+          group={group}
+          onSuccess={() => modals.closeModal(id)}
+        />
       ),
-      labels: { confirm: "Delete group", cancel: "Cancel" },
-      confirmProps: { color: "red", loading: isDeletingGroup },
-      onConfirm: onDeleteCourseGroup,
     });
+  };
 
   const openJoinGroupModal = () =>
     modals.openConfirmModal({
@@ -194,47 +192,55 @@ function GroupCardActionsMenu({
   };
 
   return (
-    <Menu
-      control={
-        <ActionIcon>
-          <FaChevronDown />
-        </ActionIcon>
-      }
-      placement="end"
-      hidden={!hasAvailableActions}
-    >
-      <Menu.Item
-        icon={<FaEdit size={14} />}
-        onClick={openRenameGroupModal}
-        hidden={!canModifyGroupName}
+    <>
+      <Menu
+        control={
+          <ActionIcon>
+            <FaChevronDown />
+          </ActionIcon>
+        }
+        placement="end"
+        hidden={!hasAvailableActions}
+        closeOnItemClick={false}
       >
-        Rename group
-      </Menu.Item>
-      <Menu.Item
-        icon={<MdPersonAdd size={14} />}
-        onClick={openJoinGroupModal}
-        hidden={!canJoinGroup}
-      >
-        Join group
-      </Menu.Item>
-      <Menu.Item icon={<MdPeopleAlt size={14} />} hidden={!canEditMembers}>
-        Edit members
-      </Menu.Item>
-      <Menu.Item
-        icon={<MdLogout size={14} />}
-        onClick={openLeaveGroupModal}
-        hidden={!canLeaveGroup}
-      >
-        Leave group
-      </Menu.Item>
-      <Menu.Item
-        icon={<FaTrashAlt size={14} color="red" />}
-        onClick={openDeleteGroupModal}
+        <Menu.Item
+          icon={<FaEdit size={14} />}
+          onClick={openRenameGroupModal}
+          hidden={!canModifyGroupName}
+        >
+          Rename group
+        </Menu.Item>
+        <Menu.Item
+          icon={<MdPersonAdd size={14} />}
+          onClick={openJoinGroupModal}
+          hidden={!canJoinGroup}
+        >
+          Join group
+        </Menu.Item>
+        <Menu.Item icon={<MdPeopleAlt size={14} />} hidden={!canEditMembers}>
+          Edit members
+        </Menu.Item>
+        <Menu.Item
+          icon={<MdLogout size={14} />}
+          onClick={openLeaveGroupModal}
+          hidden={!canLeaveGroup}
+        >
+          Leave group
+        </Menu.Item>
+        <Menu.Item
+          icon={<FaTrashAlt size={14} color="red" />}
+          onClick={openDeleteGroupModal}
+          hidden={!canDeleteGroup}
+        >
+          Delete group
+        </Menu.Item>
+        {/* <GroupDeleteOption
         hidden={!canDeleteGroup}
-      >
-        Delete group
-      </Menu.Item>
-    </Menu>
+        course={course}
+        group={group}
+      /> */}
+      </Menu>
+    </>
   );
 }
 

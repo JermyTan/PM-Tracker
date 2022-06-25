@@ -60,6 +60,8 @@ function GroupJoinOrLeaveConfirmation({
           group ? ` "${group.name}"` : ""
         }.`,
       });
+
+      onSuccess?.();
     } catch (error) {
       resolveError(error);
     }

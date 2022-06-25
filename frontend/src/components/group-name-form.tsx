@@ -57,7 +57,10 @@ function GroupNameForm({
       >
         <Stack>
           <TextField name={NAME} description="Group name" />
-          <Group>
+          <Group position="right">
+            <Button color="gray" onClick={onSuccess}>
+              Cancel
+            </Button>
             <Button
               type="submit"
               disabled={isSubmitting}

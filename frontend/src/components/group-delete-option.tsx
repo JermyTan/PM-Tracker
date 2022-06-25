@@ -30,7 +30,9 @@ function GroupDeleteOption({ course, group, onSuccess }: Props) {
       await deleteGroup({ courseId, groupId }).unwrap();
 
       toastUtils.success({
-        message: `The group has been successfully deleted.`,
+        message: `The group${
+          group ? ` "${group.name}"` : ""
+        } has been successfully deleted.`,
       });
 
       onSuccess?.();

@@ -1,19 +1,7 @@
-import {
-  ActionIcon,
-  Button,
-  Group,
-  Menu,
-  Modal,
-  Space,
-  Text,
-} from "@mantine/core";
+import { ActionIcon, Group, Menu, Modal } from "@mantine/core";
 import { useState } from "react";
 import { FaEdit, FaTrashAlt, FaUserEdit } from "react-icons/fa";
-import { useParams } from "react-router-dom";
-import { useDeleteCourseMembershipMutation } from "../redux/services/members-api";
 import { CourseMemberData } from "../types/courses";
-import { useResolveError } from "../utils/error-utils";
-import toastUtils from "../utils/toast-utils";
 import CourseMemberEditRoleMenu from "./course-member-edit-role-menu";
 import CourseMemberRemoveConfirmation from "./course-member-remove-confirmation";
 

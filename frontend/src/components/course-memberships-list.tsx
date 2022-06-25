@@ -12,12 +12,15 @@ import UserProfileDisplay from "./user-profile-display";
 
 type Props = {
   courseId: number | string | undefined;
-  makeAdminOptionsAvailable: boolean;
+  hasAdminPermission: boolean;
 };
 
 const orderedRoles = sort(roles);
 
-function CourseMembershipsList({ courseId, makeAdminOptionsAvailable }: Props) {
+function CourseMembershipsList({
+  courseId,
+  hasAdminPermission,
+}: Props) {
   const { data: coursePersonnel, isLoading } = useGetCourseMembershipsQuery(
     courseId ?? skipToken,
   );
@@ -85,7 +88,7 @@ function CourseMembershipsList({ courseId, makeAdminOptionsAvailable }: Props) {
                 <CourseRoleGroupList
                   role={role}
                   personnel={personnel ?? []}
-                  makeAdminOptionsAvailable={makeAdminOptionsAvailable}
+                  hasAdminPermission={hasAdminPermission}
                 />
               );
             })}

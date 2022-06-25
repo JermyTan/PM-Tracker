@@ -105,7 +105,7 @@ function CourseGroupPage() {
 
         <CourseMembershipsList
           courseId={courseId}
-          makeAdminOptionsAvailable={hasAdminPermission}
+          hasAdminPermission={hasAdminPermission}
         />
       </SimpleGrid>
     </>

@@ -14,6 +14,7 @@ import GroupDeleteOption from "./group-delete-option";
 import GroupNameForm, { GroupNameData } from "./group-name-form";
 import GroupJoinOrLeaveConfirmation from "./group-join-or-leave-confirmation";
 import { useResolveError } from "../utils/error-utils";
+import GroupEditMembersMenu from "./group-edit-members-menu";
 
 type Props = {
   course?: CourseData;
@@ -137,6 +138,19 @@ function GroupCardActionsMenu({
     });
   };
 
+  const openEditMembersMenu = () => {
+    const id = modals.openModal({
+      title: "Add or remove members",
+      children: (
+        <GroupEditMembersMenu
+          groupUserData={group?.members ?? []}
+          courseId={courseId}
+        />
+      ),
+      size: "lg",
+    });
+  };
+
   const shouldShowWarningModalOnJoin =
     !hasAdminPermission && !course?.allowStudentsToLeaveGroups;
 
@@ -226,7 +240,11 @@ function GroupCardActionsMenu({
       >
         Join group
       </Menu.Item>
-      <Menu.Item icon={<MdPeopleAlt size={14} />} hidden={!canEditMembers}>
+      <Menu.Item
+        icon={<MdPeopleAlt size={14} />}
+        onClick={openEditMembersMenu}
+        hidden={!canEditMembers}
+      >
         Edit members
       </Menu.Item>
       <Menu.Item

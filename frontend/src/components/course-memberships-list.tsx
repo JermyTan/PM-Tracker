@@ -17,10 +17,7 @@ type Props = {
 
 const orderedRoles = sort(roles);
 
-function CourseMembershipsList({
-  courseId,
-  hasAdminPermission,
-}: Props) {
+function CourseMembershipsList({ courseId, hasAdminPermission }: Props) {
   const { data: coursePersonnel, isLoading } = useGetCourseMembershipsQuery(
     courseId ?? skipToken,
   );

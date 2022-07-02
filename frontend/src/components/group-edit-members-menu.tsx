@@ -12,7 +12,7 @@ import {
 import { skipToken } from "@reduxjs/toolkit/dist/query";
 import { capitalize } from "lodash";
 import pluralize from "pluralize";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { USER, NAME, EMAIL } from "../constants";
 import { useAppSelector } from "../redux/hooks";
@@ -20,6 +20,7 @@ import { useGetCourseMembershipsQuery } from "../redux/services/members-api";
 import { CourseMemberData, Role } from "../types/courses";
 import { UserData } from "../types/users";
 import { sort } from "../utils/transform-utils";
+import PlaceholderWrapper from "./placeholder-wrapper";
 
 type Props = {
   groupUserData?: UserData[];
@@ -74,9 +75,10 @@ function GroupEditMembersMenu({ groupUserData, courseId }: Props) {
   const { data: allCourseMembers, isLoading } = useGetCourseMembershipsQuery(
     courseId ?? skipToken,
   );
-  const userId = useAppSelector(({ currentUser }) => currentUser?.user?.id);
 
-  const initialValues: TransferListData = useMemo(() => {
+  const [data, setData] = useState<TransferListData>([[], []]);
+
+  useEffect(() => {
     const currentGroupMembersSet = new Set();
 
     const filteredGroupMembers: CourseMemberData[] = [];
@@ -95,24 +97,33 @@ function GroupEditMembersMenu({ groupUserData, courseId }: Props) {
       availableMembers.push(member);
     });
 
-    return [
+    const transferListValues: TransferListData = [
       sortAndConvertMemberDataToListFormat(filteredGroupMembers),
       sortAndConvertMemberDataToListFormat(availableMembers),
     ];
+
+    setData(transferListValues);
   }, [allCourseMembers, groupUserData]);
 
-  const [data, setData] = useState<TransferListData>(initialValues);
+  const userId = useAppSelector(({ currentUser }) => currentUser?.user?.id);
 
   return (
-    <TransferList
-      itemComponent={ItemComponent}
-      value={data}
-      onChange={setData}
-      // filter={(query, item) =>
-      //   item.label.toLowerCase().includes(query.toLowerCase().trim()) ||
-      //   item.description.toLowerCase().includes(query.toLowerCase().trim())
-      // }
-    />
+    <PlaceholderWrapper
+      isLoading={isLoading}
+      loadingMessage="Loading members..."
+      defaultMessage="No members found."
+      showDefaultMessage={!allCourseMembers || allCourseMembers?.length === 0}
+    >
+      <TransferList
+        itemComponent={ItemComponent}
+        value={data}
+        onChange={setData}
+        // filter={(query, item) =>
+        //   item.label.toLowerCase().includes(query.toLowerCase().trim()) ||
+        //   item.description.toLowerCase().includes(query.toLowerCase().trim())
+        // }
+      />
+    </PlaceholderWrapper>
   );
 }
 

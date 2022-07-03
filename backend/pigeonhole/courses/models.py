@@ -25,6 +25,7 @@ class PatchCourseGroupAction(models.TextChoices):
     MODIFY = "MODIFY"
     ADD = "ADD"
     REMOVE = "REMOVE"
+    UPDATE_MEMBERS = "UPDATE_MEMBERS"
 
 
 MAX_ROLE_LENGTH = max(map(len, Role))

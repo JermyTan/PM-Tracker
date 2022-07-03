@@ -6,6 +6,7 @@ from pigeonhole.common.serializers import (
     UserIdSerializer,
     IdField,
     ObjectListField,
+    BatchUserIdSerializer
 )
 from forms.serializers import FormSerializer
 
@@ -133,6 +134,9 @@ class PatchCourseGroupSerializer(serializers.Serializer):
                 serializer.is_valid(raise_exception=True)
             case PatchCourseGroupAction.ADD | PatchCourseGroupAction.REMOVE:
                 serializer = UserIdSerializer(data=payload)
+                serializer.is_valid(raise_exception=True)
+            case PatchCourseGroupAction.UPDATE_MEMBERS:
+                serializer = BatchUserIdSerializer(data=payload)
                 serializer.is_valid(raise_exception=True)
 
         return data

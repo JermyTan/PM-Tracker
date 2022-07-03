@@ -4,11 +4,17 @@ import { FaChevronDown, FaEdit, FaTrashAlt } from "react-icons/fa";
 import { MdLogout, MdPersonAdd, MdPeopleAlt } from "react-icons/md";
 import { NAME } from "../constants";
 import {
-  useJoinOrLeaveCourseGroupMutation,
-  useRenameCourseGroupMutation,
+  usePatchCourseGroupMutation,
+  // useJoinOrLeaveCourseGroupMutation,
+  // useRenameCourseGroupMutation,
 } from "../redux/services/groups-api";
 import { CourseData } from "../types/courses";
-import { GroupPatchAction, GroupData } from "../types/groups";
+import {
+  GroupPatchAction,
+  GroupData,
+  GroupPatchData,
+  JoinOrLeaveGroupData,
+} from "../types/groups";
 import toastUtils from "../utils/toast-utils";
 import GroupDeleteOption from "./group-delete-option";
 import GroupNameForm, { GroupNameData } from "./group-name-form";
@@ -30,9 +36,9 @@ function GroupCardActionsMenu({
   userIsInGroup,
 }: Props) {
   const [joinOrLeaveGroup, { isLoading: isJoiningOrLeavingGroup }] =
-    useJoinOrLeaveCourseGroupMutation();
+    usePatchCourseGroupMutation();
 
-  const [renameGroup] = useRenameCourseGroupMutation();
+  const [renameGroup] = usePatchCourseGroupMutation();
 
   const modals = useModals();
   const courseId = course?.id;
@@ -74,7 +80,7 @@ function GroupCardActionsMenu({
       return;
     }
 
-    const groupPutData = {
+    const groupPatchData: GroupPatchData = {
       action,
       payload: {
         userId: null,
@@ -85,7 +91,7 @@ function GroupCardActionsMenu({
       action === GroupPatchAction.Join ? "joined" : "left";
 
     try {
-      await joinOrLeaveGroup({ ...groupPutData, courseId, groupId }).unwrap();
+      await joinOrLeaveGroup({ ...groupPatchData, courseId, groupId }).unwrap();
 
       toastUtils.success({
         message: `You have successfully ${actionPastTense} the group${
@@ -143,7 +149,8 @@ function GroupCardActionsMenu({
       title: "Add or remove members",
       children: (
         <GroupEditMembersMenu
-          groupUserData={group?.members ?? []}
+          groupId={group?.id}
+          groupUserData={group?.members}
           courseId={courseId}
         />
       ),
@@ -180,7 +187,7 @@ function GroupCardActionsMenu({
       return;
     }
 
-    const renameData = {
+    const renameData: GroupPatchData = {
       action: GroupPatchAction.Modify,
       payload: {
         name: parsedData[NAME],

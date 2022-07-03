@@ -2,11 +2,12 @@ import { Menu, Text, Modal, Button, Space, Group } from "@mantine/core";
 import { useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import {
-  useDeleteCourseGroupMutation,
-  useJoinOrLeaveCourseGroupMutation,
+  // useDeleteCourseGroupMutation,
+  // useJoinOrLeaveCourseGroupMutation,
+  usePatchCourseGroupMutation,
 } from "../redux/services/groups-api";
 import { CourseData } from "../types/courses";
-import { GroupData, GroupPatchAction } from "../types/groups";
+import { GroupData, GroupPatchAction, GroupPatchData } from "../types/groups";
 import { useResolveError } from "../utils/error-utils";
 import toastUtils from "../utils/toast-utils";
 import { capitalizeFirstLetter } from "../utils/transform-utils";
@@ -24,7 +25,7 @@ function GroupJoinOrLeaveConfirmation({
   action,
   onSuccess,
 }: Props) {
-  const [joinOrLeaveGroup, { isLoading }] = useJoinOrLeaveCourseGroupMutation();
+  const [joinOrLeaveGroup, { isLoading }] = usePatchCourseGroupMutation();
 
   const courseId = course?.id;
   const groupId = group?.id;
@@ -45,7 +46,7 @@ function GroupJoinOrLeaveConfirmation({
       return;
     }
 
-    const groupPutData = {
+    const groupPatchData: GroupPatchData = {
       action,
       payload: {
         userId: null,
@@ -53,7 +54,7 @@ function GroupJoinOrLeaveConfirmation({
     };
 
     try {
-      await joinOrLeaveGroup({ ...groupPutData, courseId, groupId }).unwrap();
+      await joinOrLeaveGroup({ ...groupPatchData, courseId, groupId }).unwrap();
 
       toastUtils.success({
         message: `You have successfully ${actionPastTense} the group${

@@ -4,6 +4,7 @@ import {
   GroupPatchData,
   JoinOrLeaveGroupData,
   RenameGroupData,
+  BatchUpdateGroupData,
 } from "../../types/groups";
 import { cacher } from "./api-cache-utils";
 import baseApi from "./base-api";
@@ -32,29 +33,56 @@ const groupsApi = baseApi
           error ? [] : cacher.invalidatesList("Group"),
       }),
 
-      joinOrLeaveCourseGroup: build.mutation<
-        GroupData,
-        GroupPatchData &
-          JoinOrLeaveGroupData & { courseId: number | string; groupId: number }
-      >({
-        query: ({ courseId, groupId, ...groupPutData }) => ({
-          url: `/courses/${courseId}/groups/${groupId}/`,
-          method: "PATCH",
-          body: groupPutData,
-        }),
-        invalidatesTags: (_, error, { groupId: id }) =>
-          error ? [] : [{ type: "Group", id }],
-      }),
+      // joinOrLeaveCourseGroup: build.mutation<
+      //   GroupData,
+      //   GroupPatchData &
+      //     JoinOrLeaveGroupData & { courseId: number | string; groupId: number }
+      // >({
+      //   query: ({ courseId, groupId, ...groupPatchData }) => ({
+      //     url: `/courses/${courseId}/groups/${groupId}/`,
+      //     method: "PATCH",
+      //     body: groupPatchData,
+      //   }),
+      //   invalidatesTags: (_, error, { groupId: id }) =>
+      //     error ? [] : [{ type: "Group", id }],
+      // }),
 
-      renameCourseGroup: build.mutation<
+      // renameCourseGroup: build.mutation<
+      //   GroupData,
+      //   GroupPatchData &
+      //     RenameGroupData & { courseId: number | string; groupId: number }
+      // >({
+      //   query: ({ courseId, groupId, ...groupPatchData }) => ({
+      //     url: `/courses/${courseId}/groups/${groupId}/`,
+      //     method: "PATCH",
+      //     body: groupPatchData,
+      //   }),
+      //   invalidatesTags: (_, error, { groupId: id }) =>
+      //     error ? [] : [{ type: "Group", id }],
+      // }),
+
+      // batchUpdateCourseGroup: build.mutation<
+      //   GroupData,
+      //   GroupPatchData &
+      //     BatchUpdateGroupData & { courseId: number | string; groupId: number }
+      // >({
+      //   query: ({ courseId, groupId, ...groupPatchData }) => ({
+      //     url: `/courses/${courseId}/groups/${groupId}/`,
+      //     method: "PATCH",
+      //     body: groupPatchData,
+      //   }),
+      //   invalidatesTags: (_, error, { groupId: id }) =>
+      //     error ? [] : [{ type: "Group", id }],
+      // }),
+
+      patchCourseGroup: build.mutation<
         GroupData,
-        GroupPatchData &
-          RenameGroupData & { courseId: number | string; groupId: number }
+        GroupPatchData & { courseId: number | string; groupId: number }
       >({
-        query: ({ courseId, groupId, ...groupPutData }) => ({
+        query: ({ courseId, groupId, ...groupPatchData }) => ({
           url: `/courses/${courseId}/groups/${groupId}/`,
           method: "PATCH",
-          body: groupPutData,
+          body: groupPatchData,
         }),
         invalidatesTags: (_, error, { groupId: id }) =>
           error ? [] : [{ type: "Group", id }],
@@ -77,7 +105,9 @@ const groupsApi = baseApi
 export const {
   useGetCourseGroupsQuery,
   useCreateCourseGroupMutation,
-  useJoinOrLeaveCourseGroupMutation,
-  useRenameCourseGroupMutation,
+  usePatchCourseGroupMutation,
+  // useJoinOrLeaveCourseGroupMutation,
+  // useRenameCourseGroupMutation,
+  // useBatchUpdateCourseGroupMutation,
   useDeleteCourseGroupMutation,
 } = groupsApi;

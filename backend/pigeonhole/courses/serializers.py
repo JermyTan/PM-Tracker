@@ -83,7 +83,7 @@ class PostCourseMilestoneSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CourseMilestone
-        fields = ("name", "description", "start_date_time", "end_date_time")
+        fields = ("name", "description", "start_date_time", "end_date_time", "is_published")
 
 
 PutCourseMilestoneSerializer = PostCourseMilestoneSerializer

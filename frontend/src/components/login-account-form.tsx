@@ -108,7 +108,7 @@ function LoginAccountForm() {
             {!name && (
               <TextField
                 name={NAME}
-                label="Full Name"
+                label="Full name"
                 autoFocus
                 autoComplete="name"
               />

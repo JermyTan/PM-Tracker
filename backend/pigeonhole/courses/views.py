@@ -281,6 +281,7 @@ class CourseMilestonesView(APIView):
                 end_date_time=parse_ms_timestamp_to_datetime(
                     validated_data["end_date_time"]
                 ),
+                is_published=validated_data["is_published"]
             )
         except ValueError as e:
             raise BadRequest(detail=e)
@@ -318,6 +319,7 @@ class SingleCourseMilestoneView(APIView):
             end_date_time=parse_ms_timestamp_to_datetime(
                 validated_data["end_date_time"]
             ),
+            is_published=validated_data["is_published"]
         )
 
         data = course_milestone_to_json(updated_milestone)

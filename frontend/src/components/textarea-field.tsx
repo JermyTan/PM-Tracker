@@ -1,6 +1,5 @@
 import { Textarea, TextareaProps } from "@mantine/core";
-import { useFormContext } from "react-hook-form";
-import get from "lodash/get";
+import { get, useFormContext } from "react-hook-form";
 
 type Props = TextareaProps & {
   name: string;

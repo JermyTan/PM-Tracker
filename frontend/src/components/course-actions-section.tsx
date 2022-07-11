@@ -11,7 +11,8 @@ import { useDisclosure } from "@mantine/hooks";
 import { useModals } from "@mantine/modals";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { MdDeleteForever, MdEdit } from "react-icons/md";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useGetCourseId } from "../custom-hooks/use-get-course-id";
 import { useAppSelector } from "../redux/hooks";
 import {
   useDeleteCourseMutation,
@@ -26,7 +27,7 @@ type Props = StackProps;
 
 function CourseActionsSection(props: Props) {
   const userId = useAppSelector(({ currentUser }) => currentUser?.user?.id);
-  const { courseId } = useParams();
+  const courseId = useGetCourseId();
   const { ownerId } = useGetSingleCourseQuery(courseId ?? skipToken, {
     selectFromResult: ({ data: course }) => ({ ownerId: course?.owner.id }),
   });
@@ -87,8 +88,8 @@ function CourseActionsSection(props: Props) {
         position="right"
         size="xl"
         padding="lg"
-        closeButtonLabel="Cancel course creation"
-        title={<Title order={2}>Edit Course Settings</Title>}
+        closeButtonLabel="Cancel course update"
+        title={<Title order={2}>Course Update</Title>}
       >
         {/* special case: this conditional render is required as course edit form is mounted and api call will be made
         even though the drawer is not yet opened */}

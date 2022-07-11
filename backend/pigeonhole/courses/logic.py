@@ -326,6 +326,7 @@ def create_course_milestone(
     description: str,
     start_date_time: datetime,
     end_date_time: Optional[datetime],
+    is_published: bool
 ) -> CourseMilestone:
     try:
         new_milestone = CourseMilestone.objects.create(
@@ -334,6 +335,7 @@ def create_course_milestone(
             description=description,
             start_date_time=start_date_time,
             end_date_time=end_date_time,
+            is_published=is_published
         )
     except IntegrityError as e:
         logger.warning(e)
@@ -351,11 +353,13 @@ def update_course_milestone(
     description: str,
     start_date_time: datetime,
     end_date_time: Optional[datetime],
+    is_published: bool
 ) -> CourseMilestone:
     milestone.name = name
     milestone.description = description
     milestone.start_date_time = start_date_time
     milestone.end_date_time = end_date_time
+    milestone.is_published = is_published
 
     milestone.save()
 

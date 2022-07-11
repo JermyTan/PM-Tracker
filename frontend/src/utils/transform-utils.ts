@@ -1,4 +1,5 @@
 import arraySort from "array-sort";
+import dayjs from "dayjs";
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return !Array.isArray(value) && typeof value === "object" && value !== null;
@@ -34,21 +35,31 @@ export function sanitizeArray(
   return strings.map((s) => s.trim()).filter((s) => s);
 }
 
-// export function displayDateTime(
-//   inputDateTime: string | number | Date,
-//   dateTimeFormat: string = DATE_TIME_FORMAT,
-// ): string {
-//   try {
-//     const dateTime =
-//       typeof inputDateTime === "string"
-//         ? parseInt(inputDateTime, 10)
-//         : inputDateTime;
+export function displayDateTime(
+  inputDateTime: string | number | Date,
+  dateTimeFormat?: string,
+): string {
+  try {
+    const dateTime = dayjs(
+      typeof inputDateTime === "string"
+        ? parseInt(inputDateTime, 10)
+        : inputDateTime,
+    );
 
-//     return format(dateTime, dateTimeFormat);
-//   } catch {
-//     return "";
-//   }
-// }
+    return dateTime.format(dateTimeFormat);
+  } catch {
+    return "";
+  }
+}
+
+export function mergeDateTime(date: Date, time: Date) {
+  return dayjs(date)
+    .hour(time.getHours())
+    .minute(time.getMinutes())
+    .second(time.getSeconds())
+    .millisecond(time.getMilliseconds())
+    .toDate();
+}
 
 // export function displayDateTimeRange(
 //   inputStartDateTime: string | number | Date,

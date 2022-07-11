@@ -1,6 +1,6 @@
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { ReactNode } from "react";
-import { useParams } from "react-router-dom";
+import { useGetCourseId } from "../custom-hooks/use-get-course-id";
 import { useGetSingleCourseQueryState } from "../redux/services/courses-api";
 import { Role } from "../types/courses";
 
@@ -15,7 +15,7 @@ function RoleRestrictedWrapper({
   allowedRoles,
   fallback = null,
 }: Props) {
-  const { courseId } = useParams();
+  const courseId = useGetCourseId();
   const { role } = useGetSingleCourseQueryState(courseId ?? skipToken, {
     selectFromResult: ({ data: course }) => ({ role: course?.role }),
   });

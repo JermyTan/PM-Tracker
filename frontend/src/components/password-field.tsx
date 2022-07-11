@@ -1,6 +1,5 @@
 import { PasswordInput, PasswordInputProps } from "@mantine/core";
-import { useFormContext } from "react-hook-form";
-import get from "lodash/get";
+import { get, useFormContext } from "react-hook-form";
 
 type Props = PasswordInputProps & {
   name: string;

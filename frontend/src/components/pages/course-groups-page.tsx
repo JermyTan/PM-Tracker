@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { Text, Stack, Space, SimpleGrid } from "@mantine/core";
 import { useGetSingleCourseQuery } from "../../redux/services/courses-api";
@@ -6,9 +5,10 @@ import { useGetCourseGroupsQuery } from "../../redux/services/groups-api";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import GroupCard from "../group-card";
 import CourseMembershipsList from "../course-members-list";
+import { useGetCourseId } from "../../custom-hooks/use-get-course-id";
 
 function CourseGroupPage() {
-  const { courseId } = useParams();
+  const courseId = useGetCourseId();
 
   const { data: groups, isLoading } = useGetCourseGroupsQuery(
     courseId ?? skipToken,

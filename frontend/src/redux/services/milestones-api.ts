@@ -17,6 +17,7 @@ const milestonesApi = baseApi
         }),
         providesTags: (result) => cacher.providesList(result, "Milestone"),
       }),
+
       createMilestone: build.mutation<
         MilestoneData,
         MilestonePostData & {
@@ -31,6 +32,20 @@ const milestonesApi = baseApi
         invalidatesTags: (_, error) =>
           error ? [] : cacher.invalidatesList("Milestone"),
       }),
+
+      getSingleMilestone: build.query<
+        MilestoneData,
+        { courseId: string | number; milestoneId: string | number }
+      >({
+        query: ({ courseId, milestoneId }) => ({
+          url: `/courses/${courseId}/milestones/${milestoneId}/`,
+          method: "GET",
+        }),
+        providesTags: (_, __, { milestoneId: id }) => [
+          { type: "Milestone", id },
+        ],
+      }),
+
       updateMilestone: build.mutation<
         MilestoneData,
         MilestonePutData & {
@@ -46,6 +61,7 @@ const milestonesApi = baseApi
         invalidatesTags: (_, error, { milestoneId: id }) =>
           error ? [] : [{ type: "Milestone", id }],
       }),
+
       deleteMilestone: build.mutation<
         MilestoneData,
         {
@@ -66,6 +82,7 @@ const milestonesApi = baseApi
 export const {
   useGetMilestonesQuery,
   useCreateMilestoneMutation,
+  useGetSingleMilestoneQuery,
   useUpdateMilestoneMutation,
   useDeleteMilestoneMutation,
 } = milestonesApi;

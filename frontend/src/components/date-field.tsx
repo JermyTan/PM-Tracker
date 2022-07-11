@@ -14,6 +14,7 @@ function DateField({ name, ...props }: Props) {
   return (
     <DatePicker
       error={error?.message}
+      firstDayOfWeek="sunday"
       {...props}
       onChange={onChange}
       value={value}

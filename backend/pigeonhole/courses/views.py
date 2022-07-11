@@ -294,6 +294,22 @@ class CourseMilestonesView(APIView):
 class SingleCourseMilestoneView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_milestone
+    def get(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+        milestone: CourseMilestone,
+    ):
+        data = course_milestone_to_json(milestone)
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
     @check_requester_membership(Role.INSTRUCTOR, Role.CO_OWNER)
     @check_milestone
     def put(

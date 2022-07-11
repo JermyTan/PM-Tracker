@@ -61,6 +61,14 @@ export function mergeDateTime(date: Date, time: Date) {
     .toDate();
 }
 
+export function getStartOfDate(date: Date, unit: dayjs.OpUnitType) {
+  return dayjs(date).startOf(unit).toDate();
+}
+
+export function getEndOfDate(date: Date, unit: dayjs.OpUnitType) {
+  return dayjs(date).endOf(unit).toDate();
+}
+
 // export function displayDateTimeRange(
 //   inputStartDateTime: string | number | Date,
 //   inputEndDateTime: string | number | Date,

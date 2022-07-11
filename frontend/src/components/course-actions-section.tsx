@@ -99,6 +99,7 @@ function CourseActionsSection(props: Props) {
           </ScrollArea>
         )}
       </Drawer>
+
       <Stack {...props}>
         <Button onClick={open} leftIcon={<MdEdit />}>
           Edit course

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createStyles,
@@ -9,7 +10,10 @@ import {
   Text,
   Space,
   Button,
+  LoadingOverlay,
 } from "@mantine/core";
+import { useDidUpdate } from "@mantine/hooks";
+import { skipToken } from "@reduxjs/toolkit/query/react";
 import { isSameDate } from "@mantine/dates";
 import { capitalCase } from "change-case";
 import { FormProvider, useForm } from "react-hook-form";
@@ -27,7 +31,10 @@ import {
 } from "../constants";
 import { useGetCourseId } from "../custom-hooks/use-get-course-id";
 import { useGetMilestoneAlias } from "../custom-hooks/use-get-milestone-alias";
-import { useCreateMilestoneMutation } from "../redux/services/milestones-api";
+import {
+  useGetSingleMilestoneQuery,
+  useUpdateMilestoneMutation,
+} from "../redux/services/milestones-api";
 import { emptySelector } from "../redux/utils";
 import { useResolveError } from "../utils/error-utils";
 import { handleSubmitForm } from "../utils/form-utils";
@@ -82,22 +89,12 @@ const schema = z
           },
   );
 
-type MilestoneCreationFormProps = Omit<
+type MilestoneEditFormProps = Omit<
   z.infer<typeof schema>,
   typeof START_DATE | typeof START_TIME
 > & {
   [START_DATE]: Date | null;
   [START_TIME]: Date | null;
-};
-
-const DEFAULT_VALUES: MilestoneCreationFormProps = {
-  name: "",
-  description: "",
-  startDate: null,
-  startTime: null,
-  endDate: null,
-  endTime: null,
-  isPublished: false,
 };
 
 const useStyles = createStyles({
@@ -110,19 +107,56 @@ const useStyles = createStyles({
 });
 
 type Props = {
+  milestoneId: string | number;
   onSuccess?: () => void;
 };
 
-function MilestoneCreationForm({ onSuccess }: Props) {
+function MilestoneEditForm({ milestoneId, onSuccess }: Props) {
   const courseId = useGetCourseId();
   const milestoneAlias = useGetMilestoneAlias();
   const capitalizedMilestoneAlias = capitalCase(milestoneAlias);
-  const methods = useForm<MilestoneCreationFormProps>({
+  const { milestone, isFetching } = useGetSingleMilestoneQuery(
+    courseId === undefined ? skipToken : { courseId, milestoneId },
+    {
+      selectFromResult: ({ data: milestone, isFetching }) => ({
+        milestone,
+        isFetching,
+      }),
+      // get the most updated milestone data before editing
+      refetchOnMountOrArgChange: true,
+    },
+  );
+
+  const defaultValues: MilestoneEditFormProps | undefined = useMemo(() => {
+    if (milestone === undefined) {
+      return undefined;
+    }
+
+    const { name, description, startDateTime, endDateTime, isPublished } =
+      milestone;
+
+    const startDate = new Date(startDateTime);
+    const startTime = new Date(startDateTime);
+    const endDate = endDateTime === null ? null : new Date(endDateTime);
+    const endTime = endDateTime === null ? null : new Date(endDateTime);
+
+    return {
+      name,
+      description,
+      startDate,
+      startTime,
+      endDate,
+      endTime,
+      isPublished,
+    };
+  }, [milestone]);
+
+  const methods = useForm<MilestoneEditFormProps>({
     resolver: zodResolver(schema),
-    defaultValues: DEFAULT_VALUES,
+    defaultValues,
   });
   const resolveError = useResolveError();
-  const [createMilestone] = useCreateMilestoneMutation({
+  const [updateMilestone] = useUpdateMilestoneMutation({
     selectFromResult: emptySelector,
   });
   const { classes } = useStyles();
@@ -130,9 +164,13 @@ function MilestoneCreationForm({ onSuccess }: Props) {
   const {
     handleSubmit,
     formState: { isSubmitting },
+    reset,
   } = methods;
 
-  const onSubmit = async (formData: MilestoneCreationFormProps) => {
+  // populate the form with the most updated milestone data (if any)
+  useDidUpdate(() => reset(defaultValues), [milestone]);
+
+  const onSubmit = async (formData: MilestoneEditFormProps) => {
     if (isSubmitting || courseId === undefined) {
       return;
     }
@@ -148,17 +186,18 @@ function MilestoneCreationForm({ onSuccess }: Props) {
         ? null
         : getEndOfDate(mergeDateTime(endDate, endTime), "minute").getTime();
 
-    const data: Parameters<typeof createMilestone>[0] = {
+    const data: Parameters<typeof updateMilestone>[0] = {
+      milestoneId,
       courseId,
       startDateTime,
       endDateTime,
       ...rest,
     };
 
-    await createMilestone(data).unwrap();
+    await updateMilestone(data).unwrap();
 
     toastUtils.success({
-      message: `The new ${milestoneAlias} has been created successfully.`,
+      message: `The ${milestoneAlias} has been updated successfully.`,
     });
     onSuccess?.();
   };
@@ -169,14 +208,14 @@ function MilestoneCreationForm({ onSuccess }: Props) {
         onSubmit={handleSubmitForm(handleSubmit(onSubmit), resolveError)}
         autoComplete="off"
       >
+        <LoadingOverlay visible={isFetching} />
+
         <Stack>
           <Title order={4}>{capitalizedMilestoneAlias} Details</Title>
 
           <TextField
             name={NAME}
             label={`${capitalizedMilestoneAlias} name`}
-            autoFocus
-            data-autofocus
             required
           />
 
@@ -277,7 +316,7 @@ function MilestoneCreationForm({ onSuccess }: Props) {
               type="submit"
               className={classes.button}
             >
-              Create
+              Save
             </Button>
           </Group>
         </Stack>
@@ -286,4 +325,4 @@ function MilestoneCreationForm({ onSuccess }: Props) {
   );
 }
 
-export default MilestoneCreationForm;
+export default MilestoneEditForm;

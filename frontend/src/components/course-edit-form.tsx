@@ -102,7 +102,7 @@ function CourseEditForm({ onSuccess }: Props) {
   } = methods;
 
   // populate the form with the most updated course data (if any)
-  useDidUpdate(reset, [course]);
+  useDidUpdate(() => reset(course), [course]);
 
   const onSubmit = async (formData: CourseEditFormProps) => {
     if (isSubmitting || courseId === undefined) {

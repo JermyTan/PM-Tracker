@@ -18,7 +18,7 @@ import { USER, NAME, EMAIL } from "../constants";
 import { useAppSelector } from "../redux/hooks";
 import { usePatchCourseGroupMutation } from "../redux/services/groups-api";
 import { useGetCourseMembershipsQuery } from "../redux/services/members-api";
-import { CourseMemberData } from "../types/courses";
+import { CourseMemberData, editableRoleMap, Role } from "../types/courses";
 import { GroupPatchAction, GroupPatchData } from "../types/groups";
 import { UserData } from "../types/users";
 import { useResolveError } from "../utils/error-utils";
@@ -30,6 +30,7 @@ type Props = {
   groupUserData?: UserData[];
   courseId?: number;
   groupId?: number;
+  userCourseRole?: Role;
 };
 
 const convertMemberDataToTransferListData = (
@@ -55,8 +56,6 @@ const ItemComponent: TransferListItemComponent = ({
   data,
   selected,
 }: TransferListItemComponentProps) => (
-  // TODO: Disable adding/removing self?
-
   <Group noWrap>
     <Avatar src={data.image} radius="xl" size="sm" />
     <div style={{ flex: 1 }}>
@@ -68,22 +67,27 @@ const ItemComponent: TransferListItemComponent = ({
       </Text>
     </div>
     <Checkbox
+      onClick={() => {}}
       checked={selected}
-      onChange={() => {}}
       tabIndex={-1}
       sx={{ pointerEvents: "none" }}
     />
   </Group>
 );
 
-function GroupEditMembersMenu({ groupUserData, courseId, groupId }: Props) {
+function GroupEditMembersMenu({
+  groupUserData,
+  courseId,
+  groupId,
+  userCourseRole,
+}: Props) {
   const { data: allCourseMembers, isLoading: isLoadingCourseMemberships } =
     useGetCourseMembershipsQuery(courseId ?? skipToken);
 
   const [data, setData] = useState<TransferListData>([[], []]);
-
   const [batchUpdateGroupMembers, { isLoading: isUpdatingGroupMembers }] =
     usePatchCourseGroupMutation();
+  const userId = useAppSelector(({ currentUser }) => currentUser?.user?.id);
 
   useEffect(() => {
     const currentGroupMembersSet = new Set();
@@ -95,7 +99,20 @@ function GroupEditMembersMenu({ groupUserData, courseId, groupId }: Props) {
       currentGroupMembersSet.add(member.id);
     });
 
+    const editableUserRoles =
+      editableRoleMap.get(userCourseRole) || new Set<Role>();
+
     allCourseMembers?.forEach((member) => {
+      // Prevent user from adding/removing self from group via edit members menu
+      if (member.user.id === userId) {
+        return;
+      }
+
+      // Prevent user from editing members for which they have no permission
+      if (!editableUserRoles.has(member.role)) {
+        return;
+      }
+
       if (currentGroupMembersSet.has(member.user.id)) {
         filteredGroupMembers.push(member);
         return;
@@ -110,9 +127,7 @@ function GroupEditMembersMenu({ groupUserData, courseId, groupId }: Props) {
     ];
 
     setData(transferListValues);
-  }, [allCourseMembers, groupUserData]);
-
-  const userId = useAppSelector(({ currentUser }) => currentUser?.user?.id);
+  }, [allCourseMembers, groupUserData, userCourseRole, userId]);
 
   const resolveError = useResolveError();
 
@@ -158,13 +173,16 @@ function GroupEditMembersMenu({ groupUserData, courseId, groupId }: Props) {
         itemComponent={ItemComponent}
         value={data}
         onChange={setData}
+        searchPlaceholder="Search..."
+        titles={["Group members to remove", "Course members to add to group"]}
         // filter={(query, item) =>
         //   item.label.toLowerCase().includes(query.toLowerCase().trim()) ||
         //   item.description.toLowerCase().includes(query.toLowerCase().trim())
         // }
       />
       <Space h="md" />
-      <Group position="center">
+      <Group position="apart">
+        <Button color="gray">Cancel</Button>
         <Button
           onClick={onUpdateGroupMembers}
           disabled={isUpdatingGroupMembers}
@@ -172,7 +190,6 @@ function GroupEditMembersMenu({ groupUserData, courseId, groupId }: Props) {
         >
           Save changes
         </Button>
-        <Button color="gray">Cancel</Button>
       </Group>
     </PlaceholderWrapper>
   );

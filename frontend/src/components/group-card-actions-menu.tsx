@@ -3,18 +3,9 @@ import { useModals } from "@mantine/modals";
 import { FaChevronDown, FaEdit, FaTrashAlt } from "react-icons/fa";
 import { MdLogout, MdPersonAdd, MdPeopleAlt } from "react-icons/md";
 import { NAME } from "../constants";
-import {
-  usePatchCourseGroupMutation,
-  // useJoinOrLeaveCourseGroupMutation,
-  // useRenameCourseGroupMutation,
-} from "../redux/services/groups-api";
+import { usePatchCourseGroupMutation } from "../redux/services/groups-api";
 import { CourseData } from "../types/courses";
-import {
-  GroupPatchAction,
-  GroupData,
-  GroupPatchData,
-  JoinOrLeaveGroupData,
-} from "../types/groups";
+import { GroupPatchAction, GroupData, GroupPatchData } from "../types/groups";
 import toastUtils from "../utils/toast-utils";
 import GroupDeleteOption from "./group-delete-option";
 import GroupNameForm, { GroupNameData } from "./group-name-form";
@@ -152,9 +143,10 @@ function GroupCardActionsMenu({
           groupId={group?.id}
           groupUserData={group?.members}
           courseId={courseId}
+          userCourseRole={course?.role}
         />
       ),
-      size: "lg",
+      size: 800,
     });
   };
 

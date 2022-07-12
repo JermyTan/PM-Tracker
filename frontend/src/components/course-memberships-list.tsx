@@ -84,6 +84,7 @@ function CourseMembershipsList({ courseId, hasAdminPermission }: Props) {
               return (
                 <CourseRoleGroupList
                   role={role}
+                  course={course}
                   personnel={personnel ?? []}
                   hasAdminPermission={hasAdminPermission}
                 />

@@ -1,9 +1,17 @@
 import { Button, Group, Radio, RadioGroup, Space } from "@mantine/core";
+import { skipToken } from "@reduxjs/toolkit/dist/query";
+import { capitalize } from "lodash";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { ROLE } from "../constants";
+import { useGetSingleCourseQuery } from "../redux/services/courses-api";
 import { useUpdateCourseMembershipMutation } from "../redux/services/members-api";
-import { CourseMemberData, Role, roles } from "../types/courses";
+import {
+  CourseMemberData,
+  editableRoleMap,
+  Role,
+  roles,
+} from "../types/courses";
 import { useResolveError } from "../utils/error-utils";
 import toastUtils from "../utils/toast-utils";
 
@@ -16,6 +24,11 @@ function CourseMemberEditRoleMenu({ member, onSuccess }: Props) {
   const [memberRole, setMemberRole] = useState(member.role);
 
   const { courseId } = useParams();
+  const { course } = useGetSingleCourseQuery(courseId ?? skipToken, {
+    selectFromResult: ({ data: course }) => ({ course }),
+  });
+  const editableRoles = editableRoleMap.get(course?.role) || new Set<Role>();
+
   const membershipId = member.id;
 
   const resolveError = useResolveError();
@@ -62,10 +75,16 @@ function CourseMemberEditRoleMenu({ member, onSuccess }: Props) {
           }
         }}
       >
-        {roles.map((role) => (
-          // TODO: remove the full capitalization for this
-          <Radio value={role} label={role} />
-        ))}
+        {roles.map((role) => {
+          const roleString = capitalize(role.toLowerCase());
+          return (
+            <Radio
+              value={role}
+              label={roleString}
+              disabled={!editableRoles.has(role)}
+            />
+          );
+        })}
       </RadioGroup>
       <Space h="md" />
       <Group position="right">

@@ -21,27 +21,12 @@ const useStyles = createStyles(
       cursor: userCanAccessCourse ? "pointer" : "not-allowed",
     },
 
-    label: {
-      textTransform: "uppercase",
-      fontSize: theme.fontSizes.xs,
-      fontWeight: 700,
-    },
-
     scrollArea: {
       height: 75,
     },
 
     description: {
       whiteSpace: "break-spaces",
-    },
-
-    metaText: {
-      letterSpacing: -0.25,
-      textTransform: "uppercase",
-    },
-
-    hostName: {
-      lineHeight: 1,
     },
   }),
 );

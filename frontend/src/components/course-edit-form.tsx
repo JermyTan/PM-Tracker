@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Group,
-  Indicator,
   Stack,
   Tooltip,
   Text,
@@ -10,12 +9,12 @@ import {
   createStyles,
   LoadingOverlay,
   Title,
+  ThemeIcon,
 } from "@mantine/core";
 import { useDidUpdate } from "@mantine/hooks";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FaQuestion } from "react-icons/fa";
-import { useParams } from "react-router-dom";
 import { z } from "zod";
 import {
   ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS,
@@ -30,6 +29,7 @@ import {
   NAME,
   SHOW_GROUP_MEMBERS_NAMES,
 } from "../constants";
+import { useGetCourseId } from "../custom-hooks/use-get-course-id";
 import {
   useGetSingleCourseQuery,
   useUpdateCourseMutation,
@@ -57,6 +57,9 @@ const schema = z.object({
 });
 
 const useStyles = createStyles({
+  tooltip: {
+    display: "flex",
+  },
   button: {
     width: "150px",
   },
@@ -69,7 +72,7 @@ type Props = {
 };
 
 function CourseEditForm({ onSuccess }: Props) {
-  const { courseId } = useParams();
+  const courseId = useGetCourseId();
   const { course, isFetching } = useGetSingleCourseQuery(
     courseId ?? skipToken,
     {
@@ -99,7 +102,7 @@ function CourseEditForm({ onSuccess }: Props) {
   } = methods;
 
   // populate the form with the most updated course data (if any)
-  useDidUpdate(reset, [course]);
+  useDidUpdate(() => reset(course), [course]);
 
   const onSubmit = async (formData: CourseEditFormProps) => {
     if (isSubmitting || courseId === undefined) {
@@ -125,11 +128,11 @@ function CourseEditForm({ onSuccess }: Props) {
           {/* TODO: add change of course owner, API already supports */}
           <Title order={4}>Course Details</Title>
 
-          <TextField name={NAME} label="Course Name" required />
+          <TextField name={NAME} label="Course name" required />
 
           <TextareaField
             name={DESCRIPTION}
-            label="Course Description"
+            label="Course description"
             autosize
             minRows={3}
             maxRows={10}
@@ -137,41 +140,38 @@ function CourseEditForm({ onSuccess }: Props) {
 
           <TextField
             name={MILESTONE_ALIAS}
-            label="Milestone Alias"
+            label="Milestone alias"
             description="Another name for milestone. This alias will be displayed in place of 'milestone'."
             placeholder="E.g. iteration"
           />
 
           <Space />
 
-          <Group spacing="lg" position="apart">
-            <Indicator
-              size={18}
-              color="gray"
-              offset={-2}
-              label={
-                <Tooltip
-                  label={
-                    <Text size="xs">
-                      Students can view and access this course via{" "}
-                      <strong>My Courses</strong>.
-                    </Text>
-                  }
-                  withArrow
-                  placement="start"
-                  transition="pop-top-left"
-                  transitionDuration={300}
-                  wrapLines
-                  width={200}
-                >
-                  <FaQuestion size={8} />
-                </Tooltip>
-              }
-            >
+          <Group position="apart">
+            <Group spacing={4}>
               <Text<"label"> size="sm" htmlFor={IS_PUBLISHED} component="label">
-                Publish Course
+                Publish course
               </Text>
-            </Indicator>
+              <Tooltip
+                className={classes.tooltip}
+                label={
+                  <Text size="xs">
+                    Students can view and access this course via{" "}
+                    <strong>My Courses</strong>.
+                  </Text>
+                }
+                withArrow
+                placement="start"
+                transition="pop-top-left"
+                transitionDuration={300}
+                wrapLines
+                width={200}
+              >
+                <ThemeIcon color="gray" size="xs" radius="xl">
+                  <FaQuestion size={7} />
+                </ThemeIcon>
+              </Tooltip>
+            </Group>
             <SwitchField
               name={IS_PUBLISHED}
               id={IS_PUBLISHED}
@@ -183,29 +183,8 @@ function CourseEditForm({ onSuccess }: Props) {
 
           <Title order={4}>Group Settings</Title>
 
-          <Group spacing="lg" position="apart">
-            <Indicator
-              size={18}
-              color="gray"
-              offset={-2}
-              label={
-                <Tooltip
-                  label={
-                    <Text size="xs">
-                      Students can view the group members in other groups.
-                    </Text>
-                  }
-                  withArrow
-                  placement="start"
-                  transition="pop-top-left"
-                  transitionDuration={300}
-                  wrapLines
-                  width={200}
-                >
-                  <FaQuestion size={8} />
-                </Tooltip>
-              }
-            >
+          <Group position="apart">
+            <Group spacing={4}>
               <Text<"label">
                 size="sm"
                 htmlFor={SHOW_GROUP_MEMBERS_NAMES}
@@ -213,7 +192,25 @@ function CourseEditForm({ onSuccess }: Props) {
               >
                 Make group members public
               </Text>
-            </Indicator>
+              <Tooltip
+                className={classes.tooltip}
+                label={
+                  <Text size="xs">
+                    Students can view the group members in other groups.
+                  </Text>
+                }
+                withArrow
+                placement="start"
+                transition="pop-top-left"
+                transitionDuration={300}
+                wrapLines
+                width={200}
+              >
+                <ThemeIcon color="gray" size="xs" radius="xl">
+                  <FaQuestion size={7} />
+                </ThemeIcon>
+              </Tooltip>
+            </Group>
             <SwitchField
               name={SHOW_GROUP_MEMBERS_NAMES}
               id={SHOW_GROUP_MEMBERS_NAMES}
@@ -223,29 +220,8 @@ function CourseEditForm({ onSuccess }: Props) {
             />
           </Group>
 
-          <Group spacing="lg" position="apart">
-            <Indicator
-              size={18}
-              color="gray"
-              offset={-2}
-              label={
-                <Tooltip
-                  label={
-                    <Text size="xs">
-                      Students can change the names of the groups they are in.
-                    </Text>
-                  }
-                  withArrow
-                  placement="start"
-                  transition="pop-top-left"
-                  transitionDuration={300}
-                  wrapLines
-                  width={200}
-                >
-                  <FaQuestion size={8} />
-                </Tooltip>
-              }
-            >
+          <Group position="apart">
+            <Group spacing={4}>
               <Text<"label">
                 size="sm"
                 htmlFor={ALLOW_STUDENTS_TO_MODIFY_GROUP_NAME}
@@ -253,7 +229,25 @@ function CourseEditForm({ onSuccess }: Props) {
               >
                 Students can modify group names
               </Text>
-            </Indicator>
+              <Tooltip
+                className={classes.tooltip}
+                label={
+                  <Text size="xs">
+                    Students can change the names of the groups they are in.
+                  </Text>
+                }
+                withArrow
+                placement="start"
+                transition="pop-top-left"
+                transitionDuration={300}
+                wrapLines
+                width={200}
+              >
+                <ThemeIcon color="gray" size="xs" radius="xl">
+                  <FaQuestion size={7} />
+                </ThemeIcon>
+              </Tooltip>
+            </Group>
             <SwitchField
               name={ALLOW_STUDENTS_TO_MODIFY_GROUP_NAME}
               id={ALLOW_STUDENTS_TO_MODIFY_GROUP_NAME}
@@ -263,7 +257,7 @@ function CourseEditForm({ onSuccess }: Props) {
             />
           </Group>
 
-          <Group spacing="lg" position="apart">
+          <Group position="apart">
             <Text<"label">
               size="sm"
               htmlFor={ALLOW_STUDENTS_TO_CREATE_GROUPS}
@@ -280,29 +274,8 @@ function CourseEditForm({ onSuccess }: Props) {
             />
           </Group>
 
-          <Group spacing="lg" position="apart">
-            <Indicator
-              size={18}
-              color="gray"
-              offset={-2}
-              label={
-                <Tooltip
-                  label={
-                    <Text size="xs">
-                      Students can disband groups for which they are in.
-                    </Text>
-                  }
-                  withArrow
-                  placement="start"
-                  transition="pop-top-left"
-                  transitionDuration={300}
-                  wrapLines
-                  width={200}
-                >
-                  <FaQuestion size={8} />
-                </Tooltip>
-              }
-            >
+          <Group position="apart">
+            <Group spacing={4}>
               <Text<"label">
                 size="sm"
                 htmlFor={ALLOW_STUDENTS_TO_DELETE_GROUPS}
@@ -310,7 +283,25 @@ function CourseEditForm({ onSuccess }: Props) {
               >
                 Students can delete groups
               </Text>
-            </Indicator>
+              <Tooltip
+                className={classes.tooltip}
+                label={
+                  <Text size="xs">
+                    Students can disband groups for which they are in.
+                  </Text>
+                }
+                withArrow
+                placement="start"
+                transition="pop-top-left"
+                transitionDuration={300}
+                wrapLines
+                width={200}
+              >
+                <ThemeIcon color="gray" size="xs" radius="xl">
+                  <FaQuestion size={7} />
+                </ThemeIcon>
+              </Tooltip>
+            </Group>
             <SwitchField
               name={ALLOW_STUDENTS_TO_DELETE_GROUPS}
               id={ALLOW_STUDENTS_TO_DELETE_GROUPS}
@@ -320,7 +311,7 @@ function CourseEditForm({ onSuccess }: Props) {
             />
           </Group>
 
-          <Group spacing="lg" position="apart">
+          <Group position="apart">
             <Text<"label">
               size="sm"
               htmlFor={ALLOW_STUDENTS_TO_JOIN_GROUPS}
@@ -337,7 +328,7 @@ function CourseEditForm({ onSuccess }: Props) {
             />
           </Group>
 
-          <Group spacing="lg" position="apart">
+          <Group position="apart">
             <Text<"label">
               size="sm"
               htmlFor={ALLOW_STUDENTS_TO_LEAVE_GROUPS}
@@ -354,30 +345,8 @@ function CourseEditForm({ onSuccess }: Props) {
             />
           </Group>
 
-          <Group spacing="lg" position="apart">
-            <Indicator
-              size={18}
-              color="gray"
-              offset={-2}
-              label={
-                <Tooltip
-                  label={
-                    <Text size="xs">
-                      Students can add/remove group members for groups they are
-                      in.
-                    </Text>
-                  }
-                  withArrow
-                  placement="start"
-                  transition="pop-top-left"
-                  transitionDuration={300}
-                  wrapLines
-                  width={200}
-                >
-                  <FaQuestion size={8} />
-                </Tooltip>
-              }
-            >
+          <Group position="apart">
+            <Group spacing={4}>
               <Text<"label">
                 size="sm"
                 htmlFor={ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS}
@@ -385,7 +354,26 @@ function CourseEditForm({ onSuccess }: Props) {
               >
                 Students can add/remove group members
               </Text>
-            </Indicator>
+              <Tooltip
+                className={classes.tooltip}
+                label={
+                  <Text size="xs">
+                    Students can add/remove group members for groups they are
+                    in.
+                  </Text>
+                }
+                withArrow
+                placement="start"
+                transition="pop-top-left"
+                transitionDuration={300}
+                wrapLines
+                width={200}
+              >
+                <ThemeIcon color="gray" size="xs" radius="xl">
+                  <FaQuestion size={7} />
+                </ThemeIcon>
+              </Tooltip>
+            </Group>
             <SwitchField
               name={ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS}
               id={ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS}

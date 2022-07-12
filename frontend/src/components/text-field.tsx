@@ -1,6 +1,5 @@
 import { TextInput, TextInputProps } from "@mantine/core";
-import { useFormContext } from "react-hook-form";
-import get from "lodash/get";
+import { useFormContext, get } from "react-hook-form";
 
 type Props = TextInputProps & {
   name: string;

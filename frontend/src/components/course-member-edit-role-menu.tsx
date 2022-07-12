@@ -2,8 +2,8 @@ import { Button, Group, Radio, RadioGroup, Space } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/dist/query";
 import { capitalize } from "lodash";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
 import { ROLE } from "../constants";
+import { useGetCourseId } from "../custom-hooks/use-get-course-id";
 import { useGetSingleCourseQuery } from "../redux/services/courses-api";
 import { useUpdateCourseMembershipMutation } from "../redux/services/members-api";
 import {
@@ -23,7 +23,7 @@ type Props = {
 function CourseMemberEditRoleMenu({ member, onSuccess }: Props) {
   const [memberRole, setMemberRole] = useState(member.role);
 
-  const { courseId } = useParams();
+  const courseId = useGetCourseId();
   const { course } = useGetSingleCourseQuery(courseId ?? skipToken, {
     selectFromResult: ({ data: course }) => ({ course }),
   });

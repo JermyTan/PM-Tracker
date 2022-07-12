@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Head from "next/head";
 import { Text, Title, Tabs, Space } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/query/react";
@@ -7,9 +7,10 @@ import { capitalCase } from "change-case";
 import pluralize from "pluralize";
 import { useGetSingleCourseQuery } from "../redux/services/courses-api";
 import PlaceholderWrapper from "./placeholder-wrapper";
-import { APP_NAME, MILESTONE } from "../constants";
+import { APP_NAME } from "../constants";
 import { useResolveError } from "../utils/error-utils";
 import { useGetMilestoneAlias } from "../custom-hooks/use-get-milestone-alias";
+import { useGetCourseId } from "../custom-hooks/use-get-course-id";
 
 type Props = {
   children: ReactNode;
@@ -31,7 +32,7 @@ const tabDetails = [
 ];
 
 function CoursePageLayout({ children }: Props) {
-  const { courseId } = useParams();
+  const courseId = useGetCourseId();
   const { course, isLoading, error } = useGetSingleCourseQuery(
     courseId ?? skipToken,
     {

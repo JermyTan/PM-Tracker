@@ -7,9 +7,7 @@ import {
   Space,
   Text,
 } from "@mantine/core";
-import { useState } from "react";
-import { FaEdit, FaTrashAlt, FaUserEdit } from "react-icons/fa";
-import { useParams } from "react-router-dom";
+import { useGetCourseId } from "../custom-hooks/use-get-course-id";
 import { useDeleteCourseMembershipMutation } from "../redux/services/members-api";
 import { CourseMemberData } from "../types/courses";
 import { useResolveError } from "../utils/error-utils";
@@ -23,7 +21,7 @@ type Props = {
 };
 
 function CourseMemberRemoveConfirmation({ member, onSuccess }: Props) {
-  const { courseId } = useParams();
+  const courseId = useGetCourseId();
   const membershipId = member.id;
 
   const resolveError = useResolveError();

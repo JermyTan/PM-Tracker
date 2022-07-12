@@ -2,7 +2,6 @@ import React, { memo, useMemo } from "react";
 import { Card, Text, Group, createStyles, Stack } from "@mantine/core";
 import { MdGroup } from "react-icons/md";
 import { createSelector } from "@reduxjs/toolkit";
-import { useParams } from "react-router-dom";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import pluralize from "pluralize";
 import { GroupData } from "../types/groups";
@@ -12,6 +11,7 @@ import { useGetCourseGroupsQuery } from "../redux/services/groups-api";
 import { CourseData, Role } from "../types/courses";
 import { useAppSelector } from "../redux/hooks";
 import GroupCardActionsMenu from "./group-card-actions-menu";
+import { useGetCourseId } from "../custom-hooks/use-get-course-id";
 
 const useStyles = createStyles((theme) => ({
   card: {
@@ -47,7 +47,7 @@ type Props = {
 };
 
 function GroupCard({ groupId, course }: Props) {
-  const { courseId } = useParams();
+  const courseId = useGetCourseId();
   const { classes } = useStyles();
 
   const userId = useAppSelector(({ currentUser }) => currentUser?.user?.id);

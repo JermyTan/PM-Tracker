@@ -1,10 +1,10 @@
 import { skipToken } from "@reduxjs/toolkit/query/react";
-import { useParams } from "react-router-dom";
 import { MILESTONE } from "../constants";
 import { useGetSingleCourseQueryState } from "../redux/services/courses-api";
+import { useGetCourseId } from "./use-get-course-id";
 
 export function useGetMilestoneAlias() {
-  const { courseId } = useParams();
+  const courseId = useGetCourseId();
   const { milestoneAlias } = useGetSingleCourseQueryState(
     courseId ?? skipToken,
     {

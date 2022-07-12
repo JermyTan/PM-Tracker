@@ -13,12 +13,12 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/query/react";
-import { useParams } from "react-router-dom";
 import { FaQuestion } from "react-icons/fa";
 import { useGetSingleCourseQuery } from "../../redux/services/courses-api";
 import CourseActionsSection from "../course-actions-section";
 import RoleRestrictedWrapper from "../role-restricted-wrapper";
 import { Role } from "../../types/courses";
+import { useGetCourseId } from "../../custom-hooks/use-get-course-id";
 
 const useStyles = createStyles({
   detailsSection: {
@@ -32,7 +32,7 @@ const useStyles = createStyles({
 });
 
 function CourseDetailsPage() {
-  const { courseId } = useParams();
+  const courseId = useGetCourseId();
   const { course } = useGetSingleCourseQuery(courseId ?? skipToken, {
     selectFromResult: ({ data: course }) => ({ course }),
   });
@@ -64,7 +64,7 @@ function CourseDetailsPage() {
       >
         <Stack spacing={36}>
           <Stack spacing="xs">
-            <Title order={4}>Course Owner</Title>
+            <Title order={4}>Course owner</Title>
             <Group spacing="xl">
               <Avatar
                 size={70}
@@ -82,12 +82,12 @@ function CourseDetailsPage() {
           </Stack>
 
           <Stack spacing="xs">
-            <Title order={4}>Course Name</Title>
+            <Title order={4}>Course name</Title>
             <Text>{name}</Text>
           </Stack>
 
           <Stack spacing="xs">
-            <Title order={4}>Course Description</Title>
+            <Title order={4}>Course description</Title>
             <Spoiler maxHeight={150} showLabel="Show more" hideLabel="Hide">
               <Text color={!description ? "dimmed" : undefined}>
                 {description || "No description"}
@@ -98,7 +98,7 @@ function CourseDetailsPage() {
           <RoleRestrictedWrapper allowedRoles={[Role.CoOwner, Role.Instructor]}>
             <Stack spacing="xs">
               <Group spacing={4}>
-                <Title order={4}>Milestone Alias</Title>
+                <Title order={4}>Milestone alias</Title>
                 <Tooltip
                   label={
                     <Text size="xs">
@@ -125,7 +125,7 @@ function CourseDetailsPage() {
 
             <Stack spacing="xs">
               <Group spacing={4}>
-                <Title order={4}>Publish Course</Title>
+                <Title order={4}>Publish course</Title>
                 <Tooltip
                   label={
                     <Text size="xs">

@@ -1,6 +1,5 @@
 import { Checkbox, CheckboxProps } from "@mantine/core";
-import { useFormContext } from "react-hook-form";
-import get from "lodash/get";
+import { get, useFormContext } from "react-hook-form";
 import { useEffect } from "react";
 import toastUtils from "../utils/toast-utils";
 

@@ -7,10 +7,14 @@ import {
 } from "../constants";
 import { BaseData } from "./base";
 
-export type MilestoneData = BaseData & {
+export type MilestonePostData = {
   [NAME]: string;
   [DESCRIPTION]: string;
   [START_DATE_TIME]: number;
   [END_DATE_TIME]: number | null;
   [IS_PUBLISHED]: boolean;
 };
+
+export type MilestonePutData = MilestonePostData;
+
+export type MilestoneData = BaseData & MilestonePostData;

@@ -54,19 +54,19 @@ function CourseMilestonesPage() {
       <Stack>
         <RoleRestrictedWrapper allowedRoles={[Role.CoOwner, Role.Instructor]}>
           <Group position="right">
-            <Button
-              color="teal"
-              leftIcon={<MdOutlineLibraryAdd />}
-              onClick={open}
-            >
-              Create new {milestoneAlias}
-            </Button>
             <Button<typeof Link>
               component={Link}
               to="../templates"
               leftIcon={<ImFilesEmpty />}
             >
               {capitalCase(milestoneAlias)} templates
+            </Button>
+            <Button
+              color="teal"
+              leftIcon={<MdOutlineLibraryAdd />}
+              onClick={open}
+            >
+              Create new {milestoneAlias}
             </Button>
           </Group>
         </RoleRestrictedWrapper>
@@ -78,7 +78,15 @@ function CourseMilestonesPage() {
           defaultMessage={`No ${pluralize(milestoneAlias)} found`}
           showDefaultMessage={!milestones || milestones.length === 0}
         >
-          <SimpleGrid cols={3} spacing="xs">
+          <SimpleGrid
+            cols={4}
+            breakpoints={[
+              { maxWidth: "sm", cols: 1 },
+              { maxWidth: "md", cols: 2 },
+              { maxWidth: "xl", cols: 3 },
+            ]}
+            spacing="xs"
+          >
             {milestones?.map((milestone) => (
               <MilestoneCard key={milestone.id} {...milestone} />
             ))}

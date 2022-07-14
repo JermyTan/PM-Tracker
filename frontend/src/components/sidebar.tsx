@@ -93,18 +93,16 @@ function Sidebar({ isSidebarExpanded, className, ...props }: Props) {
         />
       </ScrollArea>
 
-      <div>
-        <SidebarItem
-          icon={MdLogout}
-          label="Sign Out"
-          showIconOnly={!isSidebarExpanded}
-          onClick={() => {
-            dispatch(resetAppState());
-            navigate(LOGIN_PATH);
-            toastUtils.success({ message: "Signed out successfully." });
-          }}
-        />
-      </div>
+      <SidebarItem
+        icon={MdLogout}
+        label="Sign Out"
+        showIconOnly={!isSidebarExpanded}
+        onClick={() => {
+          dispatch(resetAppState());
+          navigate(LOGIN_PATH);
+          toastUtils.success({ message: "Signed out successfully." });
+        }}
+      />
     </Box>
   );
 }

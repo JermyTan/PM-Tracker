@@ -34,7 +34,7 @@ function PlaceholderWrapper({
         <>
           <Loader size="lg" variant="bars" {...loaderProps} />
           {loadingMessage && (
-            <Text size="lg" {...textProps}>
+            <Text size="lg" align="center" {...textProps}>
               {loadingMessage}
             </Text>
           )}
@@ -42,7 +42,7 @@ function PlaceholderWrapper({
       )}
 
       {!isLoading && showDefaultMessage && defaultMessage && (
-        <Text size="lg" {...textProps}>
+        <Text size="lg" align="center" {...textProps}>
           {defaultMessage}
         </Text>
       )}

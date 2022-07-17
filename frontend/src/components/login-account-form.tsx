@@ -66,7 +66,7 @@ function LoginAccountForm() {
     resolver: zodResolver(schema),
     defaultValues: { ...DEFAULT_VALUES, name, email, rememberMe },
   });
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError({ name: "login-account-form" });
 
   const {
     handleSubmit,

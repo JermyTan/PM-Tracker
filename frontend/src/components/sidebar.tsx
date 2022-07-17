@@ -6,7 +6,7 @@ import {
   ScrollArea,
   Text,
 } from "@mantine/core";
-import { useLocation, useNavigate } from "react-router-dom";
+import { matchPath, useLocation, useNavigate } from "react-router-dom";
 import { MdSpaceDashboard, MdLogout } from "react-icons/md";
 import { SiBookstack } from "react-icons/si";
 import {
@@ -81,14 +81,18 @@ function Sidebar({ isSidebarExpanded, className, ...props }: Props) {
           icon={MdSpaceDashboard}
           label="Dashboard"
           to={DASHBOARD_PATH}
-          isActive={pathname === DASHBOARD_PATH}
+          isActive={Boolean(
+            matchPath({ path: DASHBOARD_PATH, end: false }, pathname),
+          )}
           showIconOnly={!isSidebarExpanded}
         />
         <SidebarLinkItem
           icon={SiBookstack}
           label="My Courses"
           to={MY_COURSES_PATH}
-          isActive={pathname.startsWith(COURSES_PATH)}
+          isActive={Boolean(
+            matchPath({ path: COURSES_PATH, end: false }, pathname),
+          )}
           showIconOnly={!isSidebarExpanded}
         />
       </ScrollArea>

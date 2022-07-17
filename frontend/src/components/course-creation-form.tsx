@@ -83,7 +83,7 @@ function CourseCreationForm({ onSuccess }: Props) {
     resolver: zodResolver(schema),
     defaultValues: DEFAULT_VALUES,
   });
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError({ name: "course-creation-form" });
   const [createCourse] = useCreateCourseMutation({
     selectFromResult: emptySelector,
   });

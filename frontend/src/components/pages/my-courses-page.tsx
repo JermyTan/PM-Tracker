@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import Head from "next/head";
-import { HiViewGridAdd, HiRefresh } from "react-icons/hi";
+import { HiViewGridAdd } from "react-icons/hi";
 import { APP_NAME } from "../../constants";
 import { useGetCoursesQuery } from "../../redux/services/courses-api";
 import { AccountType } from "../../types/users";
@@ -29,7 +29,7 @@ function MyCoursesPage() {
   });
   // important! The very first (outermost) api call needs to resolve the error
   // subsequent api calls to the same endpoint do not need to resolve error since it is already handled here
-  useResolveError(error);
+  useResolveError({ error, name: "my-courses-page" });
   const [isDrawerOpened, { open, close }] = useDisclosure(false);
 
   return (

@@ -27,7 +27,7 @@ function LoginEmailForm() {
   const [checkAccount] = useLazyCheckAccountQuery({
     selectFromResult: emptySelector,
   });
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError({ name: "login-email-form" });
 
   const methods = useForm<LoginEmailFormProps>({
     resolver: zodResolver(schema),

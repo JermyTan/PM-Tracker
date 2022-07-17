@@ -48,7 +48,7 @@ function RenameGroupOption({ hidden, group, courseId }: OptionProps) {
     resolver: zodResolver(schema),
     defaultValues: { [NAME]: `${group ? group?.name : ""}` },
   });
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError({ name: "group-card-actions-menu" });
   const renameFormRef = useRef<HTMLFormElement>(null);
 
   const {

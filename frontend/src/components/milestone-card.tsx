@@ -27,7 +27,7 @@ type Props = MilestoneData;
 
 function MilestoneCard(props: Props) {
   const { classes } = useStyles();
-  const milestoneAlias = useGetMilestoneAlias();
+  const { milestoneAlias } = useGetMilestoneAlias();
 
   const { name, startDateTime, endDateTime, isPublished } = props;
   const now = Date.now();

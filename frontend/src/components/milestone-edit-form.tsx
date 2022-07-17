@@ -15,7 +15,6 @@ import {
 import { useDidUpdate } from "@mantine/hooks";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { isSameDate } from "@mantine/dates";
-import { capitalCase } from "change-case";
 import { FormProvider, useForm } from "react-hook-form";
 import { FaQuestion } from "react-icons/fa";
 import { z } from "zod";
@@ -113,8 +112,7 @@ type Props = {
 
 function MilestoneEditForm({ milestoneId, onSuccess }: Props) {
   const courseId = useGetCourseId();
-  const milestoneAlias = useGetMilestoneAlias();
-  const capitalizedMilestoneAlias = capitalCase(milestoneAlias);
+  const { milestoneAlias, capitalizedMilestoneAlias } = useGetMilestoneAlias();
   const { milestone, isFetching, error } = useGetSingleMilestoneQuery(
     courseId === undefined ? skipToken : { courseId, milestoneId },
     {
@@ -127,7 +125,8 @@ function MilestoneEditForm({ milestoneId, onSuccess }: Props) {
       refetchOnMountOrArgChange: true,
     },
   );
-  const resolveError = useResolveError(error);
+  useResolveError({ error, name: "milestone-edit-form" });
+  const { resolveError } = useResolveError({ name: "milestone-edit-form" });
 
   const defaultValues: MilestoneEditFormProps | undefined = useMemo(() => {
     if (milestone === undefined) {

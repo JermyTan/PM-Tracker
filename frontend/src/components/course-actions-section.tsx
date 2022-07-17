@@ -34,7 +34,7 @@ function CourseActionsSection(props: Props) {
   const [deleteCourse, { isLoading }] = useDeleteCourseMutation({
     selectFromResult: ({ isLoading }) => ({ isLoading }),
   });
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError({ name: "course-actions-section" });
   const [isDrawerOpened, { open, close }] = useDisclosure(false);
   const navigate = useNavigate();
   const modals = useModals();

@@ -77,6 +77,9 @@ const templatesApi = baseApi
     }),
   });
 
+export const useGetTemplatesQueryState =
+  templatesApi.endpoints.getTemplates.useQueryState;
+
 export const {
   useGetTemplatesQuery,
   useCreateTemplateMutation,

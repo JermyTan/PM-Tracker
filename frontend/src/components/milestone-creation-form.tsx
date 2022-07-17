@@ -11,7 +11,6 @@ import {
   Button,
 } from "@mantine/core";
 import { isSameDate } from "@mantine/dates";
-import { capitalCase } from "change-case";
 import { FormProvider, useForm } from "react-hook-form";
 import { FaQuestion } from "react-icons/fa";
 import { z } from "zod";
@@ -115,13 +114,12 @@ type Props = {
 
 function MilestoneCreationForm({ onSuccess }: Props) {
   const courseId = useGetCourseId();
-  const milestoneAlias = useGetMilestoneAlias();
-  const capitalizedMilestoneAlias = capitalCase(milestoneAlias);
+  const { milestoneAlias, capitalizedMilestoneAlias } = useGetMilestoneAlias();
   const methods = useForm<MilestoneCreationFormProps>({
     resolver: zodResolver(schema),
     defaultValues: DEFAULT_VALUES,
   });
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError({ name: "milestone-creation-form" });
   const [createMilestone] = useCreateMilestoneMutation({
     selectFromResult: emptySelector,
   });

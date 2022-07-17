@@ -85,7 +85,8 @@ function CourseEditForm({ onSuccess }: Props) {
       refetchOnMountOrArgChange: true,
     },
   );
-  const resolveError = useResolveError(error);
+  useResolveError({ error, name: "course-edit-form" });
+  const { resolveError } = useResolveError({ name: "course-edit-form" });
   const methods = useForm<CourseEditFormProps>({
     resolver: zodResolver(schema),
     defaultValues: course,

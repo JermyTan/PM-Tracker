@@ -3,7 +3,6 @@ import { Link, useLocation } from "react-router-dom";
 import Head from "next/head";
 import { Text, Title, Tabs, Space } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/query/react";
-import { capitalCase } from "change-case";
 import pluralize from "pluralize";
 import { useGetSingleCourseQuery } from "../redux/services/courses-api";
 import PlaceholderWrapper from "./placeholder-wrapper";
@@ -45,12 +44,12 @@ function CoursePageLayout({ children }: Props) {
   );
   // important! The very first (outermost) api call needs to resolve the error
   // subsequent api calls to the same endpoint do not need to resolve error since it is already handled here
-  useResolveError(error);
+  useResolveError({ error, name: "course-page-layout" });
   const { pathname } = useLocation();
-  const milestoneAlias = useGetMilestoneAlias();
+  const { capitalizedMilestoneAlias } = useGetMilestoneAlias();
 
   // update label during runtime
-  tabDetails[0].label = pluralize(capitalCase(milestoneAlias));
+  tabDetails[0].label = pluralize(capitalizedMilestoneAlias);
 
   const activeIndex = (() => {
     // get the course tab component name from pathname

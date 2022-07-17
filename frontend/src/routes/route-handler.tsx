@@ -1,19 +1,6 @@
 import { Route, Routes, Navigate, Outlet } from "react-router-dom";
 import { useAppSelector } from "../redux/hooks";
 import { selectIsLoggedIn } from "../redux/slices/current-user-slice";
-import {
-  ACCOUNT_PATH,
-  CATCH_ALL,
-  COURSES_PATH,
-  COURSE_DETAILS_PATH,
-  COURSE_GROUPS_PATH,
-  COURSE_MILESTONES_PATH,
-  COURSE_MILESTONE_TEMPLATES_PATH,
-  DASHBOARD_PATH,
-  MY_COURSES_PATH,
-  ROOT_PATH,
-  SINGLE_COURSE_PATH,
-} from "./paths";
 import AppLayout from "../components/app-layout";
 import CoursePageLayout from "../components/course-page-layout";
 import LoginPage from "../components/pages/login-page";
@@ -26,6 +13,7 @@ import CourseDetailsPage from "../components/pages/course-details-page";
 import CourseMilestoneTemplatesPage from "../components/pages/course-milestone-templates-page";
 import RoleRestrictedWrapper from "../components/role-restricted-wrapper";
 import { Role } from "../types/courses";
+import MilestoneTemplatesLayout from "../components/milestone-templates-layout";
 
 function RouteHandler() {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
@@ -34,21 +22,21 @@ function RouteHandler() {
     <Routes>
       {isLoggedIn ? (
         <Route
-          path={ROOT_PATH}
+          path="/"
           element={
             <AppLayout>
               <Outlet />
             </AppLayout>
           }
         >
-          <Route index element={<Navigate to={DASHBOARD_PATH} replace />} />
-          <Route path={DASHBOARD_PATH} element={<DashboardPage />} />
-          <Route path={ACCOUNT_PATH} element={<MyAccountPage />} />
-          <Route path={COURSES_PATH}>
-            <Route index element={<Navigate to={MY_COURSES_PATH} replace />} />
-            <Route path={MY_COURSES_PATH} element={<MyCoursesPage />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="account" element={<MyAccountPage />} />
+          <Route path="courses">
+            <Route index element={<Navigate to="me" replace />} />
+            <Route path="me" element={<MyCoursesPage />} />
             <Route
-              path={SINGLE_COURSE_PATH}
+              path=":courseId"
               element={
                 <CoursePageLayout>
                   <Outlet />
@@ -56,35 +44,41 @@ function RouteHandler() {
               }
             >
               <Route index element={<Navigate to="milestones" replace />} />
+              <Route path="milestones" element={<CourseMilestonesPage />} />
               <Route
-                path={COURSE_MILESTONES_PATH}
-                element={<CourseMilestonesPage />}
-              />
-              <Route
-                path={COURSE_MILESTONE_TEMPLATES_PATH}
+                path="templates"
                 element={
                   <RoleRestrictedWrapper
                     allowedRoles={[Role.CoOwner, Role.Instructor]}
-                    fallback={<Navigate to={DASHBOARD_PATH} replace />}
+                    fallback={<Navigate to="/dashboard" replace />}
                   >
-                    <CourseMilestoneTemplatesPage />
+                    <MilestoneTemplatesLayout>
+                      <Outlet />
+                    </MilestoneTemplatesLayout>
                   </RoleRestrictedWrapper>
                 }
-              />
-              <Route path={COURSE_GROUPS_PATH} element={<CourseGroupPage />} />
-              <Route
-                path={COURSE_DETAILS_PATH}
-                element={<CourseDetailsPage />}
-              />
+              >
+                <Route
+                  path=""
+                  element={
+                    <CourseMilestoneTemplatesPage>
+                      <Outlet />
+                    </CourseMilestoneTemplatesPage>
+                  }
+                >
+                  <Route path=":templateId" element={<div>Hello</div>} />
+                </Route>
+                <Route path="new" />
+                <Route path=":templateId/edit" />
+              </Route>
+              <Route path="groups" element={<CourseGroupPage />} />
+              <Route path="details" element={<CourseDetailsPage />} />
             </Route>
           </Route>
-          <Route
-            path={CATCH_ALL}
-            element={<Navigate to={DASHBOARD_PATH} replace />}
-          />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
       ) : (
-        <Route path={CATCH_ALL} element={<LoginPage />} />
+        <Route path="*" element={<LoginPage />} />
       )}
     </Routes>
   );

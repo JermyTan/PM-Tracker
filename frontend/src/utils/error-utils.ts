@@ -1,6 +1,6 @@
-import { useEffect, useMemo } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import { useNetwork } from "@mantine/hooks";
+import { useNetwork, useShallowEffect } from "@mantine/hooks";
 import { isRecord } from "./transform-utils";
 import toastUtils from "./toast-utils";
 import type { AppDispatch } from "../redux/store";
@@ -42,34 +42,47 @@ export function getErrorMessage(error: unknown) {
   return undefined;
 }
 
-function resolveError(
-  error: unknown,
-  dispatch: AppDispatch,
-  defaultErrorMessage: string,
-) {
+function resolveError({
+  error,
+  dispatch,
+  defaultErrorMessage,
+  setErrorMessage,
+  name,
+}: {
+  error: unknown;
+  dispatch: AppDispatch;
+  defaultErrorMessage: string;
+  setErrorMessage: Dispatch<SetStateAction<string | undefined>>;
+  name?: string;
+}) {
   if (!error) {
-    return;
+    setErrorMessage(undefined);
+    return undefined;
   }
 
-  console.log("Resolve error:", error);
+  console.log(`Resolve error${name ? ` @ ${name}` : ""}:`, error);
 
-  const message = getErrorMessage(error) ?? defaultErrorMessage;
+  const errorMessage = getErrorMessage(error) ?? defaultErrorMessage;
 
-  toastUtils.error({ message });
+  setErrorMessage(errorMessage);
+  toastUtils.error({ message: errorMessage });
 
   if (
-    !isFetchBaseQueryError(error) ||
-    error.status !== "CUSTOM_ERROR" ||
-    error.error !== FAILED_TOKEN_REFRESH
+    isFetchBaseQueryError(error) &&
+    error.status === "CUSTOM_ERROR" &&
+    error.error === FAILED_TOKEN_REFRESH
   ) {
-    return;
+    // kick user out
+    dispatch(resetAppState());
   }
-
-  // kick user out
-  dispatch(resetAppState());
+  return errorMessage;
 }
 
-export function useResolveError(error?: unknown, defaultErrorMessage?: string) {
+export function useResolveError({
+  error,
+  defaultErrorMessage,
+  name,
+}: { error?: unknown; defaultErrorMessage?: string; name?: string } = {}) {
   const networkStatus = useNetwork();
   const defaultUseResolveErrorMessage =
     defaultErrorMessage ??
@@ -77,17 +90,35 @@ export function useResolveError(error?: unknown, defaultErrorMessage?: string) {
       ? "An unknown error has occurred."
       : "No internet connection.");
   const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (error) {
-      resolveError(error, dispatch, defaultUseResolveErrorMessage);
-    }
-  }, [error, dispatch, defaultUseResolveErrorMessage]);
-
-  return useMemo(
-    () =>
-      (error: unknown, defaultErrorMessage = defaultUseResolveErrorMessage) =>
-        resolveError(error, dispatch, defaultErrorMessage),
-    [dispatch, defaultUseResolveErrorMessage],
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
+    undefined,
   );
+
+  useShallowEffect(() => {
+    if (error) {
+      resolveError({
+        error,
+        dispatch,
+        defaultErrorMessage: defaultUseResolveErrorMessage,
+        setErrorMessage,
+        name,
+      });
+    }
+  }, [error, dispatch, defaultUseResolveErrorMessage, name]);
+
+  return {
+    resolveError: useMemo(
+      () =>
+        (error: unknown, defaultErrorMessage = defaultUseResolveErrorMessage) =>
+          resolveError({
+            error,
+            dispatch,
+            defaultErrorMessage,
+            setErrorMessage,
+            name,
+          }),
+      [dispatch, defaultUseResolveErrorMessage, name],
+    ),
+    errorMessage,
+  };
 }

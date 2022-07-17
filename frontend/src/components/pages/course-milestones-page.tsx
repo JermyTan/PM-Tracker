@@ -26,11 +26,18 @@ import MilestoneCreationForm from "../milestone-creation-form";
 
 function CourseMilestonesPage() {
   const courseId = useGetCourseId();
-  const {
-    data: milestones,
-    isLoading,
-    error,
-  } = useGetMilestonesQuery(courseId ?? skipToken);
+  const { milestones, isLoading, error } = useGetMilestonesQuery(
+    courseId ?? skipToken,
+    {
+      selectFromResult: ({ data: milestones, isLoading, error }) => ({
+        milestones,
+        isLoading,
+        error,
+      }),
+    },
+  );
+  // important! The very first (outermost) api call needs to resolve the error
+  // subsequent api calls to the same endpoint do not need to resolve error since it is already handled here
   useResolveError(error);
   const milestoneAlias = useGetMilestoneAlias();
   const [isDrawerOpened, { open, close }] = useDisclosure(false);

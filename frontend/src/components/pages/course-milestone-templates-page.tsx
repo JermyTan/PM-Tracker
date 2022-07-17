@@ -6,6 +6,8 @@ import { APP_NAME } from "../../constants";
 import { useGetCourseId } from "../../custom-hooks/use-get-course-id";
 import { useGetMilestoneAlias } from "../../custom-hooks/use-get-milestone-alias";
 import { useGetSingleCourseQueryState } from "../../redux/services/courses-api";
+import { useGetTemplatesQuery } from "../../redux/services/templates-api";
+import { useResolveError } from "../../utils/error-utils";
 import PlaceholderWrapper from "../placeholder-wrapper";
 
 function CourseMilestoneTemplatesPage() {
@@ -16,6 +18,14 @@ function CourseMilestoneTemplatesPage() {
       courseName: course?.name,
     }),
   });
+  const {
+    data: milestoneTemplates,
+    isLoading,
+    error,
+  } = useGetTemplatesQuery(courseId ?? skipToken);
+  // important! The very first (outermost) api call needs to resolve the error
+  // subsequent api calls to the same endpoint do not need to resolve error since it is already handled here
+  useResolveError(error);
   const title = `${capitalCase(milestoneAlias)} Templates`;
 
   return (

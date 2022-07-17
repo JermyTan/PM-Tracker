@@ -16,7 +16,7 @@ import { useGetCourseId } from "../custom-hooks/use-get-course-id";
 import { useAppSelector } from "../redux/hooks";
 import {
   useDeleteCourseMutation,
-  useGetSingleCourseQuery,
+  useGetSingleCourseQueryState,
 } from "../redux/services/courses-api";
 import { MY_COURSES_PATH } from "../routes/paths";
 import { useResolveError } from "../utils/error-utils";
@@ -28,7 +28,7 @@ type Props = StackProps;
 function CourseActionsSection(props: Props) {
   const userId = useAppSelector(({ currentUser }) => currentUser?.user?.id);
   const courseId = useGetCourseId();
-  const { ownerId } = useGetSingleCourseQuery(courseId ?? skipToken, {
+  const { ownerId } = useGetSingleCourseQueryState(courseId ?? skipToken, {
     selectFromResult: ({ data: course }) => ({ ownerId: course?.owner.id }),
   });
   const [deleteCourse, { isLoading }] = useDeleteCourseMutation({

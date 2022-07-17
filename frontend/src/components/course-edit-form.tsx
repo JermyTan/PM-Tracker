@@ -73,23 +73,23 @@ type Props = {
 
 function CourseEditForm({ onSuccess }: Props) {
   const courseId = useGetCourseId();
-  const { course, isFetching } = useGetSingleCourseQuery(
+  const { course, isFetching, error } = useGetSingleCourseQuery(
     courseId ?? skipToken,
     {
-      selectFromResult: ({ data: course, isFetching }) => ({
+      selectFromResult: ({ data: course, isFetching, error }) => ({
         course,
         isFetching,
+        error,
       }),
       // get the most updated course data before editing
       refetchOnMountOrArgChange: true,
     },
   );
-
+  const resolveError = useResolveError(error);
   const methods = useForm<CourseEditFormProps>({
     resolver: zodResolver(schema),
     defaultValues: course,
   });
-  const resolveError = useResolveError();
   const [updateCourse] = useUpdateCourseMutation({
     selectFromResult: emptySelector,
   });

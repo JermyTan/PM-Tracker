@@ -115,17 +115,19 @@ function MilestoneEditForm({ milestoneId, onSuccess }: Props) {
   const courseId = useGetCourseId();
   const milestoneAlias = useGetMilestoneAlias();
   const capitalizedMilestoneAlias = capitalCase(milestoneAlias);
-  const { milestone, isFetching } = useGetSingleMilestoneQuery(
+  const { milestone, isFetching, error } = useGetSingleMilestoneQuery(
     courseId === undefined ? skipToken : { courseId, milestoneId },
     {
-      selectFromResult: ({ data: milestone, isFetching }) => ({
+      selectFromResult: ({ data: milestone, isFetching, error }) => ({
         milestone,
         isFetching,
+        error,
       }),
       // get the most updated milestone data before editing
       refetchOnMountOrArgChange: true,
     },
   );
+  const resolveError = useResolveError(error);
 
   const defaultValues: MilestoneEditFormProps | undefined = useMemo(() => {
     if (milestone === undefined) {
@@ -155,7 +157,6 @@ function MilestoneEditForm({ milestoneId, onSuccess }: Props) {
     resolver: zodResolver(schema),
     defaultValues,
   });
-  const resolveError = useResolveError();
   const [updateMilestone] = useUpdateMilestoneMutation({
     selectFromResult: emptySelector,
   });
@@ -168,7 +169,7 @@ function MilestoneEditForm({ milestoneId, onSuccess }: Props) {
   } = methods;
 
   // populate the form with the most updated milestone data (if any)
-  useDidUpdate(() => reset(defaultValues), [milestone]);
+  useDidUpdate(() => reset(defaultValues), [defaultValues]);
 
   const onSubmit = async (formData: MilestoneEditFormProps) => {
     if (isSubmitting || courseId === undefined) {

@@ -11,7 +11,7 @@ export const COURSE_MILESTONE_TEMPLATES_CREATION_PATH =
   "/courses/:courseId/templates/new";
 export const COURSE_MILESTONE_SINGLE_TEMPLATE_PATH =
   "/courses/:courseId/templates/:templateId";
-export const COURSE_MILESTONE_SINGLE_TEMPLATE_EDIT_PATH =
+export const COURSE_MILESTONE_TEMPLATES_EDIT_PATH =
   "/courses/:courseId/templates/:templateId/edit";
 export const COURSE_GROUPS_PATH = "/courses/:courseId/groups";
 export const COURSE_DETAILS_PATH = "/courses/:courseId/details";

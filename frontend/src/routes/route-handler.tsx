@@ -14,6 +14,8 @@ import CourseMilestoneTemplatesPage from "../components/pages/course-milestone-t
 import RoleRestrictedWrapper from "../components/role-restricted-wrapper";
 import { Role } from "../types/courses";
 import MilestoneTemplatesLayout from "../components/milestone-templates-layout";
+import CourseMilestoneTemplatesCreationPage from "../components/pages/course-milestone-templates-creation-page";
+import CourseMilestoneTemplatesEditPage from "../components/pages/course-milestone-templates-edit-page";
 
 function RouteHandler() {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
@@ -68,8 +70,14 @@ function RouteHandler() {
                 >
                   <Route path=":templateId" element={<div>Hello</div>} />
                 </Route>
-                <Route path="new" />
-                <Route path=":templateId/edit" />
+                <Route
+                  path="new"
+                  element={<CourseMilestoneTemplatesCreationPage />}
+                />
+                <Route
+                  path=":templateId/edit"
+                  element={<CourseMilestoneTemplatesEditPage />}
+                />
               </Route>
               <Route path="groups" element={<CourseGroupPage />} />
               <Route path="details" element={<CourseDetailsPage />} />

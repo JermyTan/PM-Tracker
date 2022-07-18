@@ -1,12 +1,14 @@
 import { createStyles, Table } from "@mantine/core";
 import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { generatePath, useNavigate } from "react-router-dom";
 import {
   DATE_TIME_MONTH_NAME_FORMAT,
   NAME,
   SUBMISSION_TYPE,
 } from "../constants";
+import { useGetCourseId } from "../custom-hooks/use-get-course-id";
 import { useGetTemplateId } from "../custom-hooks/use-get-template-id";
+import { COURSE_MILESTONE_TEMPLATES_PATH } from "../routes/paths";
 import { TemplateData } from "../types/templates";
 import { colorModeValue } from "../utils/theme-utils";
 import {
@@ -42,6 +44,7 @@ function MilestoneTemplatesTable({ milestoneTemplates }: Props) {
     [milestoneTemplates],
   );
   const templateId = useGetTemplateId();
+  const courseId = useGetCourseId();
 
   return (
     <Table highlightOnHover>
@@ -58,12 +61,19 @@ function MilestoneTemplatesTable({ milestoneTemplates }: Props) {
           ({ id, name, submissionType, isPublished, updatedAt }) => (
             <tr
               key={id}
-              className={cx(classes.row, {
-                [classes.active]: templateId === `${id}`,
-              })}
+              className={cx(
+                classes.row,
+                templateId === `${id}` && classes.active,
+              )}
               onClick={() => {
                 const stringId = `${id}`;
-                navigate(templateId === stringId ? "../" : stringId);
+                navigate(
+                  templateId === stringId
+                    ? generatePath(COURSE_MILESTONE_TEMPLATES_PATH, {
+                        courseId,
+                      })
+                    : stringId,
+                );
               }}
             >
               <td>{name}</td>

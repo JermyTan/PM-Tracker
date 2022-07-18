@@ -53,7 +53,7 @@ function LoginEmailForm() {
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmitForm(handleSubmit(onSubmit), resolveError)}>
-        <Stack spacing="xl">
+        <Stack spacing="lg">
           <TextField
             name={EMAIL}
             label="Email"

@@ -1,15 +1,35 @@
-import { Button, Group, Paper, Stack, Title } from "@mantine/core";
+import {
+  Button,
+  createStyles,
+  Group,
+  Paper,
+  Stack,
+  Title,
+} from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { ReactNode } from "react";
+import { BsFileEarmarkPlus } from "react-icons/bs";
+import { generatePath, Link } from "react-router-dom";
 import { useGetCourseId } from "../../custom-hooks/use-get-course-id";
 import { useGetMilestoneAlias } from "../../custom-hooks/use-get-milestone-alias";
+import { useGetTemplateId } from "../../custom-hooks/use-get-template-id";
 import { useGetTemplatesQuery } from "../../redux/services/templates-api";
+import { COURSE_MILESTONE_TEMPLATES_CREATION_PATH } from "../../routes/paths";
 import { useResolveError } from "../../utils/error-utils";
 import CourseMilestoneTemplatesTable from "../milestone-templates-table";
 import PlaceholderWrapper from "../placeholder-wrapper";
 
+const useStyles = createStyles({
+  templateContainer: {
+    flex: "1 1 auto",
+  },
+  fullTableContainer: {
+    width: "100%",
+  },
+});
+
 type Props = {
-  children?: ReactNode;
+  children: ReactNode;
 };
 
 function CourseMilestoneTemplatesPage({ children }: Props) {
@@ -26,8 +46,9 @@ function CourseMilestoneTemplatesPage({ children }: Props) {
     error,
     name: "course-milestone-templates-page",
   });
-
-  console.log(children);
+  const templateId = useGetTemplateId();
+  const hasSelectedTemplate = Boolean(templateId);
+  const { cx, classes } = useStyles();
 
   return (
     <PlaceholderWrapper
@@ -37,16 +58,35 @@ function CourseMilestoneTemplatesPage({ children }: Props) {
       defaultMessage={errorMessage}
       showDefaultMessage={Boolean(errorMessage)}
     >
-      {/* <Grid align="flex-end">
-          <Grid.Col span={8} xl={9}> */}
       {milestoneTemplates && (
-        <Group noWrap grow>
-          {children}
+        <Group align="flex-start">
+          {hasSelectedTemplate && (
+            <Paper
+              className={classes.templateContainer}
+              withBorder
+              shadow="sm"
+              p="md"
+              radius="md"
+            >
+              {children}
+            </Paper>
+          )}
 
-          <Stack>
+          <Stack
+            className={cx(!hasSelectedTemplate && classes.fullTableContainer)}
+          >
             <Group position="apart">
               <Title order={3}>{capitalizedMilestoneAlias} Templates</Title>
-              <Button color="teal">Create new template</Button>
+              <Button<typeof Link>
+                component={Link}
+                to={generatePath(COURSE_MILESTONE_TEMPLATES_CREATION_PATH, {
+                  courseId,
+                })}
+                color="teal"
+                leftIcon={<BsFileEarmarkPlus />}
+              >
+                Create new template
+              </Button>
             </Group>
 
             <Paper withBorder shadow="sm" p="md" radius="md">
@@ -57,30 +97,6 @@ function CourseMilestoneTemplatesPage({ children }: Props) {
           </Stack>
         </Group>
       )}
-
-      {/* </Grid.Col> */}
-
-      {/* <Grid.Col span={4} xl={3}>
-            <Title order={4}>Existing Templates</Title>
-          </Grid.Col>
-
-          <Grid.Col span={8} xl={9}>
-            <PlaceholderWrapper
-              sx={{
-                minHeight: "600px",
-                border: "dashed 4px #5c5f66",
-                borderRadius: "20px",
-              }}
-              textProps={{ color: "dimmed" }}
-              showDefaultMessage
-              defaultMessage="Select an existing template from the right to view/edit or create a new one"
-            />
-          </Grid.Col>
-
-          <Grid.Col span={4} xl={3}>
-            <Box sx={{ height: "600px", background: "red" }} />
-          </Grid.Col> */}
-      {/* </Grid> */}
     </PlaceholderWrapper>
   );
 }

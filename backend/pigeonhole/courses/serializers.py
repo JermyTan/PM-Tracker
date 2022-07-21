@@ -17,6 +17,7 @@ from .models import (
     CourseMilestoneTemplate,
     CourseSettings,
     CourseSubmission,
+    CourseSubmissionFieldComment,
     PatchCourseGroupAction,
     Role,
 )
@@ -182,3 +183,11 @@ class PostCourseSubmissionSerializer(PutCourseSubmissionSerializer):
 
     class Meta(PutCourseSubmissionSerializer.Meta):
         fields = PutCourseSubmissionSerializer.Meta.fields + ("milestone_id",)
+
+
+class PutCourseSubmissionFieldCommentSerializer(serializers.Serializer):
+    # TODO: test blank later
+    content = serializers.CharField(required=True)
+class PostCourseSubmissionFieldCommentSerializer(PutCourseSubmissionFieldCommentSerializer):
+    field_index = serializers.IntegerField(min_value=0)
+

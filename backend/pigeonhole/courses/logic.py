@@ -35,6 +35,10 @@ from pigeonhole.common.constants import (
     GROUP,
     MILESTONE,
     ID,
+    COMMENT,
+    COMMENTER,
+    FIELD_INDEX,
+    CONTENT,
 )
 from pigeonhole.common.parsers import to_base_json, parse_datetime_to_ms_timestamp
 from forms.models import Form
@@ -42,6 +46,7 @@ from users.models import User
 from users.logic import user_to_json, get_users
 
 from .models import (
+    Comment,
     Course,
     CourseGroup,
     CourseGroupMember,
@@ -50,6 +55,7 @@ from .models import (
     CourseMilestoneTemplate,
     CourseSettings,
     CourseSubmission,
+    CourseSubmissionFieldComment,
     PatchCourseGroupAction,
     Role,
     SubmissionType,
@@ -181,6 +187,26 @@ def course_submission_to_json(submission: CourseSubmission) -> dict:
 
     return data
 
+def comment_to_json(comment: Comment) -> dict:
+    data = to_base_json(comment)
+
+    data |= {
+        COMMENTER: user_to_json(comment.commenter),
+        CONTENT: comment.content
+    }
+
+    return data
+
+def course_submission_field_comment_to_json(field_comment: CourseSubmissionFieldComment) -> dict:
+    data = comment_to_json(field_comment.comment)
+
+    data |= {
+        FIELD_INDEX: field_comment.field_index
+    }
+
+    data[ID] = field_comment.id
+
+    return data
 
 def get_courses(*args, **kwargs) -> QuerySet[Course]:
     return Course.objects.filter(*args, **kwargs)
@@ -732,3 +758,22 @@ def can_delete_course_submission(
     return can_update_course_submission(
         requester_membership=requester_membership, submission=submission
     )
+
+@transaction.atomic
+def create_course_submission_field_comment(
+    submission: CourseSubmission,
+    commenter: User,
+    content: str,
+    field_index: int
+
+) -> CourseSubmissionFieldComment:
+    
+    new_comment = Comment.objects.create(content=content, commenter=commenter)
+
+    new_course_submission_field_comment = CourseSubmissionFieldComment.objects.create(
+        submission=submission,
+        comment=new_comment,
+        field_index=field_index
+    )
+
+    return new_course_submission_field_comment

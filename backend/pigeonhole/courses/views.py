@@ -37,6 +37,7 @@ from .logic import (
     course_group_with_members_to_json,
     course_membership_to_json,
     course_milestone_template_to_json,
+    course_submission_field_comment_to_json,
     course_submission_summary_to_json,
     course_submission_to_json,
     course_summary_to_json,
@@ -47,6 +48,7 @@ from .logic import (
     create_course_membership,
     create_course_milestone_template,
     create_course_submission,
+    create_course_submission_field_comment,
     get_requested_course_submissions,
     update_course,
     create_course_milestone,
@@ -63,6 +65,7 @@ from .serializers import (
     PostCourseGroupSerializer,
     PostCourseMilestoneTemplateSerializer,
     PostCourseSerializer,
+    PostCourseSubmissionFieldCommentSerializer,
     PostCourseSubmissionSerializer,
     PutCourseMilestoneTemplateSerializer,
     PutCourseSerializer,
@@ -870,3 +873,40 @@ class SingleCourseSubmissionView(APIView):
         submission.delete()
 
         return Response(data=data, status=status.HTTP_200_OK)
+
+class CourseSubmissionFieldCommentsView(APIView):
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_submission
+    def post(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+        submission: CourseSubmission
+    ):
+        serializer = PostCourseSubmissionFieldCommentSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+
+        field_index = validated_data["field_index"]
+        if field_index >= len(submission.form_response_data):
+            raise BadRequest(detail="Invalid field index provided.")
+
+        try:
+            new_comment = create_course_submission_field_comment(
+                submission=submission,
+                commenter = requester,
+                content=validated_data["content"],
+                field_index=validated_data["field_index"]
+            )
+        except ValueError as e:
+            raise BadRequest(detail=e)
+
+        data = course_submission_field_comment_to_json(new_comment)
+
+        return Response(data=data, status=status.HTTP_201_CREATED)
+

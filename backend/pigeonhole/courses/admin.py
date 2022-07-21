@@ -10,6 +10,7 @@ from .models import (
     CourseMilestone,
     CourseMilestoneTemplate,
     CourseSubmission,
+    CourseSubmissionFieldComment,
 )
 
 # Register your models here.
@@ -21,3 +22,4 @@ admin.site.register(CourseGroupMember, BaseAdmin)
 admin.site.register(CourseMilestone, BaseAdmin)
 admin.site.register(CourseMilestoneTemplate, BaseAdmin)
 admin.site.register(CourseSubmission, BaseAdmin)
+admin.site.register(CourseSubmissionFieldComment, BaseAdmin)

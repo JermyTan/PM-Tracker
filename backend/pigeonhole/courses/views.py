@@ -30,6 +30,7 @@ from .logic import (
     can_create_course_group,
     can_delete_course_group,
     can_delete_course_submission,
+    can_delete_course_submission_field_comment,
     can_update_course_group,
     can_update_course_submission,
     can_update_course_submission_field_comment,
@@ -51,7 +52,9 @@ from .logic import (
     create_course_milestone_template,
     create_course_submission,
     create_course_submission_field_comment,
+    delete_course_submission_field_comment,
     get_requested_course_submissions,
+    submission_field_comment_is_deleted,
     update_course,
     create_course_milestone,
     update_course_group,
@@ -953,5 +956,40 @@ class SingleCourseSubmissionFieldCommentsView(APIView):
             raise BadRequest(detail=e)
 
         data = course_submission_field_comment_to_json(updated_comment)
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_submission
+    @check_submission_comment
+    def delete(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+        submission: CourseSubmission,
+        submission_comment: CourseSubmissionFieldComment
+    ):
+        
+        if not can_delete_course_submission_field_comment(
+            requester_membership=requester_membership,
+            submission_comment=submission_comment
+        ):
+            raise PermissionDenied()
+
+        if submission_field_comment_is_deleted(submission_comment=submission_comment):
+            raise BadRequest(detail="The comment is already deleted.")
+        
+        try:
+            deleted_comment = delete_course_submission_field_comment(
+                course_submission_field_comment=submission_comment,
+            )
+        except ValueError as e:
+            raise BadRequest(detail=e)
+
+        data = course_submission_field_comment_to_json(deleted_comment)
 
         return Response(data=data, status=status.HTTP_200_OK)

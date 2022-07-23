@@ -40,6 +40,7 @@ from pigeonhole.common.constants import (
     COMMENTER,
     FIELD_INDEX,
     CONTENT,
+    IS_DELETED,
 )
 from pigeonhole.common.parsers import to_base_json, parse_datetime_to_ms_timestamp
 from forms.models import Form
@@ -193,7 +194,8 @@ def comment_to_json(comment: Comment) -> dict:
 
     data |= {
         COMMENTER: user_to_json(comment.commenter),
-        CONTENT: comment.content
+        CONTENT: "" if comment.is_deleted else comment.content,
+        IS_DELETED: comment.is_deleted,
     }
 
     return data
@@ -768,6 +770,23 @@ def can_update_course_submission_field_comment(
     return requester_membership == submission_comment.course_membership
 
 
+def can_delete_course_submission_field_comment(
+    requester_membership: CourseMembership, submission_comment: CourseSubmissionFieldComment
+) -> bool:
+    return can_update_course_submission_field_comment(
+        requester_membership=requester_membership,
+        submission_comment=submission_comment
+    )
+
+
+def comment_is_deleted(comment: Comment) -> bool:
+    return comment.is_deleted
+
+
+def submission_field_comment_is_deleted(submission_comment: CourseSubmissionFieldComment) -> bool:
+    return comment_is_deleted(submission_comment.comment)
+
+
 @transaction.atomic
 def create_course_submission_field_comment(
     submission: CourseSubmission,
@@ -797,6 +816,18 @@ def update_course_submission_field_comment(
     
     comment = course_submission_field_comment.comment
     comment.content = content
+
+    comment.save()
+
+    return course_submission_field_comment
+
+@transaction.atomic
+def delete_course_submission_field_comment(
+    course_submission_field_comment: CourseSubmissionFieldComment,
+) -> CourseSubmissionFieldComment:
+    
+    comment = course_submission_field_comment.comment
+    comment.is_deleted = True
 
     comment.save()
 

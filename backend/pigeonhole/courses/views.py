@@ -901,7 +901,8 @@ class CourseSubmissionFieldCommentsView(APIView):
                 submission=submission,
                 commenter = requester,
                 content=validated_data["content"],
-                field_index=validated_data["field_index"]
+                field_index=validated_data["field_index"],
+                course_membership=requester_membership
             )
         except ValueError as e:
             raise BadRequest(detail=e)

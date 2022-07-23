@@ -201,7 +201,8 @@ def course_submission_field_comment_to_json(field_comment: CourseSubmissionField
     data = comment_to_json(field_comment.comment)
 
     data |= {
-        FIELD_INDEX: field_comment.field_index
+        FIELD_INDEX: field_comment.field_index,
+        ROLE: field_comment.course_membership.role or ""
     }
 
     data[ID] = field_comment.id
@@ -764,7 +765,8 @@ def create_course_submission_field_comment(
     submission: CourseSubmission,
     commenter: User,
     content: str,
-    field_index: int
+    field_index: int,
+    course_membership: CourseMembership
 
 ) -> CourseSubmissionFieldComment:
     
@@ -773,7 +775,8 @@ def create_course_submission_field_comment(
     new_course_submission_field_comment = CourseSubmissionFieldComment.objects.create(
         submission=submission,
         comment=new_comment,
-        field_index=field_index
+        field_index=field_index,
+        course_membership=course_membership
     )
 
     return new_course_submission_field_comment

@@ -186,7 +186,6 @@ class PostCourseSubmissionSerializer(PutCourseSubmissionSerializer):
 
 
 class PutCourseSubmissionFieldCommentSerializer(serializers.Serializer):
-    # TODO: test blank later
     content = serializers.CharField(required=True)
 class PostCourseSubmissionFieldCommentSerializer(PutCourseSubmissionFieldCommentSerializer):
     field_index = serializers.IntegerField(min_value=0)

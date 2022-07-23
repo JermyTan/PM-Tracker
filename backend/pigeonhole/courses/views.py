@@ -22,6 +22,7 @@ from .models import (
     CourseMilestone,
     CourseMilestoneTemplate,
     CourseSubmission,
+    CourseSubmissionFieldComment,
     PatchCourseGroupAction,
     Role,
 )
@@ -31,6 +32,7 @@ from .logic import (
     can_delete_course_submission,
     can_update_course_group,
     can_update_course_submission,
+    can_update_course_submission_field_comment,
     can_view_course_group_members,
     can_view_course_submission,
     course_group_to_json,
@@ -58,6 +60,7 @@ from .logic import (
     update_course_membership,
     update_course_milestone_template,
     update_course_submission,
+    update_course_submission_field_comment,
 )
 from .serializers import (
     GetCourseSubmissionSerializer,
@@ -73,6 +76,7 @@ from .serializers import (
     PutCourseMilestoneSerializer,
     PostCourseMembershipSerializer,
     PatchCourseMembershipSerializer,
+    PutCourseSubmissionFieldCommentSerializer,
     PutCourseSubmissionSerializer,
 )
 from .middlewares import (
@@ -82,6 +86,7 @@ from .middlewares import (
     check_requester_membership,
     check_milestone,
     check_submission,
+    check_submission_comment,
     check_template,
 )
 
@@ -911,3 +916,42 @@ class CourseSubmissionFieldCommentsView(APIView):
 
         return Response(data=data, status=status.HTTP_201_CREATED)
 
+
+class SingleCourseSubmissionFieldCommentsView(APIView):
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_submission
+    @check_submission_comment
+    def put(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+        submission: CourseSubmission,
+        submission_comment: CourseSubmissionFieldComment
+    ):
+        
+        if not can_update_course_submission_field_comment(
+            requester_membership=requester_membership,
+            submission_comment=submission_comment
+        ):
+            raise PermissionDenied()
+
+        serializer = PutCourseSubmissionFieldCommentSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+
+        try:
+            updated_comment = update_course_submission_field_comment(
+                course_submission_field_comment=submission_comment,
+                content = validated_data['content']
+            )
+        except ValueError as e:
+            raise BadRequest(detail=e)
+
+        data = course_submission_field_comment_to_json(updated_comment)
+
+        return Response(data=data, status=status.HTTP_200_OK)

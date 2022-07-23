@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Optional, Sequence
 from datetime import datetime
 
@@ -760,6 +761,13 @@ def can_delete_course_submission(
         requester_membership=requester_membership, submission=submission
     )
 
+
+def can_update_course_submission_field_comment(
+    requester_membership: CourseMembership, submission_comment: CourseSubmissionFieldComment
+) -> bool:
+    return requester_membership == submission_comment.course_membership
+
+
 @transaction.atomic
 def create_course_submission_field_comment(
     submission: CourseSubmission,
@@ -780,3 +788,16 @@ def create_course_submission_field_comment(
     )
 
     return new_course_submission_field_comment
+
+@transaction.atomic
+def update_course_submission_field_comment(
+    course_submission_field_comment: CourseSubmissionFieldComment,
+    content: str
+) -> CourseSubmissionFieldComment:
+    
+    comment = course_submission_field_comment.comment
+    comment.content = content
+
+    comment.save()
+
+    return course_submission_field_comment

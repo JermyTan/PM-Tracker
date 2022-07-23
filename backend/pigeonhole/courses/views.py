@@ -887,6 +887,38 @@ class CourseSubmissionFieldCommentsView(APIView):
     @check_course
     @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     @check_submission
+    def get(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+        submission: CourseSubmission,
+    ):
+        if not can_view_course_submission(
+            requester_membership=requester_membership, submission=submission
+        ):
+            raise PermissionDenied()
+
+        data = {}
+
+        max_field_index = len(submission.form_response_data)
+        for field_index in range(0, max_field_index):
+            field_comments = submission.coursesubmissionfieldcomment_set.filter(
+                field_index=field_index
+            )
+
+            data |= {
+                str(field_index): [course_submission_field_comment_to_json(comment) for comment in field_comments]
+            }
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_submission
     def post(
         self,
         request,

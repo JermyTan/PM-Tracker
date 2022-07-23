@@ -210,6 +210,7 @@ class CourseSubmissionFieldComment(TimestampedModel):
     submission = models.ForeignKey(CourseSubmission, on_delete=models.CASCADE)
     comment = models.OneToOneField(Comment, on_delete=models.CASCADE)
     field_index = models.PositiveIntegerField()
+    course_membership = models.ForeignKey(CourseMembership, on_delete=models.SET_NULL, null=True)
     class Meta:
         constraints = [
             models.UniqueConstraint(

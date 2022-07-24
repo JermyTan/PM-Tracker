@@ -1,5 +1,4 @@
 import logging
-import re
 from typing import Optional, Sequence
 from datetime import datetime
 

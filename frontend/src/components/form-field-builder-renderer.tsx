@@ -93,9 +93,11 @@ function FormFieldBuilderRenderer({ formFieldType, builderName }: Props) {
             />
 
             <FormFieldBuilderChoicesRenderer
+              size="sm"
               name={choicesFieldName}
               withPadding
-              mt={40}
+              mt={56}
+              spacing={1}
             />
           </Group>
         );

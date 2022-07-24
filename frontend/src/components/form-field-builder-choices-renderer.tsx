@@ -15,8 +15,8 @@ function FormFieldBuilderChoicesRenderer({ name, ...props }: Props) {
 
   return (
     <List {...props}>
-      {choices.map((choice) => (
-        <List.Item>{choice}</List.Item>
+      {choices.map((choice, index) => (
+        <List.Item key={`${index}.${choice}`}>{choice}</List.Item>
       ))}
     </List>
   );

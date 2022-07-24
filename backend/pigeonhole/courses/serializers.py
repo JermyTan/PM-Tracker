@@ -187,6 +187,9 @@ class PostCourseSubmissionSerializer(PutCourseSubmissionSerializer):
 
 class PutCourseSubmissionFieldCommentSerializer(serializers.Serializer):
     content = serializers.CharField(required=True)
+    
 class PostCourseSubmissionFieldCommentSerializer(PutCourseSubmissionFieldCommentSerializer):
     field_index = serializers.IntegerField(min_value=0)
 
+class GetCourseSubmissionFieldCommentSerializer(serializers.Serializer):
+    field_index = serializers.IntegerField(required=False, min_value=0)

@@ -66,6 +66,7 @@ from .logic import (
     update_course_submission_field_comment,
 )
 from .serializers import (
+    GetCourseSubmissionFieldCommentSerializer,
     GetCourseSubmissionSerializer,
     PatchCourseGroupSerializer,
     PostCourseGroupSerializer,
@@ -900,10 +901,26 @@ class CourseSubmissionFieldCommentsView(APIView):
         ):
             raise PermissionDenied()
 
+        query_params = request.query_params.dict()
+        serializer = GetCourseSubmissionFieldCommentSerializer(data=query_params)
+
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+
+        field_index = validated_data.get("field_index", None)
+        max_field_index = len(submission.form_response_data)
+
+        if field_index:
+            if field_index >= max_field_index:
+                raise BadRequest(detail="Invalid field index provided.")
+
+            index_set = [field_index,]
+        else:
+            index_set = [index for index in range(0, max_field_index)]
+
         data = {}
 
-        max_field_index = len(submission.form_response_data)
-        for field_index in range(0, max_field_index):
+        for field_index in index_set:
             field_comments = submission.coursesubmissionfieldcomment_set.filter(
                 field_index=field_index
             )

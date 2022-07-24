@@ -1,14 +1,12 @@
 import { useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  createStyles,
   Group,
   Stack,
   ThemeIcon,
   Title,
   Tooltip,
   Text,
-  Space,
   Button,
   LoadingOverlay,
 } from "@mantine/core";
@@ -96,15 +94,6 @@ type MilestoneEditFormProps = Omit<
   [START_TIME]: Date | null;
 };
 
-const useStyles = createStyles({
-  tooltip: {
-    display: "flex",
-  },
-  button: {
-    width: "150px",
-  },
-});
-
 type Props = {
   milestoneId: string | number;
   onSuccess?: () => void;
@@ -159,7 +148,6 @@ function MilestoneEditForm({ milestoneId, onSuccess }: Props) {
   const [updateMilestone] = useUpdateMilestoneMutation({
     selectFromResult: emptySelector,
   });
-  const { classes } = useStyles();
 
   const {
     handleSubmit,
@@ -175,8 +163,12 @@ function MilestoneEditForm({ milestoneId, onSuccess }: Props) {
       return;
     }
 
-    const { startDate, startTime, endDate, endTime, ...rest } =
-      schema.parse(formData);
+    const { startDate, startTime, endDate, endTime, ...rest } = formData;
+
+    if (startDate === null || startTime === null) {
+      return;
+    }
+
     const startDateTime = getStartOfDate(
       mergeDateTime(startDate, startTime),
       "minute",
@@ -210,111 +202,108 @@ function MilestoneEditForm({ milestoneId, onSuccess }: Props) {
       >
         <LoadingOverlay visible={isFetching} />
 
-        <Stack>
-          <Title order={4}>{capitalizedMilestoneAlias} Details</Title>
+        <Stack spacing={32}>
+          <Stack>
+            <Title order={4}>{capitalizedMilestoneAlias} Details</Title>
 
-          <TextField
-            name={NAME}
-            label={`${capitalizedMilestoneAlias} name`}
-            required
-          />
-
-          <TextareaField
-            name={DESCRIPTION}
-            label={`${capitalizedMilestoneAlias} description`}
-            autosize
-            minRows={3}
-            maxRows={10}
-          />
-
-          <Stack spacing={6}>
-            <Group noWrap grow align="flex-start">
-              <DateField
-                name={START_DATE}
-                inputFormat={DATE_MONTH_NAME_FORMAT}
-                label="Start date"
-                required
-                clearable={false}
-              />
-              <TimeField
-                name={START_TIME}
-                label="Start time"
-                format="12"
-                required
-                clearable
-              />
-            </Group>
-
-            <Text size="xs" color="dimmed">
-              Students can only access this {milestoneAlias} after the start
-              date/time.
-            </Text>
-          </Stack>
-
-          <Stack spacing={6}>
-            <Group noWrap grow align="flex-start">
-              <DateField
-                name={END_DATE}
-                inputFormat={DATE_MONTH_NAME_FORMAT}
-                label="End date"
-                clearable
-              />
-              <TimeField
-                name={END_TIME}
-                label="End time"
-                format="12"
-                clearable
-              />
-            </Group>
-            <Text size="xs" color="dimmed">
-              If specified, students cannot make submissions after the end
-              date/time.
-            </Text>
-          </Stack>
-
-          <Space />
-
-          <Group position="apart">
-            <Group spacing={4}>
-              <Text<"label"> size="sm" htmlFor={IS_PUBLISHED} component="label">
-                Publish {milestoneAlias}
-              </Text>
-              <Tooltip
-                className={classes.tooltip}
-                label={
-                  <Text size="xs">
-                    Students can view this {milestoneAlias}.
-                  </Text>
-                }
-                withArrow
-                placement="start"
-                transition="pop-top-left"
-                transitionDuration={300}
-                wrapLines
-                width={200}
-              >
-                <ThemeIcon color="gray" size="xs" radius="xl">
-                  <FaQuestion size={7} />
-                </ThemeIcon>
-              </Tooltip>
-            </Group>
-            <SwitchField
-              name={IS_PUBLISHED}
-              id={IS_PUBLISHED}
-              onLabel="Yes"
-              offLabel="No"
-              size="md"
+            <TextField
+              name={NAME}
+              label={`${capitalizedMilestoneAlias} name`}
+              required
             />
-          </Group>
 
-          <Space />
+            <TextareaField
+              name={DESCRIPTION}
+              label={`${capitalizedMilestoneAlias} description`}
+            />
+
+            <Stack spacing={6}>
+              <Group noWrap grow align="flex-start">
+                <DateField
+                  name={START_DATE}
+                  inputFormat={DATE_MONTH_NAME_FORMAT}
+                  label="Start date"
+                  required
+                  clearable={false}
+                />
+                <TimeField
+                  name={START_TIME}
+                  label="Start time"
+                  format="12"
+                  required
+                  clearable
+                />
+              </Group>
+
+              <Text size="xs" color="dimmed">
+                Students can only access this {milestoneAlias} after the start
+                date/time.
+              </Text>
+            </Stack>
+
+            <Stack spacing={6}>
+              <Group noWrap grow align="flex-start">
+                <DateField
+                  name={END_DATE}
+                  inputFormat={DATE_MONTH_NAME_FORMAT}
+                  label="End date"
+                  clearable
+                />
+                <TimeField
+                  name={END_TIME}
+                  label="End time"
+                  format="12"
+                  clearable
+                />
+              </Group>
+              <Text size="xs" color="dimmed">
+                If specified, students cannot make submissions after the end
+                date/time.
+              </Text>
+            </Stack>
+
+            <Group position="apart">
+              <Group spacing={4}>
+                <Text<"label">
+                  size="sm"
+                  htmlFor={IS_PUBLISHED}
+                  component="label"
+                >
+                  Publish {milestoneAlias}
+                </Text>
+                <Tooltip
+                  label={
+                    <Text size="xs">
+                      Students can view this {milestoneAlias}.
+                    </Text>
+                  }
+                  withArrow
+                  placement="start"
+                  transition="pop-top-left"
+                  transitionDuration={300}
+                  wrapLines
+                  width={200}
+                >
+                  <ThemeIcon color="gray" size="xs" radius="xl">
+                    <FaQuestion size={7} />
+                  </ThemeIcon>
+                </Tooltip>
+              </Group>
+              <SwitchField
+                name={IS_PUBLISHED}
+                id={IS_PUBLISHED}
+                onLabel="Yes"
+                offLabel="No"
+                size="md"
+              />
+            </Group>
+          </Stack>
 
           <Group position="right">
             <Button
               disabled={isSubmitting}
               loading={isSubmitting}
               type="submit"
-              className={classes.button}
             >
               Save
             </Button>

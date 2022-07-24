@@ -1,7 +1,5 @@
 import arraySort from "array-sort";
-import { capitalCase } from "change-case";
 import dayjs from "dayjs";
-import { SubmissionType } from "../types/templates";
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return !Array.isArray(value) && typeof value === "object" && value !== null;
@@ -71,14 +69,6 @@ export function getEndOfDate(date: Date, unit: dayjs.OpUnitType) {
   return dayjs(date).endOf(unit).toDate();
 }
 
-export function capitalizeSubmissionType(submissionType: SubmissionType) {
-  if (submissionType !== SubmissionType.IndividualGroup) {
-    return capitalCase(submissionType);
-  }
-
-  return capitalCase(submissionType).replace(" ", "/");
-}
-
 // export function displayDateTimeRange(
 //   inputStartDateTime: string | number | Date,
 //   inputEndDateTime: string | number | Date,
@@ -105,7 +95,7 @@ export function sort<T>(
   {
     key,
     reverse = false,
-  }: { key?: Parameters<typeof arraySort<T>>[1]; reverse?: boolean } = {},
+  }: { key?: Parameters<typeof arraySort>[1]; reverse?: boolean } = {},
 ) {
   return arraySort([...array], key, { reverse });
 }

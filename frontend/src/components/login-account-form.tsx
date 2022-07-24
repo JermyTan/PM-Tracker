@@ -78,7 +78,7 @@ function LoginAccountForm() {
       return;
     }
 
-    const { rememberMe, ...passwordLoginPostData } = schema.parse(formData);
+    const { rememberMe, ...passwordLoginPostData } = formData;
 
     const currentUser = await passwordLogin(passwordLoginPostData).unwrap();
 
@@ -132,12 +132,7 @@ function LoginAccountForm() {
             </Group>
           </Stack>
 
-          <Button
-            fullWidth
-            disabled={isSubmitting}
-            loading={isSubmitting}
-            type="submit"
-          >
+          <Button disabled={isSubmitting} loading={isSubmitting} type="submit">
             {name ? "Login" : "Sign up"}
           </Button>
         </Stack>

@@ -95,7 +95,7 @@ function App({ Component, pageProps }: AppProps) {
             styles={{
               Tooltip: {
                 root: {
-                  display: "block",
+                  display: "flex",
                 },
               },
               Checkbox: {
@@ -107,11 +107,14 @@ function App({ Component, pageProps }: AppProps) {
                 },
               },
               Button: {
+                root: {
+                  minWidth: "150px",
+                },
                 rightIcon: {
-                  marginLeft: 6,
+                  marginLeft: "6px",
                 },
                 leftIcon: {
-                  marginRight: 6,
+                  marginRight: "6px",
                 },
               },
               Drawer: {

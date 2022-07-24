@@ -1,7 +1,6 @@
 import {
   Anchor,
   Avatar,
-  Box,
   createStyles,
   Group,
   Paper,
@@ -72,12 +71,12 @@ function CourseDetailsPage() {
                 alt=""
                 src={owner?.profileImage || undefined}
               />
-              <Box>
+              <div>
                 <Text weight={500}>{owner?.name}</Text>
                 {owner?.email && (
                   <Anchor href={`mailto:${owner.email}`}>{owner.email}</Anchor>
                 )}
-              </Box>
+              </div>
             </Group>
           </Stack>
 

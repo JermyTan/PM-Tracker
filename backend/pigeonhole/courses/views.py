@@ -80,7 +80,7 @@ from .serializers import (
     PutCourseMilestoneSerializer,
     PostCourseMembershipSerializer,
     PatchCourseMembershipSerializer,
-    PutCourseSubmissionFieldCommentSerializer,
+    PatchCourseSubmissionFieldCommentSerializer,
     PutCourseSubmissionSerializer,
 )
 from .middlewares import (
@@ -975,7 +975,7 @@ class SingleCourseSubmissionFieldCommentsView(APIView):
     @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     @check_submission
     @check_submission_comment
-    def put(
+    def patch(
         self,
         request,
         requester: User,
@@ -991,7 +991,7 @@ class SingleCourseSubmissionFieldCommentsView(APIView):
         ):
             raise PermissionDenied()
 
-        serializer = PutCourseSubmissionFieldCommentSerializer(data=request.data)
+        serializer = PatchCourseSubmissionFieldCommentSerializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data

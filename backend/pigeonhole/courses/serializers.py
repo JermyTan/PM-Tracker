@@ -185,10 +185,10 @@ class PostCourseSubmissionSerializer(PutCourseSubmissionSerializer):
         fields = PutCourseSubmissionSerializer.Meta.fields + ("milestone_id",)
 
 
-class PutCourseSubmissionFieldCommentSerializer(serializers.Serializer):
+class PatchCourseSubmissionFieldCommentSerializer(serializers.Serializer):
     content = serializers.CharField(required=True)
-    
-class PostCourseSubmissionFieldCommentSerializer(PutCourseSubmissionFieldCommentSerializer):
+
+class PostCourseSubmissionFieldCommentSerializer(PatchCourseSubmissionFieldCommentSerializer):
     field_index = serializers.IntegerField(min_value=0)
 
 class GetCourseSubmissionFieldCommentSerializer(serializers.Serializer):

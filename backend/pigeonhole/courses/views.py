@@ -22,6 +22,7 @@ from .models import (
     CourseMilestone,
     CourseMilestoneTemplate,
     CourseSubmission,
+    CourseSubmissionFieldComment,
     PatchCourseGroupAction,
     Role,
 )
@@ -29,14 +30,17 @@ from .logic import (
     can_create_course_group,
     can_delete_course_group,
     can_delete_course_submission,
+    can_delete_course_submission_field_comment,
     can_update_course_group,
     can_update_course_submission,
+    can_update_course_submission_field_comment,
     can_view_course_group_members,
     can_view_course_submission,
     course_group_to_json,
     course_group_with_members_to_json,
     course_membership_to_json,
     course_milestone_template_to_json,
+    course_submission_field_comment_to_json,
     course_submission_summary_to_json,
     course_submission_to_json,
     course_summary_to_json,
@@ -47,7 +51,10 @@ from .logic import (
     create_course_membership,
     create_course_milestone_template,
     create_course_submission,
+    create_course_submission_field_comment,
+    delete_course_submission_field_comment,
     get_requested_course_submissions,
+    submission_field_comment_is_deleted,
     update_course,
     create_course_milestone,
     update_course_group,
@@ -56,13 +63,16 @@ from .logic import (
     update_course_membership,
     update_course_milestone_template,
     update_course_submission,
+    update_course_submission_field_comment,
 )
 from .serializers import (
+    GetCourseSubmissionFieldCommentSerializer,
     GetCourseSubmissionSerializer,
     PatchCourseGroupSerializer,
     PostCourseGroupSerializer,
     PostCourseMilestoneTemplateSerializer,
     PostCourseSerializer,
+    PostCourseSubmissionFieldCommentSerializer,
     PostCourseSubmissionSerializer,
     PutCourseMilestoneTemplateSerializer,
     PutCourseSerializer,
@@ -70,6 +80,7 @@ from .serializers import (
     PutCourseMilestoneSerializer,
     PostCourseMembershipSerializer,
     PatchCourseMembershipSerializer,
+    PatchCourseSubmissionFieldCommentSerializer,
     PutCourseSubmissionSerializer,
 )
 from .middlewares import (
@@ -79,6 +90,7 @@ from .middlewares import (
     check_requester_membership,
     check_milestone,
     check_submission,
+    check_submission_comment,
     check_template,
 )
 
@@ -868,5 +880,165 @@ class SingleCourseSubmissionView(APIView):
         data = course_submission_to_json(submission)
 
         submission.delete()
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+class CourseSubmissionFieldCommentsView(APIView):
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_submission
+    def get(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+        submission: CourseSubmission,
+    ):
+        if not can_view_course_submission(
+            requester_membership=requester_membership, submission=submission
+        ):
+            raise PermissionDenied()
+
+        query_params = request.query_params.dict()
+        serializer = GetCourseSubmissionFieldCommentSerializer(data=query_params)
+
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+
+        field_index = validated_data.get("field_index", None)
+        max_field_index = len(submission.form_response_data)
+
+        if field_index:
+            if field_index >= max_field_index:
+                raise BadRequest(detail="Invalid field index provided.")
+
+            index_set = [field_index,]
+        else:
+            index_set = [index for index in range(0, max_field_index)]
+
+        data = {}
+
+        for field_index in index_set:
+            field_comments = submission.coursesubmissionfieldcomment_set.filter(
+                field_index=field_index
+            )
+
+            data |= {
+                str(field_index): [course_submission_field_comment_to_json(comment) for comment in field_comments]
+            }
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_submission
+    def post(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+        submission: CourseSubmission
+    ):
+        serializer = PostCourseSubmissionFieldCommentSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+
+        field_index = validated_data["field_index"]
+        if field_index >= len(submission.form_response_data):
+            raise BadRequest(detail="Invalid field index provided.")
+
+        try:
+            new_comment = create_course_submission_field_comment(
+                submission=submission,
+                commenter = requester,
+                content=validated_data["content"],
+                field_index=validated_data["field_index"],
+                course_membership=requester_membership
+            )
+        except ValueError as e:
+            raise BadRequest(detail=e)
+
+        data = course_submission_field_comment_to_json(new_comment)
+
+        return Response(data=data, status=status.HTTP_201_CREATED)
+
+
+class SingleCourseSubmissionFieldCommentsView(APIView):
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_submission
+    @check_submission_comment
+    def patch(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+        submission: CourseSubmission,
+        submission_comment: CourseSubmissionFieldComment
+    ):
+        
+        if not can_update_course_submission_field_comment(
+            requester_membership=requester_membership,
+            submission_comment=submission_comment
+        ):
+            raise PermissionDenied()
+
+        serializer = PatchCourseSubmissionFieldCommentSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+
+        try:
+            updated_comment = update_course_submission_field_comment(
+                course_submission_field_comment=submission_comment,
+                content = validated_data['content']
+            )
+        except ValueError as e:
+            raise BadRequest(detail=e)
+
+        data = course_submission_field_comment_to_json(updated_comment)
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_submission
+    @check_submission_comment
+    def delete(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+        submission: CourseSubmission,
+        submission_comment: CourseSubmissionFieldComment
+    ):
+        
+        if not can_delete_course_submission_field_comment(
+            requester_membership=requester_membership,
+            submission_comment=submission_comment
+        ):
+            raise PermissionDenied()
+
+        if submission_field_comment_is_deleted(submission_comment=submission_comment):
+            raise BadRequest(detail="The comment is already deleted.")
+        
+        try:
+            deleted_comment = delete_course_submission_field_comment(
+                course_submission_field_comment=submission_comment,
+            )
+        except ValueError as e:
+            raise BadRequest(detail=e)
+
+        data = course_submission_field_comment_to_json(deleted_comment)
 
         return Response(data=data, status=status.HTTP_200_OK)

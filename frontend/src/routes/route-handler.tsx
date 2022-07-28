@@ -16,6 +16,7 @@ import { Role } from "../types/courses";
 import MilestoneTemplatesLayout from "../components/milestone-templates-layout";
 import CourseMilestoneTemplatesCreationPage from "../components/pages/course-milestone-templates-creation-page";
 import CourseMilestoneTemplatesEditPage from "../components/pages/course-milestone-templates-edit-page";
+import MilestoneTemplateDisplay from "../components/milestone-template-display";
 
 function RouteHandler() {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
@@ -68,7 +69,10 @@ function RouteHandler() {
                     </CourseMilestoneTemplatesPage>
                   }
                 >
-                  <Route path=":templateId" element={<div>Hello</div>} />
+                  <Route
+                    path=":templateId"
+                    element={<MilestoneTemplateDisplay />}
+                  />
                 </Route>
                 <Route
                   path="new"

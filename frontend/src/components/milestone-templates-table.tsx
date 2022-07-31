@@ -6,8 +6,8 @@ import {
   NAME,
   SUBMISSION_TYPE,
 } from "../constants";
-import { useGetCourseId } from "../custom-hooks/use-get-course-id";
-import { useGetTemplateId } from "../custom-hooks/use-get-template-id";
+import useGetCourseId from "../custom-hooks/use-get-course-id";
+import useGetTemplateId from "../custom-hooks/use-get-template-id";
 import { COURSE_MILESTONE_TEMPLATES_PATH } from "../routes/paths";
 import { submissionTypeToStringMap, TemplateData } from "../types/templates";
 import { colorModeValue } from "../utils/theme-utils";

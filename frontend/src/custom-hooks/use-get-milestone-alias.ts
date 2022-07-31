@@ -2,9 +2,9 @@ import { skipToken } from "@reduxjs/toolkit/query/react";
 import { capitalCase } from "change-case";
 import { MILESTONE } from "../constants";
 import { useGetSingleCourseQueryState } from "../redux/services/courses-api";
-import { useGetCourseId } from "./use-get-course-id";
+import useGetCourseId from "./use-get-course-id";
 
-export function useGetMilestoneAlias() {
+export default function useGetMilestoneAlias() {
   const courseId = useGetCourseId();
   const { milestoneAlias } = useGetSingleCourseQueryState(
     courseId ?? skipToken,

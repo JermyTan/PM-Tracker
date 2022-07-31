@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   ButtonProps,
   Group,
@@ -20,12 +21,17 @@ import {
   IS_PUBLISHED,
   SUBMISSION_TYPE,
   FORM_FIELD_DATA,
+  CHOICES,
 } from "../constants";
 import {
   DEFAULT_FORM_FIELD,
+  FormField,
   formFieldSchema,
   SubmissionType,
   submissionTypeToStringMap,
+  fieldToFieldTypeMap,
+  McqFormField,
+  MrqFormField,
 } from "../types/templates";
 import TextField from "./text-field";
 import TextareaField from "./textarea-field";
@@ -88,12 +94,33 @@ function MilestoneTemplateFormBuilder({
   onSubmit: handleOnSubmit,
   submitButtonProps,
 }: Props) {
+  const parsedDefaultValues = useMemo(() => {
+    const { formFieldData, ...rest } = defaultValues;
+    const typedFormFieldData = formFieldData as [FormField, ...FormField[]];
+
+    return {
+      ...rest,
+      formFieldData: typedFormFieldData.map((formField) => {
+        if (!fieldToFieldTypeMap.get(CHOICES)?.has(formField.type)) {
+          return formField;
+        }
+        const { choices, ...rest } = formField as McqFormField | MrqFormField;
+
+        return {
+          ...rest,
+          choices: choices.join("\n"),
+        };
+      }),
+    };
+  }, [defaultValues]);
   const { classes } = useStyles();
   const methods = useForm<MilestoneTemplateFormBuilderProps>({
     resolver: zodResolver(schema),
-    defaultValues,
+    defaultValues: parsedDefaultValues,
   });
-  const { resolveError } = useResolveError();
+  const { resolveError } = useResolveError({
+    name: "milestone-template-form-builder",
+  });
 
   const {
     handleSubmit,

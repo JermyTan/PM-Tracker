@@ -26,8 +26,8 @@ import {
   START_DATE,
   START_TIME,
 } from "../constants";
-import { useGetCourseId } from "../custom-hooks/use-get-course-id";
-import { useGetMilestoneAlias } from "../custom-hooks/use-get-milestone-alias";
+import useGetCourseId from "../custom-hooks/use-get-course-id";
+import useGetMilestoneAlias from "../custom-hooks/use-get-milestone-alias";
 import {
   useGetSingleMilestoneQuery,
   useUpdateMilestoneMutation,

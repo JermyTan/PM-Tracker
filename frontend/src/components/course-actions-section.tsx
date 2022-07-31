@@ -12,7 +12,7 @@ import { useModals } from "@mantine/modals";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { MdDeleteForever, MdEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { useGetCourseId } from "../custom-hooks/use-get-course-id";
+import useGetCourseId from "../custom-hooks/use-get-course-id";
 import { useAppSelector } from "../redux/hooks";
 import {
   useDeleteCourseMutation,

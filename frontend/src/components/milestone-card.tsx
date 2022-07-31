@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { HiEyeOff } from "react-icons/hi";
 import { DATE_TIME_MONTH_NAME_FORMAT } from "../constants";
-import { useGetMilestoneAlias } from "../custom-hooks/use-get-milestone-alias";
+import useGetMilestoneAlias from "../custom-hooks/use-get-milestone-alias";
 import { Role } from "../types/courses";
 import { MilestoneData } from "../types/milestones";
 import { displayDateTime } from "../utils/transform-utils";

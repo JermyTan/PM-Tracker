@@ -166,14 +166,21 @@ export type MrqFormField = z.infer<typeof mrqFormFieldSchema>;
 
 export type TextDisplayFormField = z.infer<typeof textDisplayFormFieldSchema>;
 
-export type FormField = z.infer<typeof formFieldSchema>;
+// NOTE: need to add the new type to discriminated union type below if there is any new type
+export type FormField =
+  | TextFormField
+  | TextAreaFormField
+  | NumericFormField
+  | McqFormField
+  | MrqFormField
+  | TextDisplayFormField;
 
 export type TemplatePostData = {
   [NAME]: string;
   [DESCRIPTION]: string;
   [SUBMISSION_TYPE]: SubmissionType;
   [IS_PUBLISHED]: boolean;
-  [FORM_FIELD_DATA]: FormField[];
+  [FORM_FIELD_DATA]: [FormField, ...FormField[]];
 };
 
 export type TemplatePutData = TemplatePostData;

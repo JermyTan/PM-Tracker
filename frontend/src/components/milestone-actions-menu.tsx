@@ -11,8 +11,8 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { MdEdit, MdDelete } from "react-icons/md";
-import { useGetCourseId } from "../custom-hooks/use-get-course-id";
-import { useGetMilestoneAlias } from "../custom-hooks/use-get-milestone-alias";
+import useGetCourseId from "../custom-hooks/use-get-course-id";
+import useGetMilestoneAlias from "../custom-hooks/use-get-milestone-alias";
 import { useDeleteMilestoneMutation } from "../redux/services/milestones-api";
 import { MilestoneData } from "../types/milestones";
 import { useResolveError } from "../utils/error-utils";

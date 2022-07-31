@@ -8,8 +8,8 @@ import { useGetSingleCourseQuery } from "../redux/services/courses-api";
 import PlaceholderWrapper from "./placeholder-wrapper";
 import { APP_NAME } from "../constants";
 import { useResolveError } from "../utils/error-utils";
-import { useGetMilestoneAlias } from "../custom-hooks/use-get-milestone-alias";
-import { useGetCourseId } from "../custom-hooks/use-get-course-id";
+import useGetMilestoneAlias from "../custom-hooks/use-get-milestone-alias";
+import useGetCourseId from "../custom-hooks/use-get-course-id";
 
 type Props = {
   children: ReactNode;
@@ -65,7 +65,7 @@ function CoursePageLayout({ children }: Props) {
       py={150}
       loadingMessage="Loading course..."
       showDefaultMessage={course === undefined}
-      defaultMessage="No course found"
+      defaultMessage="No course found."
     >
       <Head>
         <title>

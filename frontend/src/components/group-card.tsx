@@ -11,7 +11,7 @@ import { useGetCourseGroupsQuery } from "../redux/services/groups-api";
 import { CourseData, Role } from "../types/courses";
 import { useAppSelector } from "../redux/hooks";
 import GroupCardActionsMenu from "./group-card-actions-menu";
-import { useGetCourseId } from "../custom-hooks/use-get-course-id";
+import useGetCourseId from "../custom-hooks/use-get-course-id";
 
 const useStyles = createStyles((theme) => ({
   card: {
@@ -108,7 +108,7 @@ function GroupCard({ groupId, course }: Props) {
           <PlaceholderWrapper
             py={10}
             loadingMessage="Loading members..."
-            defaultMessage="No members found"
+            defaultMessage="No members found."
             showDefaultMessage={!group?.members || group.members?.length === 0}
           >
             {group?.members?.map((member) => (

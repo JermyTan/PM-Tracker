@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 import Head from "next/head";
 import { skipToken } from "@reduxjs/toolkit/query/react";
-import { useGetCourseId } from "../custom-hooks/use-get-course-id";
-import { useGetMilestoneAlias } from "../custom-hooks/use-get-milestone-alias";
+import useGetCourseId from "../custom-hooks/use-get-course-id";
+import useGetMilestoneAlias from "../custom-hooks/use-get-milestone-alias";
 import { useGetSingleCourseQueryState } from "../redux/services/courses-api";
 import { APP_NAME } from "../constants";
 

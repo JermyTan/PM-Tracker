@@ -27,7 +27,7 @@ import {
   NAME,
   SHOW_GROUP_MEMBERS_NAMES,
 } from "../constants";
-import { useGetCourseId } from "../custom-hooks/use-get-course-id";
+import useGetCourseId from "../custom-hooks/use-get-course-id";
 import {
   useGetSingleCourseQuery,
   useUpdateCourseMutation,

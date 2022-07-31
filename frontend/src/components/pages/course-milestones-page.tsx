@@ -22,6 +22,7 @@ import { useGetMilestoneAlias } from "../../custom-hooks/use-get-milestone-alias
 import MilestoneCard from "../milestone-card";
 import { useGetCourseId } from "../../custom-hooks/use-get-course-id";
 import MilestoneCreationForm from "../milestone-creation-form";
+import SubmissionCommentsSection from "../submission-comments-section";
 
 function CourseMilestonesPage() {
   const courseId = useGetCourseId();
@@ -98,6 +99,9 @@ function CourseMilestonesPage() {
               <MilestoneCard key={milestone.id} {...milestone} />
             ))}
           </SimpleGrid>
+        </PlaceholderWrapper>
+        <PlaceholderWrapper>
+          <SubmissionCommentsSection />
         </PlaceholderWrapper>
       </Stack>
     </>

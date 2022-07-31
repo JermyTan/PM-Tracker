@@ -910,7 +910,7 @@ class CourseSubmissionFieldCommentsView(APIView):
         field_index = validated_data.get("field_index", None)
         max_field_index = len(submission.form_response_data)
 
-        if field_index:
+        if field_index is not None:
             if field_index >= max_field_index:
                 raise BadRequest(detail="Invalid field index provided.")
 

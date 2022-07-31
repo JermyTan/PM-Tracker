@@ -58,3 +58,6 @@ export const LABEL = "label";
 export const HAS_FEEDBACK = "hasFeedback";
 export const CHOICES = "choices";
 export const CONTENT = "content";
+export const COMMENTER = "commenter";
+export const IS_DELETED = "isDeleted";
+export const FIELD_INDEX = "fieldIndex";

@@ -630,6 +630,8 @@ def update_course_milestone_template(
 
     return template
 
+def can_view_course_milestone_template(template: CourseMilestoneTemplate, requester_membership: CourseMembership) -> bool:
+    return template.is_published or requester_membership.role != Role.STUDENT
 
 @transaction.atomic
 def create_course_submission(

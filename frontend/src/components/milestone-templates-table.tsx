@@ -6,16 +6,12 @@ import {
   NAME,
   SUBMISSION_TYPE,
 } from "../constants";
-import { useGetCourseId } from "../custom-hooks/use-get-course-id";
-import { useGetTemplateId } from "../custom-hooks/use-get-template-id";
+import useGetCourseId from "../custom-hooks/use-get-course-id";
+import useGetTemplateId from "../custom-hooks/use-get-template-id";
 import { COURSE_MILESTONE_TEMPLATES_PATH } from "../routes/paths";
-import { TemplateData } from "../types/templates";
+import { submissionTypeToStringMap, TemplateData } from "../types/templates";
 import { colorModeValue } from "../utils/theme-utils";
-import {
-  capitalizeSubmissionType,
-  displayDateTime,
-  sort,
-} from "../utils/transform-utils";
+import { displayDateTime, sort } from "../utils/transform-utils";
 
 const useStyles = createStyles((theme) => ({
   row: {
@@ -77,7 +73,7 @@ function MilestoneTemplatesTable({ milestoneTemplates }: Props) {
               }}
             >
               <td>{name}</td>
-              <td>{capitalizeSubmissionType(submissionType)}</td>
+              <td>{submissionTypeToStringMap[submissionType]}</td>
               <td>{isPublished ? "✅" : "❌"}</td>
               <td>{displayDateTime(updatedAt, DATE_TIME_MONTH_NAME_FORMAT)}</td>
             </tr>

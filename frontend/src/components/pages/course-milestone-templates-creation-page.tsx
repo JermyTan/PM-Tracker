@@ -1,46 +1,52 @@
-import {
-  Box,
-  Button,
-  Paper,
-  Stack,
-  Title,
-  useMantineTheme,
-} from "@mantine/core";
-import { FaChevronLeft } from "react-icons/fa";
-import { generatePath, Link } from "react-router-dom";
-import { useGetCourseId } from "../../custom-hooks/use-get-course-id";
-import { useGetMilestoneAlias } from "../../custom-hooks/use-get-milestone-alias";
-import { COURSE_MILESTONE_TEMPLATES_PATH } from "../../routes/paths";
-import { colorModeValue } from "../../utils/theme-utils";
+import { Paper, Space, Title } from "@mantine/core";
+import { useNavigate } from "react-router-dom";
+import useGetCourseId from "../../custom-hooks/use-get-course-id";
+import useGetMilestoneAlias from "../../custom-hooks/use-get-milestone-alias";
+import { useCreateTemplateMutation } from "../../redux/services/templates-api";
+import { emptySelector } from "../../redux/utils";
+import toastUtils from "../../utils/toast-utils";
+import MilestoneTemplateFormBuilder, {
+  MilestoneTemplateFormBuilderData,
+} from "../milestone-template-form-builder";
 
 function CourseMilestoneTemplatesCreationPage() {
   const { capitalizedMilestoneAlias } = useGetMilestoneAlias();
-  const { colorScheme } = useMantineTheme();
   const courseId = useGetCourseId();
+  const [createTemplate] = useCreateTemplateMutation({
+    selectFromResult: emptySelector,
+  });
+  const navigate = useNavigate();
+
+  const onCreateTemplate = async (
+    formData: MilestoneTemplateFormBuilderData,
+  ) => {
+    if (courseId === undefined) {
+      return;
+    }
+
+    const newTemplate = await createTemplate({
+      ...formData,
+      courseId,
+    }).unwrap();
+
+    toastUtils.success({
+      message: "The new template has been created successfully.",
+    });
+
+    navigate(`../${newTemplate.id}`);
+  };
 
   return (
-    <Stack>
-      <Box>
-        <Button<typeof Link>
-          component={Link}
-          to={generatePath(COURSE_MILESTONE_TEMPLATES_PATH, {
-            courseId,
-          })}
-          leftIcon={<FaChevronLeft />}
-          color={colorModeValue(colorScheme, {
-            lightModeValue: "dark",
-            darkModeValue: "gray",
-          })}
-          variant="outline"
-        >
-          Back
-        </Button>
-      </Box>
+    <Paper withBorder shadow="sm" p="md" radius="md">
+      <Title order={3}>{capitalizedMilestoneAlias} Template Creation</Title>
 
-      <Paper withBorder shadow="sm" p="md" radius="md">
-        <Title order={3}>{capitalizedMilestoneAlias} Template Creation</Title>
-      </Paper>
-    </Stack>
+      <Space h="md" />
+
+      <MilestoneTemplateFormBuilder
+        onSubmit={onCreateTemplate}
+        submitButtonProps={{ children: "Create" }}
+      />
+    </Paper>
   );
 }
 

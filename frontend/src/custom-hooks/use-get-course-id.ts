@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-export function useGetCourseId() {
+export default function useGetCourseId() {
   const { courseId } = useParams();
   return courseId;
 }

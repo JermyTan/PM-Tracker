@@ -18,9 +18,9 @@ import RoleRestrictedWrapper from "../role-restricted-wrapper";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import { useGetMilestonesQuery } from "../../redux/services/milestones-api";
 import { useResolveError } from "../../utils/error-utils";
-import { useGetMilestoneAlias } from "../../custom-hooks/use-get-milestone-alias";
+import useGetMilestoneAlias from "../../custom-hooks/use-get-milestone-alias";
 import MilestoneCard from "../milestone-card";
-import { useGetCourseId } from "../../custom-hooks/use-get-course-id";
+import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import MilestoneCreationForm from "../milestone-creation-form";
 import SubmissionCommentsSection from "../submission-comments-section";
 
@@ -83,7 +83,7 @@ function CourseMilestonesPage() {
           isLoading={isLoading}
           py={150}
           loadingMessage={`Loading ${pluralizedMilestoneAlias}...`}
-          defaultMessage={`No ${pluralizedMilestoneAlias} found`}
+          defaultMessage={`No ${pluralizedMilestoneAlias} found.`}
           showDefaultMessage={!milestones || milestones.length === 0}
         >
           <SimpleGrid

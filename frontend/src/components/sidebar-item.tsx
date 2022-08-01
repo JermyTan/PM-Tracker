@@ -85,7 +85,7 @@ function SidebarItem<C = "button">({
         {...props}
       >
         <Group className={classes.content} spacing="xs" noWrap>
-          <Icon size={showIconOnly ? "24px" : "20px"} aria-label={label} />
+          <Icon size={showIconOnly ? 24 : 20} aria-label={label} />
 
           {!showIconOnly && label && <Text<"span">>{label}</Text>}
         </Group>

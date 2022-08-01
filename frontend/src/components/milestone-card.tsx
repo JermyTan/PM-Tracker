@@ -1,7 +1,6 @@
 import {
   Alert,
   Badge,
-  Box,
   createStyles,
   Group,
   Paper,
@@ -10,7 +9,7 @@ import {
 } from "@mantine/core";
 import { HiEyeOff } from "react-icons/hi";
 import { DATE_TIME_MONTH_NAME_FORMAT } from "../constants";
-import { useGetMilestoneAlias } from "../custom-hooks/use-get-milestone-alias";
+import useGetMilestoneAlias from "../custom-hooks/use-get-milestone-alias";
 import { Role } from "../types/courses";
 import { MilestoneData } from "../types/milestones";
 import { displayDateTime } from "../utils/transform-utils";
@@ -45,7 +44,7 @@ function MilestoneCard(props: Props) {
             <MilestoneActionsMenu {...props} />
           </RoleRestrictedWrapper>
         </Group>
-        <Box>
+        <div>
           <Text size="sm">
             Start:{" "}
             <Text<"span"> weight={500} size="sm" component="span">
@@ -60,12 +59,12 @@ function MilestoneCard(props: Props) {
               </Text>
             </Text>
           )}
-        </Box>
-        <Box>
+        </div>
+        <div>
           <Badge variant="outline" color={isOpen ? "green" : "red"}>
             {isOpen ? "Open" : "Closed"}
           </Badge>
-        </Box>
+        </div>
         {!isPublished && (
           <Alert
             p="xs"

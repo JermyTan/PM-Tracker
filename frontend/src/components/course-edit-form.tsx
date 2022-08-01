@@ -4,9 +4,7 @@ import {
   Stack,
   Tooltip,
   Text,
-  Space,
   Button,
-  createStyles,
   LoadingOverlay,
   Title,
   ThemeIcon,
@@ -29,7 +27,7 @@ import {
   NAME,
   SHOW_GROUP_MEMBERS_NAMES,
 } from "../constants";
-import { useGetCourseId } from "../custom-hooks/use-get-course-id";
+import useGetCourseId from "../custom-hooks/use-get-course-id";
 import {
   useGetSingleCourseQuery,
   useUpdateCourseMutation,
@@ -54,15 +52,6 @@ const schema = z.object({
   [ALLOW_STUDENTS_TO_JOIN_GROUPS]: z.boolean(),
   [ALLOW_STUDENTS_TO_LEAVE_GROUPS]: z.boolean(),
   [ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS]: z.boolean(),
-});
-
-const useStyles = createStyles({
-  tooltip: {
-    display: "flex",
-  },
-  button: {
-    width: "150px",
-  },
 });
 
 type CourseEditFormProps = z.infer<typeof schema>;
@@ -94,7 +83,6 @@ function CourseEditForm({ onSuccess }: Props) {
   const [updateCourse] = useUpdateCourseMutation({
     selectFromResult: emptySelector,
   });
-  const { classes } = useStyles();
 
   const {
     handleSubmit,
@@ -110,7 +98,7 @@ function CourseEditForm({ onSuccess }: Props) {
       return;
     }
 
-    await updateCourse({ ...schema.parse(formData), courseId }).unwrap();
+    await updateCourse({ ...formData, courseId }).unwrap();
 
     toastUtils.success({
       message: "This course has been updated successfully.",
@@ -125,273 +113,264 @@ function CourseEditForm({ onSuccess }: Props) {
         autoComplete="off"
       >
         <LoadingOverlay visible={isFetching} />
-        <Stack>
-          {/* TODO: add change of course owner, API already supports */}
-          <Title order={4}>Course Details</Title>
 
-          <TextField name={NAME} label="Course name" required />
+        <Stack spacing={32}>
+          <Stack>
+            {/* TODO: add change of course owner, API already supports */}
+            <Title order={4}>Course Details</Title>
 
-          <TextareaField
-            name={DESCRIPTION}
-            label="Course description"
-            autosize
-            minRows={3}
-            maxRows={10}
-          />
+            <TextField name={NAME} label="Course name" required />
 
-          <TextField
-            name={MILESTONE_ALIAS}
-            label="Milestone alias"
-            description="Another name for milestone. This alias will be displayed in place of 'milestone'."
-            placeholder="E.g. iteration"
-          />
+            <TextareaField name={DESCRIPTION} label="Course description" />
 
-          <Space />
-
-          <Group position="apart">
-            <Group spacing={4}>
-              <Text<"label"> size="sm" htmlFor={IS_PUBLISHED} component="label">
-                Publish course
-              </Text>
-              <Tooltip
-                className={classes.tooltip}
-                label={
-                  <Text size="xs">
-                    Students can view and access this course via{" "}
-                    <strong>My Courses</strong>.
-                  </Text>
-                }
-                withArrow
-                placement="start"
-                transition="pop-top-left"
-                transitionDuration={300}
-                wrapLines
-                width={200}
-              >
-                <ThemeIcon color="gray" size="xs" radius="xl">
-                  <FaQuestion size={7} />
-                </ThemeIcon>
-              </Tooltip>
-            </Group>
-            <SwitchField
-              name={IS_PUBLISHED}
-              id={IS_PUBLISHED}
-              onLabel="Yes"
-              offLabel="No"
-              size="md"
+            <TextField
+              name={MILESTONE_ALIAS}
+              label="Milestone alias"
+              description="Another name for milestone. This alias will be displayed in place of 'milestone'."
+              placeholder="E.g. iteration"
             />
-          </Group>
 
-          <Title order={4}>Group Settings</Title>
+            <Group position="apart">
+              <Group spacing={4}>
+                <Text<"label">
+                  size="sm"
+                  htmlFor={IS_PUBLISHED}
+                  component="label"
+                >
+                  Publish course
+                </Text>
+                <Tooltip
+                  label={
+                    <Text size="xs">
+                      Students can view and access this course via{" "}
+                      <strong>My Courses</strong>.
+                    </Text>
+                  }
+                  withArrow
+                  placement="start"
+                  transition="pop-top-left"
+                  transitionDuration={300}
+                  wrapLines
+                  width={200}
+                >
+                  <ThemeIcon color="gray" size="xs" radius="xl">
+                    <FaQuestion size={7} />
+                  </ThemeIcon>
+                </Tooltip>
+              </Group>
+              <SwitchField
+                name={IS_PUBLISHED}
+                id={IS_PUBLISHED}
+                onLabel="Yes"
+                offLabel="No"
+                size="md"
+              />
+            </Group>
 
-          <Group position="apart">
-            <Group spacing={4}>
+            <Title order={4}>Group Settings</Title>
+
+            <Group position="apart">
+              <Group spacing={4}>
+                <Text<"label">
+                  size="sm"
+                  htmlFor={SHOW_GROUP_MEMBERS_NAMES}
+                  component="label"
+                >
+                  Make group members public
+                </Text>
+                <Tooltip
+                  label={
+                    <Text size="xs">
+                      Students can view the group members in other groups.
+                    </Text>
+                  }
+                  withArrow
+                  placement="start"
+                  transition="pop-top-left"
+                  transitionDuration={300}
+                  wrapLines
+                  width={200}
+                >
+                  <ThemeIcon color="gray" size="xs" radius="xl">
+                    <FaQuestion size={7} />
+                  </ThemeIcon>
+                </Tooltip>
+              </Group>
+              <SwitchField
+                name={SHOW_GROUP_MEMBERS_NAMES}
+                id={SHOW_GROUP_MEMBERS_NAMES}
+                onLabel="Yes"
+                offLabel="No"
+                size="md"
+              />
+            </Group>
+
+            <Group position="apart">
+              <Group spacing={4}>
+                <Text<"label">
+                  size="sm"
+                  htmlFor={ALLOW_STUDENTS_TO_MODIFY_GROUP_NAME}
+                  component="label"
+                >
+                  Students can modify group names
+                </Text>
+                <Tooltip
+                  label={
+                    <Text size="xs">
+                      Students can change the names of the groups they are in.
+                    </Text>
+                  }
+                  withArrow
+                  placement="start"
+                  transition="pop-top-left"
+                  transitionDuration={300}
+                  wrapLines
+                  width={200}
+                >
+                  <ThemeIcon color="gray" size="xs" radius="xl">
+                    <FaQuestion size={7} />
+                  </ThemeIcon>
+                </Tooltip>
+              </Group>
+              <SwitchField
+                name={ALLOW_STUDENTS_TO_MODIFY_GROUP_NAME}
+                id={ALLOW_STUDENTS_TO_MODIFY_GROUP_NAME}
+                onLabel="Yes"
+                offLabel="No"
+                size="md"
+              />
+            </Group>
+
+            <Group position="apart">
               <Text<"label">
                 size="sm"
-                htmlFor={SHOW_GROUP_MEMBERS_NAMES}
+                htmlFor={ALLOW_STUDENTS_TO_CREATE_GROUPS}
                 component="label"
               >
-                Make group members public
+                Students can create groups
               </Text>
-              <Tooltip
-                className={classes.tooltip}
-                label={
-                  <Text size="xs">
-                    Students can view the group members in other groups.
-                  </Text>
-                }
-                withArrow
-                placement="start"
-                transition="pop-top-left"
-                transitionDuration={300}
-                wrapLines
-                width={200}
-              >
-                <ThemeIcon color="gray" size="xs" radius="xl">
-                  <FaQuestion size={7} />
-                </ThemeIcon>
-              </Tooltip>
+              <SwitchField
+                name={ALLOW_STUDENTS_TO_CREATE_GROUPS}
+                id={ALLOW_STUDENTS_TO_CREATE_GROUPS}
+                onLabel="Yes"
+                offLabel="No"
+                size="md"
+              />
             </Group>
-            <SwitchField
-              name={SHOW_GROUP_MEMBERS_NAMES}
-              id={SHOW_GROUP_MEMBERS_NAMES}
-              onLabel="Yes"
-              offLabel="No"
-              size="md"
-            />
-          </Group>
 
-          <Group position="apart">
-            <Group spacing={4}>
+            <Group position="apart">
+              <Group spacing={4}>
+                <Text<"label">
+                  size="sm"
+                  htmlFor={ALLOW_STUDENTS_TO_DELETE_GROUPS}
+                  component="label"
+                >
+                  Students can delete groups
+                </Text>
+                <Tooltip
+                  label={
+                    <Text size="xs">
+                      Students can disband groups for which they are in.
+                    </Text>
+                  }
+                  withArrow
+                  placement="start"
+                  transition="pop-top-left"
+                  transitionDuration={300}
+                  wrapLines
+                  width={200}
+                >
+                  <ThemeIcon color="gray" size="xs" radius="xl">
+                    <FaQuestion size={7} />
+                  </ThemeIcon>
+                </Tooltip>
+              </Group>
+              <SwitchField
+                name={ALLOW_STUDENTS_TO_DELETE_GROUPS}
+                id={ALLOW_STUDENTS_TO_DELETE_GROUPS}
+                onLabel="Yes"
+                offLabel="No"
+                size="md"
+              />
+            </Group>
+
+            <Group position="apart">
               <Text<"label">
                 size="sm"
-                htmlFor={ALLOW_STUDENTS_TO_MODIFY_GROUP_NAME}
+                htmlFor={ALLOW_STUDENTS_TO_JOIN_GROUPS}
                 component="label"
               >
-                Students can modify group names
+                Students can join groups
               </Text>
-              <Tooltip
-                className={classes.tooltip}
-                label={
-                  <Text size="xs">
-                    Students can change the names of the groups they are in.
-                  </Text>
-                }
-                withArrow
-                placement="start"
-                transition="pop-top-left"
-                transitionDuration={300}
-                wrapLines
-                width={200}
-              >
-                <ThemeIcon color="gray" size="xs" radius="xl">
-                  <FaQuestion size={7} />
-                </ThemeIcon>
-              </Tooltip>
+              <SwitchField
+                name={ALLOW_STUDENTS_TO_JOIN_GROUPS}
+                id={ALLOW_STUDENTS_TO_JOIN_GROUPS}
+                onLabel="Yes"
+                offLabel="No"
+                size="md"
+              />
             </Group>
-            <SwitchField
-              name={ALLOW_STUDENTS_TO_MODIFY_GROUP_NAME}
-              id={ALLOW_STUDENTS_TO_MODIFY_GROUP_NAME}
-              onLabel="Yes"
-              offLabel="No"
-              size="md"
-            />
-          </Group>
 
-          <Group position="apart">
-            <Text<"label">
-              size="sm"
-              htmlFor={ALLOW_STUDENTS_TO_CREATE_GROUPS}
-              component="label"
-            >
-              Students can create groups
-            </Text>
-            <SwitchField
-              name={ALLOW_STUDENTS_TO_CREATE_GROUPS}
-              id={ALLOW_STUDENTS_TO_CREATE_GROUPS}
-              onLabel="Yes"
-              offLabel="No"
-              size="md"
-            />
-          </Group>
-
-          <Group position="apart">
-            <Group spacing={4}>
+            <Group position="apart">
               <Text<"label">
                 size="sm"
-                htmlFor={ALLOW_STUDENTS_TO_DELETE_GROUPS}
+                htmlFor={ALLOW_STUDENTS_TO_LEAVE_GROUPS}
                 component="label"
               >
-                Students can delete groups
+                Students can leave groups
               </Text>
-              <Tooltip
-                className={classes.tooltip}
-                label={
-                  <Text size="xs">
-                    Students can disband groups for which they are in.
-                  </Text>
-                }
-                withArrow
-                placement="start"
-                transition="pop-top-left"
-                transitionDuration={300}
-                wrapLines
-                width={200}
-              >
-                <ThemeIcon color="gray" size="xs" radius="xl">
-                  <FaQuestion size={7} />
-                </ThemeIcon>
-              </Tooltip>
+              <SwitchField
+                name={ALLOW_STUDENTS_TO_LEAVE_GROUPS}
+                id={ALLOW_STUDENTS_TO_LEAVE_GROUPS}
+                onLabel="Yes"
+                offLabel="No"
+                size="md"
+              />
             </Group>
-            <SwitchField
-              name={ALLOW_STUDENTS_TO_DELETE_GROUPS}
-              id={ALLOW_STUDENTS_TO_DELETE_GROUPS}
-              onLabel="Yes"
-              offLabel="No"
-              size="md"
-            />
-          </Group>
 
-          <Group position="apart">
-            <Text<"label">
-              size="sm"
-              htmlFor={ALLOW_STUDENTS_TO_JOIN_GROUPS}
-              component="label"
-            >
-              Students can join groups
-            </Text>
-            <SwitchField
-              name={ALLOW_STUDENTS_TO_JOIN_GROUPS}
-              id={ALLOW_STUDENTS_TO_JOIN_GROUPS}
-              onLabel="Yes"
-              offLabel="No"
-              size="md"
-            />
-          </Group>
-
-          <Group position="apart">
-            <Text<"label">
-              size="sm"
-              htmlFor={ALLOW_STUDENTS_TO_LEAVE_GROUPS}
-              component="label"
-            >
-              Students can leave groups
-            </Text>
-            <SwitchField
-              name={ALLOW_STUDENTS_TO_LEAVE_GROUPS}
-              id={ALLOW_STUDENTS_TO_LEAVE_GROUPS}
-              onLabel="Yes"
-              offLabel="No"
-              size="md"
-            />
-          </Group>
-
-          <Group position="apart">
-            <Group spacing={4}>
-              <Text<"label">
-                size="sm"
-                htmlFor={ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS}
-                component="label"
-              >
-                Students can add/remove group members
-              </Text>
-              <Tooltip
-                className={classes.tooltip}
-                label={
-                  <Text size="xs">
-                    Students can add/remove group members for groups they are
-                    in.
-                  </Text>
-                }
-                withArrow
-                placement="start"
-                transition="pop-top-left"
-                transitionDuration={300}
-                wrapLines
-                width={200}
-              >
-                <ThemeIcon color="gray" size="xs" radius="xl">
-                  <FaQuestion size={7} />
-                </ThemeIcon>
-              </Tooltip>
+            <Group position="apart">
+              <Group spacing={4}>
+                <Text<"label">
+                  size="sm"
+                  htmlFor={ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS}
+                  component="label"
+                >
+                  Students can add/remove group members
+                </Text>
+                <Tooltip
+                  label={
+                    <Text size="xs">
+                      Students can add/remove group members for groups they are
+                      in.
+                    </Text>
+                  }
+                  withArrow
+                  placement="start"
+                  transition="pop-top-left"
+                  transitionDuration={300}
+                  wrapLines
+                  width={200}
+                >
+                  <ThemeIcon color="gray" size="xs" radius="xl">
+                    <FaQuestion size={7} />
+                  </ThemeIcon>
+                </Tooltip>
+              </Group>
+              <SwitchField
+                name={ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS}
+                id={ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS}
+                onLabel="Yes"
+                offLabel="No"
+                size="md"
+              />
             </Group>
-            <SwitchField
-              name={ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS}
-              id={ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS}
-              onLabel="Yes"
-              offLabel="No"
-              size="md"
-            />
-          </Group>
-
-          <Space />
+          </Stack>
 
           <Group position="right">
             <Button
               disabled={isSubmitting}
               loading={isSubmitting}
               type="submit"
-              className={classes.button}
             >
               Save
             </Button>

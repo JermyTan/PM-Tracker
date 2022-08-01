@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-export function useGetTemplateId() {
+export default function useGetTemplateId() {
   const { templateId } = useParams();
   return templateId;
 }

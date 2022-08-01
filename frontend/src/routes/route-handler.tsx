@@ -16,6 +16,8 @@ import { Role } from "../types/courses";
 import MilestoneTemplatesLayout from "../components/milestone-templates-layout";
 import CourseMilestoneTemplatesCreationPage from "../components/pages/course-milestone-templates-creation-page";
 import CourseMilestoneTemplatesEditPage from "../components/pages/course-milestone-templates-edit-page";
+import CourseMilestoneTemplatesViewPage from "../components/pages/course-milestone-templates-view-page";
+import MilestoneTemplatesNestedLayout from "../components/milestone-templates-nested-layout";
 
 function RouteHandler() {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
@@ -68,16 +70,27 @@ function RouteHandler() {
                     </CourseMilestoneTemplatesPage>
                   }
                 >
-                  <Route path=":templateId" element={<div>Hello</div>} />
+                  <Route
+                    path=":templateId"
+                    element={<CourseMilestoneTemplatesViewPage />}
+                  />
                 </Route>
                 <Route
-                  path="new"
-                  element={<CourseMilestoneTemplatesCreationPage />}
-                />
-                <Route
-                  path=":templateId/edit"
-                  element={<CourseMilestoneTemplatesEditPage />}
-                />
+                  element={
+                    <MilestoneTemplatesNestedLayout>
+                      <Outlet />
+                    </MilestoneTemplatesNestedLayout>
+                  }
+                >
+                  <Route
+                    path="new"
+                    element={<CourseMilestoneTemplatesCreationPage />}
+                  />
+                  <Route
+                    path=":templateId/edit"
+                    element={<CourseMilestoneTemplatesEditPage />}
+                  />
+                </Route>
               </Route>
               <Route path="groups" element={<CourseGroupPage />} />
               <Route path="details" element={<CourseDetailsPage />} />

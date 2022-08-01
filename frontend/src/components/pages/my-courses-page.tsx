@@ -70,7 +70,7 @@ function MyCoursesPage() {
         isLoading={isLoading}
         py={150}
         loadingMessage="Loading my courses..."
-        defaultMessage="No courses found"
+        defaultMessage="No courses found."
         showDefaultMessage={!courses || courses.length === 0}
       >
         <SimpleGrid cols={3} spacing="xs">

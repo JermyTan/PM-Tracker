@@ -35,6 +35,7 @@ from .logic import (
     can_update_course_submission,
     can_update_course_submission_field_comment,
     can_view_course_group_members,
+    can_view_course_milestone_template,
     can_view_course_submission,
     course_group_to_json,
     course_group_with_members_to_json,
@@ -685,6 +686,25 @@ class CourseMilestoneTemplatesView(APIView):
 
 
 class SingleCourseMilestoneTemplateView(APIView):
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_template
+    def get(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+        template: CourseMilestoneTemplate,
+    ):
+        if not can_view_course_milestone_template(template=template, requester_membership=requester_membership):
+            raise PermissionDenied()
+
+        data = course_milestone_template_to_json(template)
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
     @check_requester_membership(Role.INSTRUCTOR, Role.CO_OWNER)

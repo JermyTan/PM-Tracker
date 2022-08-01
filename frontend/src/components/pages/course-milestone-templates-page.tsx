@@ -8,11 +8,11 @@ import {
 } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { ReactNode } from "react";
-import { BsFileEarmarkPlus } from "react-icons/bs";
+import { RiFileAddLine } from "react-icons/ri";
 import { generatePath, Link } from "react-router-dom";
-import { useGetCourseId } from "../../custom-hooks/use-get-course-id";
-import { useGetMilestoneAlias } from "../../custom-hooks/use-get-milestone-alias";
-import { useGetTemplateId } from "../../custom-hooks/use-get-template-id";
+import useGetCourseId from "../../custom-hooks/use-get-course-id";
+import useGetMilestoneAlias from "../../custom-hooks/use-get-milestone-alias";
+import useGetTemplateId from "../../custom-hooks/use-get-template-id";
 import { useGetTemplatesQuery } from "../../redux/services/templates-api";
 import { COURSE_MILESTONE_TEMPLATES_CREATION_PATH } from "../../routes/paths";
 import { useResolveError } from "../../utils/error-utils";
@@ -34,12 +34,17 @@ type Props = {
 
 function CourseMilestoneTemplatesPage({ children }: Props) {
   const courseId = useGetCourseId();
-  const { milestoneAlias, capitalizedMilestoneAlias } = useGetMilestoneAlias();
-  const {
-    data: milestoneTemplates,
-    isLoading,
-    error,
-  } = useGetTemplatesQuery(courseId ?? skipToken);
+  const { capitalizedMilestoneAlias } = useGetMilestoneAlias();
+  const { milestoneTemplates, isLoading, error } = useGetTemplatesQuery(
+    courseId ?? skipToken,
+    {
+      selectFromResult: ({ data: milestoneTemplates, isLoading, error }) => ({
+        milestoneTemplates,
+        isLoading,
+        error,
+      }),
+    },
+  );
   // important! The very first (outermost) api call needs to resolve the error
   // subsequent api calls to the same endpoint do not need to resolve error since it is already handled here
   const { errorMessage } = useResolveError({
@@ -54,22 +59,14 @@ function CourseMilestoneTemplatesPage({ children }: Props) {
     <PlaceholderWrapper
       isLoading={isLoading}
       py={150}
-      loadingMessage={`Loading ${milestoneAlias} templates...`}
+      loadingMessage="Loading templates..."
       defaultMessage={errorMessage}
       showDefaultMessage={Boolean(errorMessage)}
     >
       {milestoneTemplates && (
         <Group align="flex-start">
           {hasSelectedTemplate && (
-            <Paper
-              className={classes.templateContainer}
-              withBorder
-              shadow="sm"
-              p="md"
-              radius="md"
-            >
-              {children}
-            </Paper>
+            <div className={classes.templateContainer}>{children}</div>
           )}
 
           <Stack
@@ -83,7 +80,7 @@ function CourseMilestoneTemplatesPage({ children }: Props) {
                   courseId,
                 })}
                 color="teal"
-                leftIcon={<BsFileEarmarkPlus />}
+                leftIcon={<RiFileAddLine />}
               >
                 Create new template
               </Button>

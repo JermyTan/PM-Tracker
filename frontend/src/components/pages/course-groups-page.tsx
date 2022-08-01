@@ -5,7 +5,7 @@ import { useGetCourseGroupsQuery } from "../../redux/services/groups-api";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import GroupCard from "../group-card";
 import CourseMembershipsList from "../course-members-list";
-import { useGetCourseId } from "../../custom-hooks/use-get-course-id";
+import useGetCourseId from "../../custom-hooks/use-get-course-id";
 
 function CourseGroupPage() {
   const courseId = useGetCourseId();

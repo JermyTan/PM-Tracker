@@ -26,8 +26,8 @@ function ColorModeToggler({ iconProps, ...props }: Props) {
       {...props}
     >
       {colorModeValue(colorScheme, {
-        lightModeValue: <FaMoon size="20px" {...iconProps} />,
-        darkModeValue: <FaSun size="20px" {...iconProps} />,
+        lightModeValue: <FaMoon size={20} {...iconProps} />,
+        darkModeValue: <FaSun size={20} {...iconProps} />,
       })}
     </ActionIcon>
   );

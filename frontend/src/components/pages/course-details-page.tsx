@@ -1,7 +1,6 @@
 import {
   Anchor,
   Avatar,
-  Box,
   createStyles,
   Group,
   Paper,
@@ -18,7 +17,7 @@ import { useGetSingleCourseQuery } from "../../redux/services/courses-api";
 import CourseActionsSection from "../course-actions-section";
 import RoleRestrictedWrapper from "../role-restricted-wrapper";
 import { Role } from "../../types/courses";
-import { useGetCourseId } from "../../custom-hooks/use-get-course-id";
+import useGetCourseId from "../../custom-hooks/use-get-course-id";
 
 const useStyles = createStyles({
   detailsSection: {
@@ -72,12 +71,12 @@ function CourseDetailsPage() {
                 alt=""
                 src={owner?.profileImage || undefined}
               />
-              <Box>
+              <div>
                 <Text weight={500}>{owner?.name}</Text>
                 {owner?.email && (
                   <Anchor href={`mailto:${owner.email}`}>{owner.email}</Anchor>
                 )}
-              </Box>
+              </div>
             </Group>
           </Stack>
 

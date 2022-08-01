@@ -6,6 +6,7 @@ import {
   Stack,
   Title,
 } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { ReactNode } from "react";
 import { RiFileAddLine } from "react-icons/ri";
@@ -21,10 +22,10 @@ import PlaceholderWrapper from "../placeholder-wrapper";
 
 const useStyles = createStyles({
   templateContainer: {
-    flex: "1 1 auto",
+    flex: "1 3 auto",
   },
-  fullTableContainer: {
-    width: "100%",
+  templateTableContainer: {
+    flex: "1 1 auto",
   },
 });
 
@@ -54,6 +55,7 @@ function CourseMilestoneTemplatesPage({ children }: Props) {
   const templateId = useGetTemplateId();
   const hasSelectedTemplate = Boolean(templateId);
   const { cx, classes } = useStyles();
+  const noWrap = useMediaQuery("(min-width: 1400px)");
 
   return (
     <PlaceholderWrapper
@@ -64,14 +66,12 @@ function CourseMilestoneTemplatesPage({ children }: Props) {
       showDefaultMessage={Boolean(errorMessage)}
     >
       {milestoneTemplates && (
-        <Group align="flex-start">
+        <Group noWrap={noWrap} align="flex-start">
           {hasSelectedTemplate && (
             <div className={classes.templateContainer}>{children}</div>
           )}
 
-          <Stack
-            className={cx(!hasSelectedTemplate && classes.fullTableContainer)}
-          >
+          <Stack className={cx(classes.templateTableContainer)}>
             <Group position="apart">
               <Title order={3}>{capitalizedMilestoneAlias} Templates</Title>
               <Button<typeof Link>

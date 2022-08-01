@@ -12,6 +12,7 @@ import {
 import { COURSE_MILESTONE_TEMPLATES_PATH } from "../../routes/paths";
 import { useResolveError } from "../../utils/error-utils";
 import toastUtils from "../../utils/toast-utils";
+import MilestoneSubmissionForm from "../milestone-submission-form";
 import PlaceholderWrapper from "../placeholder-wrapper";
 
 function CourseMilestoneTemplatesViewPage() {
@@ -82,30 +83,32 @@ function CourseMilestoneTemplatesViewPage() {
       defaultMessage="No template found."
       showDefaultMessage={!milestoneTemplate}
     >
-      <Stack>
-        <Group position="right">
-          <Button<typeof Link>
-            component={Link}
-            to="edit"
-            leftIcon={<RiFileEditLine />}
-          >
-            Edit template
-          </Button>
-          <Button
-            color="red"
-            leftIcon={<RiFileEditLine />}
-            onClick={openDeleteModal}
-            loading={isLoading}
-            disabled={isLoading}
-          >
-            Delete template
-          </Button>
-        </Group>
+      {milestoneTemplate && (
+        <Stack>
+          <Group position="right">
+            <Button<typeof Link>
+              component={Link}
+              to="edit"
+              leftIcon={<RiFileEditLine />}
+            >
+              Edit template
+            </Button>
+            <Button
+              color="red"
+              leftIcon={<RiFileEditLine />}
+              onClick={openDeleteModal}
+              loading={isLoading}
+              disabled={isLoading}
+            >
+              Delete template
+            </Button>
+          </Group>
 
-        <Paper withBorder shadow="sm" p="md" radius="md">
-          Hello world
-        </Paper>
-      </Stack>
+          <Paper withBorder shadow="sm" p="md" radius="md">
+            <MilestoneSubmissionForm milestoneTemplate={milestoneTemplate} />
+          </Paper>
+        </Stack>
+      )}
     </PlaceholderWrapper>
   );
 }

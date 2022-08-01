@@ -1,4 +1,5 @@
 import { z, ZodDiscriminatedUnionOption } from "zod";
+import { MdPerson, MdPeopleAlt, MdOutlinePeopleAlt } from "react-icons/md";
 import {
   CHOICES,
   CONTENT,
@@ -22,10 +23,13 @@ export enum SubmissionType {
   IndividualGroup = "INDIVIDUAL/GROUP",
 }
 
-export const submissionTypeToStringMap = {
-  [SubmissionType.Individual]: "Individual",
-  [SubmissionType.Group]: "Group",
-  [SubmissionType.IndividualGroup]: "Individual/Group",
+export const submissionTypeToPropertiesMap = {
+  [SubmissionType.Individual]: { label: "Individual", Icon: MdPerson },
+  [SubmissionType.Group]: { label: "Group", Icon: MdPeopleAlt },
+  [SubmissionType.IndividualGroup]: {
+    label: "Individual/Group",
+    Icon: MdOutlinePeopleAlt,
+  },
 };
 
 export enum FormFieldType {
@@ -55,7 +59,7 @@ export const superFormFieldSchema = z.object({
   [CONTENT]: z.string().trim().min(1, "Content cannot be empty"),
 });
 
-const textFormFieldSchema = superFormFieldSchema
+export const textFormFieldSchema = superFormFieldSchema
   .pick({
     label: true,
     description: true,
@@ -66,7 +70,7 @@ const textFormFieldSchema = superFormFieldSchema
     [TYPE]: z.literal(FormFieldType.Text),
   });
 
-const textAreaFormFieldSchema = superFormFieldSchema
+export const textAreaFormFieldSchema = superFormFieldSchema
   .pick({
     label: true,
     description: true,
@@ -78,7 +82,7 @@ const textAreaFormFieldSchema = superFormFieldSchema
     [TYPE]: z.literal(FormFieldType.TextArea),
   });
 
-const numericFormFieldSchema = superFormFieldSchema
+export const numericFormFieldSchema = superFormFieldSchema
   .pick({
     label: true,
     description: true,
@@ -89,7 +93,7 @@ const numericFormFieldSchema = superFormFieldSchema
     [TYPE]: z.literal(FormFieldType.Numeric),
   });
 
-const mcqFormFieldSchema = superFormFieldSchema
+export const mcqFormFieldSchema = superFormFieldSchema
   .pick({
     label: true,
     description: true,
@@ -100,7 +104,7 @@ const mcqFormFieldSchema = superFormFieldSchema
     [TYPE]: z.literal(FormFieldType.Mcq),
   });
 
-const mrqFormFieldSchema = superFormFieldSchema
+export const mrqFormFieldSchema = superFormFieldSchema
   .pick({
     label: true,
     description: true,
@@ -111,7 +115,7 @@ const mrqFormFieldSchema = superFormFieldSchema
     [TYPE]: z.literal(FormFieldType.Mrq),
   });
 
-const textDisplayFormFieldSchema = superFormFieldSchema
+export const textDisplayFormFieldSchema = superFormFieldSchema
   .pick({
     content: true,
   })

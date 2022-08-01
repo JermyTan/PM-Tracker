@@ -164,6 +164,7 @@ def check_submission(view_method):
             submission = course.coursesubmission_set.select_related(
                 "milestone",
                 "group",
+                "template__form",
                 "creator__user__profile_image",
                 "editor__user__profile_image",
             ).get(id=submission_id)

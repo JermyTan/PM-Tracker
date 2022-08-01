@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { forwardRef, useMemo } from "react";
 import {
   ButtonProps,
   Group,
@@ -28,7 +28,7 @@ import {
   FormField,
   formFieldSchema,
   SubmissionType,
-  submissionTypeToStringMap,
+  submissionTypeToPropertiesMap,
   fieldToFieldTypeMap,
   McqFormField,
   MrqFormField,
@@ -40,6 +40,7 @@ import SwitchField from "./switch-field";
 import FormFieldBuilderSection from "./form-field-builder-section";
 import { handleSubmitForm } from "../utils/form-utils";
 import { useResolveError } from "../utils/error-utils";
+import SubmissionTypeIconLabel from "./submission-type-icon-label";
 
 const useStyles = createStyles({
   submissionTypeSelect: {
@@ -80,7 +81,15 @@ const DEFAULT_VALUES: MilestoneTemplateFormBuilderProps = {
 };
 
 const SUBMISSION_TYPE_OPTIONS: SelectItem[] = Object.values(SubmissionType).map(
-  (type) => ({ value: type, label: submissionTypeToStringMap[type] }),
+  (type) => ({ value: type, label: submissionTypeToPropertiesMap[type].label }),
+);
+
+const SelectItemComponent = forwardRef<HTMLDivElement, SelectItem>(
+  ({ value, ...others }: SelectItem, ref) => (
+    <div ref={ref} {...others}>
+      <SubmissionTypeIconLabel submissionType={value as SubmissionType} />
+    </div>
+  ),
 );
 
 type Props = {
@@ -159,6 +168,7 @@ function MilestoneTemplateFormBuilder({
               data={SUBMISSION_TYPE_OPTIONS}
               required
               className={classes.submissionTypeSelect}
+              itemComponent={SelectItemComponent}
             />
 
             <Group>

@@ -9,9 +9,10 @@ import {
 import useGetCourseId from "../custom-hooks/use-get-course-id";
 import useGetTemplateId from "../custom-hooks/use-get-template-id";
 import { COURSE_MILESTONE_TEMPLATES_PATH } from "../routes/paths";
-import { submissionTypeToStringMap, TemplateData } from "../types/templates";
+import { TemplateData } from "../types/templates";
 import { colorModeValue } from "../utils/theme-utils";
 import { displayDateTime, sort } from "../utils/transform-utils";
+import SubmissionTypeIconLabel from "./submission-type-icon-label";
 
 const useStyles = createStyles((theme) => ({
   row: {
@@ -73,7 +74,9 @@ function MilestoneTemplatesTable({ milestoneTemplates }: Props) {
               }}
             >
               <td>{name}</td>
-              <td>{submissionTypeToStringMap[submissionType]}</td>
+              <td>
+                <SubmissionTypeIconLabel submissionType={submissionType} />
+              </td>
               <td>{isPublished ? "✅" : "❌"}</td>
               <td>{displayDateTime(updatedAt, DATE_TIME_MONTH_NAME_FORMAT)}</td>
             </tr>

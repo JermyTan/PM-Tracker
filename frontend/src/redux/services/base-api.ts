@@ -8,9 +8,12 @@ import {
   FetchBaseQueryMeta,
 } from "@reduxjs/toolkit/query/react";
 import { Mutex } from "async-mutex";
+import { snakeCase } from "change-case";
 import { StatusCodes } from "http-status-codes";
+import { stringify } from "query-string";
 import { FAILED_TOKEN_REFRESH } from "../../constants";
 import { AuthenticationData } from "../../types/auth";
+import { transformKeys } from "../../utils/transform-utils";
 import {
   updateCurrentUser,
   selectCurrentUserTokens,
@@ -43,6 +46,11 @@ const baseQuery = fetchBaseQuery({
 
     return headers;
   },
+  paramsSerializer: (params) =>
+    stringify(transformKeys(snakeCase, params), {
+      skipNull: true,
+      skipEmptyString: true,
+    }),
 });
 
 // Implement query with token refresh

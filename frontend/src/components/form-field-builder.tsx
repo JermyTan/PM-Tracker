@@ -15,11 +15,18 @@ import { FaTrashAlt } from "react-icons/fa";
 import { MdDragIndicator } from "react-icons/md";
 import { TYPE } from "../constants";
 import { FormFieldType } from "../types/templates";
+import { colorModeValue } from "../utils/theme-utils";
 import FlexSpacer from "./flex-spacer";
 import FormFieldBuilderRenderer from "./form-field-builder-renderer";
 import SelectField from "./select-field";
 
-const useStyles = createStyles({
+const useStyles = createStyles((theme) => ({
+  card: {
+    borderColor: colorModeValue(theme.colorScheme, {
+      lightModeValue: theme.colors.gray[4],
+      darkModeValue: theme.colors.dark[4],
+    }),
+  },
   topSection: {
     height: "48px",
   },
@@ -48,7 +55,7 @@ const useStyles = createStyles({
     alignItems: "center",
     justifyContent: "center",
   },
-});
+}));
 
 const FORM_FIELD_TYPE_OPTIONS: SelectItem[] = [
   {
@@ -107,7 +114,7 @@ function FormFieldBuilder({
 
   return (
     <Box py="xs">
-      <Paper withBorder shadow="sm">
+      <Paper className={classes.card} withBorder shadow="sm">
         <Group noWrap spacing={0} className={classes.topSection}>
           <Box px="sm" className={classes.fieldNumberContainer}>
             {index + 1}

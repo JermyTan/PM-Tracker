@@ -30,11 +30,6 @@ const useStyles = createStyles((theme) => ({
       darkModeValue: theme.colors.dark[8],
     }),
   },
-  headerDivider: {
-    borderTopColor: colorModeValue(theme.colorScheme, {
-      darkModeValue: theme.colors.dark[4],
-    }),
-  },
 }));
 
 function AppLayout({ children }: Props) {
@@ -59,7 +54,7 @@ function AppLayout({ children }: Props) {
           onSidebarToggle={toggle}
         />
 
-        <Divider className={classes.headerDivider} />
+        <Divider />
 
         {/* Main content */}
         <ScrollArea className={classes.scrollArea} scrollHideDelay={500}>

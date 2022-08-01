@@ -44,7 +44,7 @@ function MilestoneActionsMenu({ id: milestoneId, name }: Props) {
       await deleteMilestone({ courseId, milestoneId }).unwrap();
 
       toastUtils.success({
-        message: `The ${milestoneAlias} has been successfully deleted.`,
+        message: `The ${milestoneAlias} has been deleted successfully.`,
       });
       closeDeleteModal();
     } catch (error) {
@@ -80,11 +80,14 @@ function MilestoneActionsMenu({ id: milestoneId, name }: Props) {
         onClose={closeDeleteModal}
         centered
         title={`Delete ${milestoneAlias}`}
+        closeButtonLabel={`Cancel ${milestoneAlias} deletion`}
       >
         <Stack>
           <Text size="sm">
             Are you sure you want to delete this {milestoneAlias} (
             <strong>{name}</strong>)?
+            <br />
+            <strong>This action is destructive and irreversible.</strong>
           </Text>
           <Group position="right">
             <Button variant="default" onClick={closeDeleteModal}>

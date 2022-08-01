@@ -10,6 +10,7 @@ import {
 } from "../../redux/services/templates-api";
 import { emptySelector } from "../../redux/utils";
 import { COURSE_MILESTONE_SINGLE_TEMPLATE_PATH } from "../../routes/paths";
+import { TemplatePostData } from "../../types/templates";
 import { useResolveError } from "../../utils/error-utils";
 import toastUtils from "../../utils/toast-utils";
 import MilestoneTemplateFormBuilder, {
@@ -49,7 +50,7 @@ function CourseMilestoneTemplatesEditPage() {
     }
 
     const newTemplate = await updateTemplate({
-      ...formData,
+      ...(formData as TemplatePostData),
       courseId,
       templateId,
     }).unwrap();

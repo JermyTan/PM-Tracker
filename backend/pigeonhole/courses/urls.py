@@ -71,7 +71,7 @@ urlpatterns = [
         name="single_course_group",
     ),
     path(
-        "<int:course_id>/submissions/<int:submission_id>/comments/",
+        "<int:course_id>/submissions/<int:submission_id>/fields/<int:field_index>/comments/",
         CourseSubmissionFieldCommentsView.as_view(),
         name="course_submission_field_comments",
     ),

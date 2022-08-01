@@ -67,7 +67,6 @@ from .logic import (
     update_course_submission_field_comment,
 )
 from .serializers import (
-    GetCourseSubmissionFieldCommentSerializer,
     GetCourseSubmissionSerializer,
     PatchCourseGroupSerializer,
     PostCourseGroupSerializer,
@@ -915,39 +914,21 @@ class CourseSubmissionFieldCommentsView(APIView):
         course: Course,
         requester_membership: CourseMembership,
         submission: CourseSubmission,
+        field_index: int
     ):
         if not can_view_course_submission(
             requester_membership=requester_membership, submission=submission
         ):
             raise PermissionDenied()
 
-        query_params = request.query_params.dict()
-        serializer = GetCourseSubmissionFieldCommentSerializer(data=query_params)
+        if field_index < 0 or field_index >= len(submission.form_response_data):
+            raise BadRequest(detail="Invalid field index provided.")
 
-        serializer.is_valid(raise_exception=True)
-        validated_data = serializer.validated_data
+        field_comments = submission.coursesubmissionfieldcomment_set.filter(
+            field_index=field_index
+        )
 
-        field_index = validated_data.get("field_index", None)
-        max_field_index = len(submission.form_response_data)
-
-        if field_index is not None:
-            if field_index >= max_field_index:
-                raise BadRequest(detail="Invalid field index provided.")
-
-            index_set = [field_index,]
-        else:
-            index_set = [index for index in range(0, max_field_index)]
-
-        data = {}
-
-        for field_index in index_set:
-            field_comments = submission.coursesubmissionfieldcomment_set.filter(
-                field_index=field_index
-            )
-
-            data |= {
-                str(field_index): [course_submission_field_comment_to_json(comment) for comment in field_comments]
-            }
+        data = [course_submission_field_comment_to_json(comment) for comment in field_comments]
 
         return Response(data=data, status=status.HTTP_200_OK)
 
@@ -962,23 +943,28 @@ class CourseSubmissionFieldCommentsView(APIView):
         requester: User,
         course: Course,
         requester_membership: CourseMembership,
-        submission: CourseSubmission
+        submission: CourseSubmission,
+        field_index: int
     ):
+        if not can_view_course_submission(
+            requester_membership=requester_membership, submission=submission
+        ):
+            raise PermissionDenied()
+
+        if field_index < 0 or field_index >= len(submission.form_response_data):
+            raise BadRequest(detail="Invalid field index provided.")
+        
         serializer = PostCourseSubmissionFieldCommentSerializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
-
-        field_index = validated_data["field_index"]
-        if field_index >= len(submission.form_response_data):
-            raise BadRequest(detail="Invalid field index provided.")
 
         try:
             new_comment = create_course_submission_field_comment(
                 submission=submission,
                 commenter = requester,
                 content=validated_data["content"],
-                field_index=validated_data["field_index"],
+                field_index=field_index,
                 course_membership=requester_membership
             )
         except ValueError as e:
@@ -995,7 +981,7 @@ class SingleCourseSubmissionFieldCommentsView(APIView):
     @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
     @check_submission
     @check_submission_comment
-    def put(
+    def patch(
         self,
         request,
         requester: User,
@@ -1010,6 +996,9 @@ class SingleCourseSubmissionFieldCommentsView(APIView):
             submission_comment=submission_comment
         ):
             raise PermissionDenied()
+
+        if submission_field_comment_is_deleted(submission_comment=submission_comment):
+            raise BadRequest(detail="The comment is already deleted.")
 
         serializer = PutCourseSubmissionFieldCommentSerializer(data=request.data)
 

@@ -14,13 +14,14 @@ const schema = z.object({
     .min(1, "Please ensure that the comment is not blank."),
 });
 
-export type CommentData = z.infer<typeof schema>;
+export type CommentCreateOrUpdateData = z.infer<typeof schema>;
 
 type Props = {
   onSuccess?: () => void;
   defaultValue: string;
-  onSubmit?: (data: CommentData) => Promise<void>;
+  onSubmit?: (data: CommentCreateOrUpdateData) => Promise<void>;
   confirmButtonName: string;
+  showCancelButton: boolean;
 };
 
 function CommentEditForm({
@@ -28,8 +29,9 @@ function CommentEditForm({
   defaultValue,
   onSubmit,
   confirmButtonName,
+  showCancelButton,
 }: Props) {
-  const methods = useForm<CommentData>({
+  const methods = useForm<CommentCreateOrUpdateData>({
     resolver: zodResolver(schema),
     defaultValues: { [CONTENT]: defaultValue },
   });
@@ -41,7 +43,7 @@ function CommentEditForm({
     formState: { isSubmitting },
   } = methods;
 
-  const processData = async (formData: CommentData) => {
+  const processData = async (formData: CommentCreateOrUpdateData) => {
     if (isSubmitting) {
       return;
     }
@@ -62,9 +64,11 @@ function CommentEditForm({
         <Stack>
           <TextField name={CONTENT} description="Comment content" />
           <Group position="right">
-            <Button color="gray" onClick={onSuccess}>
-              Cancel
-            </Button>
+            {showCancelButton && (
+              <Button color="gray" onClick={onSuccess}>
+                Cancel
+              </Button>
+            )}
             <Button
               type="submit"
               disabled={isSubmitting}

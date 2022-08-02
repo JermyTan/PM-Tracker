@@ -17,6 +17,8 @@ export type SubmissionFieldComment = BaseData & {
   [FIELD_INDEX]: number;
 };
 
-export type SubmissionCommentsData = {
-  [fieldIndex: string]: SubmissionFieldComment[];
+export type SubmissionCommentsData = SubmissionFieldComment[];
+
+export type SubmissionFieldCommentPatchData = {
+  [CONTENT]: string;
 };

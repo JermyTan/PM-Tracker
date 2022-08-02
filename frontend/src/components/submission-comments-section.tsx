@@ -1,11 +1,11 @@
-import { Avatar, Group, Paper, Stack } from "@mantine/core";
+import { Paper, Stack } from "@mantine/core";
 import { useGetSubmissionCommentsQuery } from "../redux/services/comments-api";
 import CommentDisplay from "./comment-display";
 import PlaceholderWrapper from "./placeholder-wrapper";
 
 function SubmissionCommentsSection() {
   const courseId = 1;
-  const submissionId = 16;
+  const submissionId = 1;
   const fieldIndex = 0;
   const {
     data: comments,

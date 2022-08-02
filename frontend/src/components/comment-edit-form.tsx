@@ -36,7 +36,7 @@ function CommentEditForm({
     defaultValues: { [CONTENT]: defaultValue },
   });
 
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError({ name: "comment-edit-form" });
 
   const {
     handleSubmit,

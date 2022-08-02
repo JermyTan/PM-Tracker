@@ -22,7 +22,7 @@ function CommentContentDisplayAndEditor({
 }: Props) {
   const [editComment] = useUpdateSubmissionCommentMutation();
   const courseId = useGetCourseId();
-  const submissionId = useGetSubmissionId();
+  const submissionId = useGetSubmissionId() ?? 1; // TODO: replace
   const commentId = comment.id;
 
   const handleEditComment = async (parsedData: CommentCreateOrUpdateData) => {

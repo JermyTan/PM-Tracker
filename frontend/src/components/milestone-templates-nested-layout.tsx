@@ -1,9 +1,8 @@
+import path from "path";
 import { useMantineTheme, Stack, Anchor, Group, Text } from "@mantine/core";
 import { ReactNode } from "react";
 import { HiOutlineChevronLeft } from "react-icons/hi";
-import { Link, generatePath } from "react-router-dom";
-import useGetCourseId from "../custom-hooks/use-get-course-id";
-import { COURSE_MILESTONE_TEMPLATES_PATH } from "../routes/paths";
+import { Link, useLocation } from "react-router-dom";
 import { colorModeValue } from "../utils/theme-utils";
 
 type Props = {
@@ -12,16 +11,14 @@ type Props = {
 
 function MilestoneTemplatesNestedLayout({ children }: Props) {
   const { colorScheme } = useMantineTheme();
-  const courseId = useGetCourseId();
+  const { pathname } = useLocation();
 
   return (
     <Stack>
       <div>
         <Anchor<typeof Link>
           component={Link}
-          to={generatePath(COURSE_MILESTONE_TEMPLATES_PATH, {
-            courseId,
-          })}
+          to={path.resolve(pathname, "../")}
           color={colorModeValue(colorScheme, {
             lightModeValue: "dark",
             darkModeValue: "gray",

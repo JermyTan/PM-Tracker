@@ -205,7 +205,7 @@ function GroupCardActionsMenu({
     await deleteGroup({ courseId, groupId }).unwrap();
 
     toastUtils.success({
-      message: `The group has been successfully deleted.`,
+      message: `The group has been deleted successfully.`,
     });
   };
 

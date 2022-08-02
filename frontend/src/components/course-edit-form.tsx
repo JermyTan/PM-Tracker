@@ -72,6 +72,8 @@ function CourseEditForm({ onSuccess }: Props) {
       }),
       // get the most updated course data before editing
       refetchOnMountOrArgChange: true,
+      // do not want refetch while using is editing the form
+      refetchOnReconnect: false,
     },
   );
   useResolveError({ error, name: "course-edit-form" });

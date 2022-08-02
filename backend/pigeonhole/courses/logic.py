@@ -32,6 +32,7 @@ from pigeonhole.common.constants import (
     CREATOR,
     EDITOR,
     FORM_RESPONSE_DATA,
+    TEMPLATE,
     GROUP,
     MILESTONE,
     ID,
@@ -164,6 +165,7 @@ def course_submission_summary_to_json(submission: CourseSubmission) -> dict:
         NAME: submission.name,
         DESCRIPTION: submission.description,
         IS_DRAFT: submission.is_draft,
+        SUBMISSION_TYPE: submission.submission_type,
         CREATOR: user_to_json(submission.creator.user)
         if submission.creator is not None
         else None,
@@ -184,7 +186,12 @@ def course_submission_summary_to_json(submission: CourseSubmission) -> dict:
 def course_submission_to_json(submission: CourseSubmission) -> dict:
     data = course_submission_summary_to_json(submission)
 
-    data |= {FORM_RESPONSE_DATA: submission.form_response_data}
+    data |= {
+        TEMPLATE: course_milestone_template_to_json(submission.template)
+        if submission.template is not None
+        else None,
+        FORM_RESPONSE_DATA: submission.form_response_data,
+    }
 
     return data
 
@@ -221,6 +228,7 @@ def get_requested_course_submissions(
     group_id: Optional[int],
     creator_id: Optional[int],
     editor_id: Optional[int],
+    template_id: Optional[int],
 ) -> QuerySet[CourseSubmission]:
     submissions: QuerySet[
         CourseSubmission
@@ -242,6 +250,9 @@ def get_requested_course_submissions(
 
     if editor_id is not None:
         submissions = submissions.filter(editor__user_id=editor_id)
+
+    if template_id is not None:
+        submissions = submissions.filter(template_id=template_id)
 
     return submissions
 
@@ -355,7 +366,7 @@ def create_course_milestone(
     description: str,
     start_date_time: datetime,
     end_date_time: Optional[datetime],
-    is_published: bool
+    is_published: bool,
 ) -> CourseMilestone:
     try:
         new_milestone = CourseMilestone.objects.create(
@@ -364,7 +375,7 @@ def create_course_milestone(
             description=description,
             start_date_time=start_date_time,
             end_date_time=end_date_time,
-            is_published=is_published
+            is_published=is_published,
         )
     except IntegrityError as e:
         logger.warning(e)
@@ -382,7 +393,7 @@ def update_course_milestone(
     description: str,
     start_date_time: datetime,
     end_date_time: Optional[datetime],
-    is_published: bool
+    is_published: bool,
 ) -> CourseMilestone:
     milestone.name = name
     milestone.description = description
@@ -630,8 +641,12 @@ def update_course_milestone_template(
 
     return template
 
-def can_view_course_milestone_template(template: CourseMilestoneTemplate, requester_membership: CourseMembership) -> bool:
+
+def can_view_course_milestone_template(
+    template: CourseMilestoneTemplate, requester_membership: CourseMembership
+) -> bool:
     return template.is_published or requester_membership.role != Role.STUDENT
+
 
 @transaction.atomic
 def create_course_submission(
@@ -639,9 +654,11 @@ def create_course_submission(
     requester_membership: CourseMembership,
     milestone_id: int,
     group_id: Optional[int],
+    template_id: int,
     name: str,
     description: str,
     is_draft: bool,
+    submission_type: SubmissionType,
     form_response_data: Sequence[dict],
 ) -> CourseSubmission:
     try:
@@ -652,6 +669,15 @@ def create_course_submission(
         raise ValueError(
             f"No such {course.coursesettings.milestone_alias or MILESTONE} found in this course."
         )
+
+    try:
+        template = course.coursemilestonetemplate_set.select_related("form").get(
+            id=template_id
+        )
+
+    except CourseMilestoneTemplate.DoesNotExist as e:
+        logger.warning(e)
+        raise ValueError(f"No such template found in this course.")
 
     if requester_membership.role == Role.STUDENT and not is_milestone_active(
         milestone=milestone
@@ -678,11 +704,13 @@ def create_course_submission(
         course=course,
         milestone=milestone,
         group=group,
+        template=template,
         creator=requester_membership,
         editor=requester_membership,
         name=name,
         description=description,
         is_draft=is_draft,
+        submission_type=submission_type,
         form_response_data=form_response_data,
     )
 
@@ -698,6 +726,7 @@ def update_course_submission(
     name: str,
     description: str,
     is_draft: bool,
+    submission_type: SubmissionType,
     form_response_data: Sequence[dict],
 ) -> CourseSubmission:
     if group_id != submission.group_id:
@@ -721,6 +750,7 @@ def update_course_submission(
     submission.name = name
     submission.description = description
     submission.is_draft = is_draft
+    submission.submission_type = submission_type
     submission.form_response_data = form_response_data
     submission.editor = requester_membership
 

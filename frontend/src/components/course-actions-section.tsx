@@ -48,7 +48,7 @@ function CourseActionsSection(props: Props) {
       await deleteCourse(courseId).unwrap();
 
       toastUtils.success({
-        message: "The course has been successfully deleted.",
+        message: "The course has been deleted successfully.",
       });
 
       // TODO: navigate will trigger after rtk query has invalidated the current course tag
@@ -76,7 +76,7 @@ function CourseActionsSection(props: Props) {
         </Text>
       ),
       labels: { confirm: "Delete course", cancel: "No don't delete" },
-      confirmProps: { color: "red", loading: isLoading },
+      confirmProps: { color: "red" },
       onConfirm: onDeleteCourse,
     });
 

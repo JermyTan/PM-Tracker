@@ -98,14 +98,6 @@ function App({ Component, pageProps }: AppProps) {
                   display: "flex",
                 },
               },
-              Checkbox: {
-                input: {
-                  cursor: "pointer",
-                },
-                label: {
-                  cursor: "pointer",
-                },
-              },
               Button: {
                 root: {
                   minWidth: "150px",
@@ -123,6 +115,13 @@ function App({ Component, pageProps }: AppProps) {
                   flexDirection: "column",
                 },
               },
+              Divider: (theme) => ({
+                horizontal: {
+                  borderTopColor: colorModeValue(colorScheme, {
+                    darkModeValue: theme.colors.dark[4],
+                  }),
+                },
+              }),
             }}
           >
             <NotificationsProvider position="bottom-center" limit={3}>

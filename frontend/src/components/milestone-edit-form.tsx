@@ -112,6 +112,8 @@ function MilestoneEditForm({ milestoneId, onSuccess }: Props) {
       }),
       // get the most updated milestone data before editing
       refetchOnMountOrArgChange: true,
+      // do not want refetch while using is editing the form
+      refetchOnReconnect: false,
     },
   );
   useResolveError({ error, name: "milestone-edit-form" });

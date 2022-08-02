@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { forwardRef, useMemo } from "react";
 import {
   ButtonProps,
   Group,
@@ -12,6 +12,7 @@ import {
   Button,
 } from "@mantine/core";
 import { FormProvider, useForm } from "react-hook-form";
+import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { FaQuestion } from "react-icons/fa";
@@ -28,7 +29,7 @@ import {
   FormField,
   formFieldSchema,
   SubmissionType,
-  submissionTypeToStringMap,
+  submissionTypeToPropertiesMap,
   fieldToFieldTypeMap,
   McqFormField,
   MrqFormField,
@@ -40,6 +41,7 @@ import SwitchField from "./switch-field";
 import FormFieldBuilderSection from "./form-field-builder-section";
 import { handleSubmitForm } from "../utils/form-utils";
 import { useResolveError } from "../utils/error-utils";
+import SubmissionTypeIconLabel from "./submission-type-icon-label";
 
 const useStyles = createStyles({
   submissionTypeSelect: {
@@ -59,7 +61,9 @@ const schema = z.object({
     }),
   }),
   [IS_PUBLISHED]: z.boolean(),
-  [FORM_FIELD_DATA]: z.array(formFieldSchema).nonempty(),
+  [FORM_FIELD_DATA]: z
+    .array(formFieldSchema)
+    .nonempty({ message: "Please create at least 1 field" }),
 });
 
 export type MilestoneTemplateFormBuilderData = z.infer<typeof schema>;
@@ -80,7 +84,15 @@ const DEFAULT_VALUES: MilestoneTemplateFormBuilderProps = {
 };
 
 const SUBMISSION_TYPE_OPTIONS: SelectItem[] = Object.values(SubmissionType).map(
-  (type) => ({ value: type, label: submissionTypeToStringMap[type] }),
+  (type) => ({ value: type, label: submissionTypeToPropertiesMap[type].label }),
+);
+
+const SelectItemComponent = forwardRef<HTMLDivElement, SelectItem>(
+  ({ value, ...others }: SelectItem, ref) => (
+    <div ref={ref} {...others}>
+      <SubmissionTypeIconLabel submissionType={value as SubmissionType} />
+    </div>
+  ),
 );
 
 type Props = {
@@ -159,6 +171,7 @@ function MilestoneTemplateFormBuilder({
               data={SUBMISSION_TYPE_OPTIONS}
               required
               className={classes.submissionTypeSelect}
+              itemComponent={SelectItemComponent}
             />
 
             <Group>
@@ -204,6 +217,14 @@ function MilestoneTemplateFormBuilder({
               <Text size="sm" color="dimmed">
                 Please set up the fields for this template.
               </Text>
+              <ErrorMessage
+                name={FORM_FIELD_DATA}
+                render={({ message }) => (
+                  <Text color="red" size="sm">
+                    {message}
+                  </Text>
+                )}
+              />
             </div>
 
             <FormFieldBuilderSection name={FORM_FIELD_DATA} />

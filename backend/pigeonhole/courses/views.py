@@ -293,7 +293,7 @@ class CourseMilestonesView(APIView):
                 end_date_time=parse_ms_timestamp_to_datetime(
                     validated_data["end_date_time"]
                 ),
-                is_published=validated_data["is_published"]
+                is_published=validated_data["is_published"],
             )
         except ValueError as e:
             raise BadRequest(detail=e)
@@ -347,7 +347,7 @@ class SingleCourseMilestoneView(APIView):
             end_date_time=parse_ms_timestamp_to_datetime(
                 validated_data["end_date_time"]
             ),
-            is_published=validated_data["is_published"]
+            is_published=validated_data["is_published"],
         )
 
         data = course_milestone_to_json(updated_milestone)
@@ -697,7 +697,9 @@ class SingleCourseMilestoneTemplateView(APIView):
         requester_membership: CourseMembership,
         template: CourseMilestoneTemplate,
     ):
-        if not can_view_course_milestone_template(template=template, requester_membership=requester_membership):
+        if not can_view_course_milestone_template(
+            template=template, requester_membership=requester_membership
+        ):
             raise PermissionDenied()
 
         data = course_milestone_template_to_json(template)
@@ -775,6 +777,7 @@ class CourseSubmissionsView(APIView):
             group_id=validated_data["group_id"],
             creator_id=validated_data["creator_id"],
             editor_id=validated_data["editor_id"],
+            template_id=validated_data["template_id"],
         )
 
         data = [
@@ -804,9 +807,11 @@ class CourseSubmissionsView(APIView):
                 requester_membership=requester_membership,
                 milestone_id=validated_data["milestone_id"],
                 group_id=validated_data["group_id"],
+                template_id=validated_data["template_id"],
                 name=validated_data["name"],
                 description=validated_data["description"],
                 is_draft=validated_data["is_draft"],
+                submission_type=validated_data["submission_type"],
                 form_response_data=validated_data["form_response_data"],
             )
         except ValueError as e:
@@ -870,6 +875,7 @@ class SingleCourseSubmissionView(APIView):
                 name=validated_data["name"],
                 description=validated_data["description"],
                 is_draft=validated_data["is_draft"],
+                submission_type=validated_data["submission_type"],
                 form_response_data=validated_data["form_response_data"],
             )
         except ValueError as e:

@@ -32,8 +32,10 @@ function CourseMilestoneTemplatesEditPage() {
         isFetching,
         error,
       }),
-      // get the most updated course data before editing
+      // get the most updated template data before editing
       refetchOnMountOrArgChange: true,
+      // do not want refetch while using is editing the form
+      refetchOnReconnect: false,
     },
   );
   useResolveError({ error, name: "course-milestone-templates-edit-page" });

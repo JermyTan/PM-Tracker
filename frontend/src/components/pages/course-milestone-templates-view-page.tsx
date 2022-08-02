@@ -1,6 +1,8 @@
 import { Button, Group, Paper, Stack, Text } from "@mantine/core";
 import { useModals } from "@mantine/modals";
+import { createSelector } from "@reduxjs/toolkit";
 import { skipToken } from "@reduxjs/toolkit/query/react";
+import { useMemo } from "react";
 import { RiFileEditLine } from "react-icons/ri";
 import { generatePath, Link, useNavigate } from "react-router-dom";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
@@ -10,6 +12,8 @@ import {
   useGetTemplatesQueryState,
 } from "../../redux/services/templates-api";
 import { COURSE_MILESTONE_TEMPLATES_PATH } from "../../routes/paths";
+import { transformTemplateToSubmissionView } from "../../types/submissions";
+import { TemplateData } from "../../types/templates";
 import { useResolveError } from "../../utils/error-utils";
 import toastUtils from "../../utils/toast-utils";
 import MilestoneSubmissionForm from "../milestone-submission-form";
@@ -18,16 +22,25 @@ import PlaceholderWrapper from "../placeholder-wrapper";
 function CourseMilestoneTemplatesViewPage() {
   const courseId = useGetCourseId();
   const templateId = useGetTemplateId();
-  const { milestoneTemplate } = useGetTemplatesQueryState(
-    courseId ?? skipToken,
-    {
-      selectFromResult: ({ data: milestoneTemplates }) => ({
-        milestoneTemplate: milestoneTemplates?.find(
-          ({ id }) => `${id}` === templateId,
-        ),
-      }),
-    },
+  const selectSubmissionView = useMemo(
+    () =>
+      createSelector(
+        (milestoneTemplates?: TemplateData[]) => milestoneTemplates,
+        (_: unknown, templateId?: string) => templateId,
+        (milestoneTemplates, templateId) =>
+          transformTemplateToSubmissionView({
+            template: milestoneTemplates?.find(
+              ({ id }) => `${id}` === templateId,
+            ),
+          }),
+      ),
+    [],
   );
+  const { submissionView } = useGetTemplatesQueryState(courseId ?? skipToken, {
+    selectFromResult: ({ data: milestoneTemplates }) => ({
+      submissionView: selectSubmissionView(milestoneTemplates, templateId),
+    }),
+  });
   const [deleteTemplate, { isLoading }] = useDeleteTemplateMutation({
     selectFromResult: ({ isLoading }) => ({ isLoading }),
   });
@@ -67,7 +80,7 @@ function CourseMilestoneTemplatesViewPage() {
       children: (
         <Text size="sm">
           Are you sure you want to delete this template (
-          <strong>{milestoneTemplate?.name}</strong>)?
+          <strong>{submissionView?.name}</strong>)?
           <br />
           <strong>This action is destructive and irreversible.</strong>
         </Text>
@@ -81,9 +94,9 @@ function CourseMilestoneTemplatesViewPage() {
     <PlaceholderWrapper
       py={150}
       defaultMessage="No template found."
-      showDefaultMessage={!milestoneTemplate}
+      showDefaultMessage={!submissionView}
     >
-      {milestoneTemplate && (
+      {submissionView && (
         <Stack>
           <Group position="right">
             <Button<typeof Link>
@@ -105,7 +118,7 @@ function CourseMilestoneTemplatesViewPage() {
           </Group>
 
           <Paper withBorder shadow="sm" p="md" radius="md">
-            <MilestoneSubmissionForm milestoneTemplate={milestoneTemplate} />
+            <MilestoneSubmissionForm defaultValues={submissionView} readOnly />
           </Paper>
         </Stack>
       )}

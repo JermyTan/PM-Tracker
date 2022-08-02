@@ -1,37 +1,62 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Stack, Title, Text } from "@mantine/core";
+import { z } from "zod";
+import { Stack, Title, Text, NumberInput } from "@mantine/core";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
-import useGetCourseId from "../custom-hooks/use-get-course-id";
-import { useGetSubmissionsQuery } from "../redux/services/submissions-api";
-
-import { TemplateData } from "../types/templates";
+import {
+  FORM_RESPONSE_DATA,
+  GROUP,
+  IS_DRAFT,
+  SUBMISSION_TYPE,
+} from "../constants";
+import {
+  formResponseFieldSchema,
+  SubmissionViewData,
+} from "../types/submissions";
+import { SubmissionType } from "../types/templates";
 import { useResolveError } from "../utils/error-utils";
 import { handleSubmitForm } from "../utils/form-utils";
 import SubmissionTypeIconLabel from "./submission-type-icon-label";
+import FormFieldRenderer from "./form-field-renderer";
+
+const schema = z.object({
+  [IS_DRAFT]: z.boolean(),
+  [SUBMISSION_TYPE]: z.nativeEnum(SubmissionType),
+  [GROUP]: z.null(), // TODO: update to GroupData
+  [FORM_RESPONSE_DATA]: z.array(formResponseFieldSchema),
+});
+
+type SubmissionFormProps = z.infer<typeof schema>;
 
 type Props = {
-  milestoneTemplate: TemplateData;
+  defaultValues: SubmissionViewData;
+  readOnly?: boolean;
 };
 
-function MilestoneSubmissionForm({ milestoneTemplate }: Props) {
-  const { name, description, submissionType, formFieldData } =
-    milestoneTemplate;
-  const { resolveError } = useResolveError({ name: "milestone-template-form" });
-  const methods = useForm({
-    // resolver: zodResolver(schema),
-    // defaultValues,
+function MilestoneSubmissionForm({ defaultValues, readOnly }: Props) {
+  const methods = useForm<SubmissionFormProps>({
+    resolver: zodResolver(schema),
+    defaultValues,
   });
   const { control, handleSubmit } = methods;
   const { fields } = useFieldArray({
-    control, // control props comes from useForm (optional: if you are using FormContext)
-    name: "test", // unique name for your Field Array
+    control,
+    name: FORM_RESPONSE_DATA,
   });
 
-  const courseId = useGetCourseId() ?? 0;
-  const { data } = useGetSubmissionsQuery({
-    courseId,
+  const { resolveError } = useResolveError({
+    name: "milestone-submission-form",
   });
-  console.log(data);
+
+  const {
+    createdAt,
+    updatedAt,
+    name,
+    description,
+    submissionType,
+    creator,
+    editor,
+    milestone,
+  } = defaultValues;
 
   const onSubmit = () => {};
 
@@ -49,6 +74,17 @@ function MilestoneSubmissionForm({ milestoneTemplate }: Props) {
             </Text>
             <Text size="sm">{description}</Text>
           </Stack>
+
+          {fields.map((field, index) => {
+            const name = `${FORM_RESPONSE_DATA}.${index}`;
+            return (
+              <FormFieldRenderer
+                key={name}
+                name={name}
+                formResponseField={field}
+              />
+            );
+          })}
         </Stack>
       </form>
     </FormProvider>

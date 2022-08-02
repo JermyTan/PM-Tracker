@@ -1,6 +1,5 @@
 import arraySort from "array-sort";
 import dayjs from "dayjs";
-import { StringifiableRecord } from "query-string";
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return !Array.isArray(value) && typeof value === "object" && value !== null;

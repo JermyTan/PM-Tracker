@@ -12,6 +12,7 @@ import {
   Button,
 } from "@mantine/core";
 import { FormProvider, useForm } from "react-hook-form";
+import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { FaQuestion } from "react-icons/fa";
@@ -60,7 +61,9 @@ const schema = z.object({
     }),
   }),
   [IS_PUBLISHED]: z.boolean(),
-  [FORM_FIELD_DATA]: z.array(formFieldSchema).nonempty(),
+  [FORM_FIELD_DATA]: z
+    .array(formFieldSchema)
+    .nonempty({ message: "Please create at least 1 field" }),
 });
 
 export type MilestoneTemplateFormBuilderData = z.infer<typeof schema>;
@@ -214,6 +217,14 @@ function MilestoneTemplateFormBuilder({
               <Text size="sm" color="dimmed">
                 Please set up the fields for this template.
               </Text>
+              <ErrorMessage
+                name={FORM_FIELD_DATA}
+                render={({ message }) => (
+                  <Text color="red" size="sm">
+                    {message}
+                  </Text>
+                )}
+              />
             </div>
 
             <FormFieldBuilderSection name={FORM_FIELD_DATA} />

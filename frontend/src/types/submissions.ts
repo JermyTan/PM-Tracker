@@ -46,11 +46,11 @@ export const numericFormResponseFieldSchema = numericFormFieldSchema.extend({
 });
 
 export const mcqFormResponseFieldSchema = mcqFormFieldSchema.extend({
-  [RESPONSE]: z.string().trim(),
+  [RESPONSE]: z.string(),
 });
 
 export const mrqFormResponseFieldSchema = mrqFormFieldSchema.extend({
-  [RESPONSE]: z.array(z.string().trim()),
+  [RESPONSE]: z.array(z.string()),
 });
 
 // NOTE: this list should contain all available form response field schemas
@@ -68,7 +68,7 @@ const allFormResponseFieldSchemas: [
   textDisplayFormFieldSchema,
 ];
 
-export const formFieldSchema = z.discriminatedUnion(
+export const formResponseFieldSchema = z.discriminatedUnion(
   TYPE,
   allFormResponseFieldSchemas,
 );
@@ -96,21 +96,7 @@ export type FormResponseField =
   | MrqFormResponseField
   | TextDisplayFormField;
 
-export type SubmissionPutData = {
-  [NAME]: string;
-  [DESCRIPTION]: string;
-  [SUBMISSION_TYPE]: SubmissionType;
-  [IS_DRAFT]: boolean;
-  [FORM_RESPONSE_DATA]: [FormResponseField, ...FormResponseField[]];
-  [GROUP_ID]: string | number | null;
-};
-
-export type SubmissionPostData = SubmissionPutData & {
-  [MILESTONE_ID]: string | number;
-  [TEMPLATE_ID]: string | number;
-};
-
-export type SubmissionSummaryData = BaseData & {
+export type SubmissionViewData = Partial<BaseData> & {
   [NAME]: string;
   [DESCRIPTION]: string;
   [IS_DRAFT]: boolean;
@@ -119,9 +105,76 @@ export type SubmissionSummaryData = BaseData & {
   [EDITOR]: UserData | null;
   [MILESTONE]: Pick<MilestoneData, typeof ID | typeof NAME> | null;
   [GROUP]: null; // TODO: update to GroupData | null
+  [TEMPLATE]: TemplateData | null;
+  [FORM_RESPONSE_DATA]: FormResponseField[];
 };
 
-export type SubmissionData = SubmissionSummaryData & {
-  [TEMPLATE]: TemplateData | null;
-  [FORM_RESPONSE_DATA]: Pick<SubmissionPostData, typeof FORM_RESPONSE_DATA>;
+export type SubmissionPutData = Pick<
+  SubmissionViewData,
+  | typeof NAME
+  | typeof DESCRIPTION
+  | typeof SUBMISSION_TYPE
+  | typeof IS_DRAFT
+  | typeof FORM_RESPONSE_DATA
+> & {
+  [GROUP_ID]: string | number | null;
 };
+
+export type SubmissionPostData = SubmissionPutData & {
+  [MILESTONE_ID]: string | number;
+  [TEMPLATE_ID]: string | number;
+};
+
+export type SubmissionSummaryData = BaseData &
+  Pick<
+    SubmissionViewData,
+    | typeof NAME
+    | typeof DESCRIPTION
+    | typeof IS_DRAFT
+    | typeof SUBMISSION_TYPE
+    | typeof CREATOR
+    | typeof EDITOR
+    | typeof MILESTONE
+    | typeof GROUP
+  >;
+
+export type SubmissionData = SubmissionSummaryData &
+  Pick<SubmissionViewData, typeof TEMPLATE | typeof FORM_RESPONSE_DATA>;
+
+export function transformTemplateToSubmissionView({
+  template,
+  overrides,
+}: {
+  template?: TemplateData;
+  overrides?: Partial<SubmissionViewData>;
+}) {
+  if (!template) {
+    return undefined;
+  }
+
+  const { name, description, submissionType, formFieldData } = template;
+  const submissionView: SubmissionViewData = {
+    name,
+    description,
+    isDraft: false,
+    submissionType,
+    creator: null,
+    editor: null,
+    milestone: null,
+    group: null,
+    template,
+    formResponseData: formFieldData.map((formField) => {
+      switch (formField.type) {
+        case FormFieldType.TextDisplay:
+          return formField;
+        case FormFieldType.Mrq:
+          return { ...formField, response: [] };
+        default:
+          return { ...formField, response: "" };
+      }
+    }),
+    ...overrides,
+  };
+
+  return submissionView;
+}

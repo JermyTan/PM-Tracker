@@ -12,6 +12,7 @@
     "serve": "serve -s out"
   },
   "dependencies": {
+    "@hookform/error-message": "^2.0.0",
     "@hookform/resolvers": "^2.9.7",
     "@mantine/core": "^4.2.12",
     "@mantine/dates": "^4.2.12",

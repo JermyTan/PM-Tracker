@@ -9,7 +9,7 @@ function TimeField({ name, ...props }: Props) {
   const {
     field,
     fieldState: { error },
-  } = useController({ name });
+  } = useController<{ [name: string]: Date | null }>({ name });
 
   return <TimeInput error={error?.message} {...props} {...field} />;
 }

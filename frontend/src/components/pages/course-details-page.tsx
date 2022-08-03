@@ -18,11 +18,11 @@ import CourseActionsSection from "../course-actions-section";
 import RoleRestrictedWrapper from "../role-restricted-wrapper";
 import { Role } from "../../types/courses";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
+import TextViewer from "../text-viewer";
 
 const useStyles = createStyles({
   detailsSection: {
     flex: "1 1 auto",
-    whiteSpace: "break-spaces",
   },
   actionsSection: {
     width: "250px",
@@ -88,9 +88,14 @@ function CourseDetailsPage() {
           <Stack spacing="xs">
             <Title order={4}>Course description</Title>
             <Spoiler maxHeight={150} showLabel="Show more" hideLabel="Hide">
-              <Text color={!description ? "dimmed" : undefined}>
+              <TextViewer
+                preserveWhiteSpace
+                overflowWrap
+                withLinkify
+                color={!description ? "dimmed" : undefined}
+              >
                 {description || "No description"}
-              </Text>
+              </TextViewer>
             </Spoiler>
           </Stack>
 

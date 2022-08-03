@@ -1,12 +1,4 @@
-import {
-  Alert,
-  Badge,
-  createStyles,
-  Group,
-  Paper,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { Alert, Badge, Group, Paper, Stack, Text } from "@mantine/core";
 import { HiEyeOff } from "react-icons/hi";
 import { DATE_TIME_MONTH_NAME_FORMAT } from "../constants";
 import useGetMilestoneAlias from "../custom-hooks/use-get-milestone-alias";
@@ -15,17 +7,11 @@ import { MilestoneData } from "../types/milestones";
 import { displayDateTime } from "../utils/transform-utils";
 import MilestoneActionsMenu from "./milestone-actions-menu";
 import RoleRestrictedWrapper from "./role-restricted-wrapper";
-
-const useStyles = createStyles({
-  title: {
-    overflowWrap: "anywhere",
-  },
-});
+import TextViewer from "./text-viewer";
 
 type Props = MilestoneData;
 
 function MilestoneCard(props: Props) {
-  const { classes } = useStyles();
   const { milestoneAlias } = useGetMilestoneAlias();
 
   const { name, startDateTime, endDateTime, isPublished } = props;
@@ -37,9 +23,9 @@ function MilestoneCard(props: Props) {
     <Paper withBorder shadow="sm" p="md" radius="md">
       <Stack spacing="xs">
         <Group noWrap spacing={4} position="apart" align="flex-start">
-          <Text weight={600} size="lg" className={classes.title}>
+          <TextViewer overflowWrap weight={600} size="lg">
             {name}
-          </Text>
+          </TextViewer>
           <RoleRestrictedWrapper allowedRoles={[Role.CoOwner, Role.Instructor]}>
             <MilestoneActionsMenu {...props} />
           </RoleRestrictedWrapper>

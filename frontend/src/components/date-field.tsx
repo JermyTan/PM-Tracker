@@ -9,7 +9,7 @@ function DateField({ name, ...props }: Props) {
   const {
     field,
     fieldState: { error },
-  } = useController({ name });
+  } = useController<{ [name: string]: Date | null }>({ name });
 
   return (
     <DatePicker

@@ -1,18 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Stack, Title, Text, NumberInput } from "@mantine/core";
+import { Stack, Title, Text } from "@mantine/core";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import {
   FORM_RESPONSE_DATA,
   GROUP,
   IS_DRAFT,
+  RESPONSE,
   SUBMISSION_TYPE,
 } from "../constants";
 import {
   formResponseFieldSchema,
   SubmissionViewData,
 } from "../types/submissions";
-import { SubmissionType } from "../types/templates";
+import { FormField, SubmissionType } from "../types/templates";
 import { useResolveError } from "../utils/error-utils";
 import { handleSubmitForm } from "../utils/form-utils";
 import SubmissionTypeIconLabel from "./submission-type-icon-label";
@@ -66,7 +67,7 @@ function MilestoneSubmissionForm({ defaultValues, readOnly }: Props) {
         onSubmit={handleSubmitForm(handleSubmit(onSubmit), resolveError)}
         autoComplete="off"
       >
-        <Stack>
+        <Stack spacing={32}>
           <Stack spacing={2}>
             <Title order={4}>{name}</Title>
             <Text size="sm" color="dimmed">
@@ -75,16 +76,13 @@ function MilestoneSubmissionForm({ defaultValues, readOnly }: Props) {
             <Text size="sm">{description}</Text>
           </Stack>
 
-          {fields.map((field, index) => {
-            const name = `${FORM_RESPONSE_DATA}.${index}`;
-            return (
-              <FormFieldRenderer
-                key={name}
-                name={name}
-                formResponseField={field}
-              />
-            );
-          })}
+          {fields.map(({ id, ...field }, index) => (
+            <FormFieldRenderer
+              key={id}
+              name={`${FORM_RESPONSE_DATA}.${index}.${RESPONSE}`}
+              formField={field as FormField}
+            />
+          ))}
         </Stack>
       </form>
     </FormProvider>

@@ -30,7 +30,7 @@ function SubmissionCommentsSection({
     {
       courseId,
       submissionId,
-      fieldIndex: fieldIndex,
+      fieldIndex,
     },
     {
       selectFromResult: ({ data: comments, isLoading }) => ({
@@ -80,8 +80,8 @@ function SubmissionCommentsSection({
         />
 
         <CommentEditForm
-          defaultValue={""}
-          confirmButtonName={"Comment"}
+          defaultValue=""
+          confirmButtonName="Comment"
           showCancelButton={false}
           onSubmit={handleCreateComment}
         />

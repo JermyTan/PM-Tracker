@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Group, Stack } from "@mantine/core";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, UseFormReset } from "react-hook-form";
 import { z } from "zod";
 import { CONTENT } from "../constants";
 import { useResolveError } from "../utils/error-utils";
@@ -14,24 +14,20 @@ const schema = z.object({
     .min(1, "Please ensure that the comment is not blank."),
 });
 
-export type CommentCreateOrUpdateData = z.infer<typeof schema>;
+export type CommentFormData = z.infer<typeof schema>;
 
 type Props = {
   onSuccess?: () => void;
   defaultValue: string;
-  onSubmit?: (data: CommentCreateOrUpdateData) => Promise<void>;
+  onSubmit?: (
+    data: CommentFormData,
+    reset: UseFormReset<CommentFormData>,
+  ) => Promise<void>;
   confirmButtonName: string;
-  showCancelButton: boolean;
 };
 
-function CommentEditForm({
-  onSuccess,
-  defaultValue,
-  onSubmit,
-  confirmButtonName,
-  showCancelButton,
-}: Props) {
-  const methods = useForm<CommentCreateOrUpdateData>({
+function CommentEditForm({ defaultValue, onSubmit, confirmButtonName }: Props) {
+  const methods = useForm<CommentFormData>({
     resolver: zodResolver(schema),
     defaultValues: { [CONTENT]: defaultValue },
   });
@@ -41,18 +37,17 @@ function CommentEditForm({
   const {
     handleSubmit,
     formState: { isSubmitting },
+    reset,
   } = methods;
 
-  const processData = async (formData: CommentCreateOrUpdateData) => {
+  const processData = async (formData: CommentFormData) => {
     if (isSubmitting) {
       return;
     }
 
     const parsedData = schema.parse(formData);
 
-    await onSubmit?.(parsedData);
-
-    onSuccess?.();
+    await onSubmit?.(parsedData, reset);
   };
 
   return (
@@ -64,11 +59,6 @@ function CommentEditForm({
         <Stack>
           <TextField name={CONTENT} />
           <Group position="right">
-            {showCancelButton && (
-              <Button color="gray" onClick={onSuccess}>
-                Cancel
-              </Button>
-            )}
             <Button
               type="submit"
               disabled={isSubmitting}

@@ -1,4 +1,5 @@
 import { Avatar, Paper, Stack, Space, Group } from "@mantine/core";
+import { UseFormReset } from "react-hook-form";
 import { CONTENT } from "../constants";
 import { useAppSelector } from "../redux/hooks";
 import {
@@ -8,9 +9,7 @@ import {
 import { useCreateSubmissionMutation } from "../redux/services/submissions-api";
 import toastUtils from "../utils/toast-utils";
 import CommentDisplay from "./comment-display";
-import CommentEditForm, {
-  CommentCreateOrUpdateData,
-} from "./comment-edit-form";
+import CommentEditForm, { CommentFormData } from "./comment-edit-form";
 import PlaceholderWrapper from "./placeholder-wrapper";
 
 type Props = {
@@ -41,8 +40,11 @@ function SubmissionCommentsSection({
   );
   const [createComment] = useCreateSubmissionCommentMutation();
 
-  const handleCreateComment = async (parsedData: CommentCreateOrUpdateData) => {
-    const commentPostData: CommentCreateOrUpdateData = {
+  const handleCreateComment = async (
+    parsedData: CommentFormData,
+    reset: UseFormReset<CommentFormData>,
+  ) => {
+    const commentPostData: CommentFormData = {
       content: parsedData[CONTENT],
     };
 
@@ -54,6 +56,7 @@ function SubmissionCommentsSection({
     }).unwrap();
 
     toastUtils.success({ message: "Succesfully created comment." });
+    reset({ [CONTENT]: "" });
   };
 
   return (
@@ -82,7 +85,6 @@ function SubmissionCommentsSection({
         <CommentEditForm
           defaultValue=""
           confirmButtonName="Comment"
-          showCancelButton={false}
           onSubmit={handleCreateComment}
         />
       </Group>

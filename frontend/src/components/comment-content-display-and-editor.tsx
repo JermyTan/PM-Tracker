@@ -5,9 +5,7 @@ import useGetSubmissionId from "../custom-hooks/use-get-submission-id";
 import { useUpdateSubmissionCommentMutation } from "../redux/services/comments-api";
 import { SubmissionFieldComment } from "../types/comments";
 import toastUtils from "../utils/toast-utils";
-import CommentEditForm, {
-  CommentCreateOrUpdateData,
-} from "./comment-edit-form";
+import CommentEditForm, { CommentFormData } from "./comment-edit-form";
 
 type Props = {
   isEditingComment: boolean;
@@ -25,12 +23,12 @@ function CommentContentDisplayAndEditor({
   const submissionId = useGetSubmissionId() ?? 1; // TODO: replace
   const commentId = comment.id;
 
-  const handleEditComment = async (parsedData: CommentCreateOrUpdateData) => {
+  const handleEditComment = async (parsedData: CommentFormData) => {
     if (courseId === undefined || submissionId === undefined) {
       return;
     }
 
-    const commentUpdateData: CommentCreateOrUpdateData = {
+    const commentUpdateData: CommentFormData = {
       content: parsedData[CONTENT],
     };
 
@@ -42,6 +40,7 @@ function CommentContentDisplayAndEditor({
     }).unwrap();
 
     toastUtils.success({ message: "Succesfully edited comment." });
+    onEditSuccess();
   };
 
   return isEditingComment ? (
@@ -50,7 +49,6 @@ function CommentContentDisplayAndEditor({
       defaultValue={comment.content}
       confirmButtonName="Save"
       onSuccess={onEditSuccess}
-      showCancelButton
       onSubmit={handleEditComment}
     />
   ) : (

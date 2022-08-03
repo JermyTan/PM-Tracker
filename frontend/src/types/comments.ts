@@ -19,6 +19,6 @@ export type SubmissionFieldComment = BaseData & {
 
 export type SubmissionCommentsData = SubmissionFieldComment[];
 
-export type SubmissionFieldCommentPatchData = {
+export type SubmissionFieldCommentPostPatchData = {
   [CONTENT]: string;
 };

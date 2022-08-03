@@ -101,7 +101,11 @@ function CourseMilestonesPage() {
           </SimpleGrid>
         </PlaceholderWrapper>
         <PlaceholderWrapper>
-          <SubmissionCommentsSection />
+          <SubmissionCommentsSection
+            courseId={1}
+            submissionId={1}
+            fieldIndex={0}
+          />
         </PlaceholderWrapper>
       </Stack>
     </>

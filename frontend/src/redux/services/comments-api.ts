@@ -1,7 +1,7 @@
 import {
   SubmissionCommentsData,
   SubmissionFieldComment,
-  SubmissionFieldCommentPatchData,
+  SubmissionFieldCommentPostPatchData,
 } from "../../types/comments";
 import { cacher } from "./api-cache-utils";
 import baseApi from "./base-api";
@@ -25,9 +25,31 @@ const commentsApi = baseApi
         providesTags: (result) => cacher.providesList(result, "Comment"),
       }),
 
+      createSubmissionComment: build.mutation<
+        SubmissionFieldComment,
+        SubmissionFieldCommentPostPatchData & {
+          courseId: string | number;
+          submissionId: string | number;
+          fieldIndex: number;
+        }
+      >({
+        query: ({
+          courseId,
+          submissionId,
+          fieldIndex,
+          ...commentPostData
+        }) => ({
+          url: `/courses/${courseId}/submissions/${submissionId}/fields/${fieldIndex}/comments/`,
+          method: "POST",
+          body: commentPostData,
+        }),
+        invalidatesTags: (_, error) =>
+          error ? [] : cacher.invalidatesList("Comment"),
+      }),
+
       updateSubmissionComment: build.mutation<
         SubmissionFieldComment,
-        SubmissionFieldCommentPatchData & {
+        SubmissionFieldCommentPostPatchData & {
           courseId: string | number;
           submissionId: string | number;
           commentId: string | number;
@@ -52,6 +74,7 @@ const commentsApi = baseApi
 export const {
   useGetSubmissionCommentsQuery,
   useUpdateSubmissionCommentMutation,
+  useCreateSubmissionCommentMutation,
 } = commentsApi;
 
 export default commentsApi;

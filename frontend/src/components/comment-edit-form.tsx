@@ -62,7 +62,7 @@ function CommentEditForm({
         onSubmit={handleSubmitForm(handleSubmit(processData), resolveError)}
       >
         <Stack>
-          <TextField name={CONTENT} description="Comment content" />
+          <TextField name={CONTENT} />
           <Group position="right">
             {showCancelButton && (
               <Button color="gray" onClick={onSuccess}>

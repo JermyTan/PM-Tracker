@@ -1,23 +1,60 @@
-import { Paper, Stack } from "@mantine/core";
-import { useGetSubmissionCommentsQuery } from "../redux/services/comments-api";
+import { Avatar, Paper, Stack, Space, Group } from "@mantine/core";
+import { CONTENT } from "../constants";
+import { useAppSelector } from "../redux/hooks";
+import {
+  useCreateSubmissionCommentMutation,
+  useGetSubmissionCommentsQuery,
+} from "../redux/services/comments-api";
+import { useCreateSubmissionMutation } from "../redux/services/submissions-api";
+import toastUtils from "../utils/toast-utils";
 import CommentDisplay from "./comment-display";
+import CommentEditForm, {
+  CommentCreateOrUpdateData,
+} from "./comment-edit-form";
 import PlaceholderWrapper from "./placeholder-wrapper";
 
-function SubmissionCommentsSection() {
-  const courseId = 1;
-  const submissionId = 1;
-  const fieldIndex = 0;
-  const {
-    data: comments,
-    isLoading,
-    error,
-  } = useGetSubmissionCommentsQuery({
-    courseId,
-    submissionId,
-    fieldIndex,
-  });
+type Props = {
+  fieldIndex: number;
+  courseId: number;
+  submissionId: number;
+};
 
-  console.log("COMMENTS:", comments);
+function SubmissionCommentsSection({
+  fieldIndex,
+  courseId,
+  submissionId,
+}: Props) {
+  const currentUser = useAppSelector(({ currentUser }) => currentUser?.user);
+
+  const { comments, isLoading } = useGetSubmissionCommentsQuery(
+    {
+      courseId,
+      submissionId,
+      fieldIndex: fieldIndex,
+    },
+    {
+      selectFromResult: ({ data: comments, isLoading }) => ({
+        comments,
+        isLoading,
+      }),
+    },
+  );
+  const [createComment] = useCreateSubmissionCommentMutation();
+
+  const handleCreateComment = async (parsedData: CommentCreateOrUpdateData) => {
+    const commentPostData: CommentCreateOrUpdateData = {
+      content: parsedData[CONTENT],
+    };
+
+    await createComment({
+      ...commentPostData,
+      courseId,
+      submissionId,
+      fieldIndex,
+    }).unwrap();
+
+    toastUtils.success({ message: "Succesfully created comment." });
+  };
 
   return (
     <Paper withBorder shadow="sm" p="md" radius="md">
@@ -34,6 +71,21 @@ function SubmissionCommentsSection() {
           ))}
         </Stack>
       </PlaceholderWrapper>
+      <Space h="lg" />
+      <Group align="flex-start" noWrap>
+        <Avatar
+          src={currentUser?.profileImage}
+          alt={currentUser?.name}
+          radius="xl"
+        />
+
+        <CommentEditForm
+          defaultValue={""}
+          confirmButtonName={"Comment"}
+          showCancelButton={false}
+          onSubmit={handleCreateComment}
+        />
+      </Group>
     </Paper>
   );
 }

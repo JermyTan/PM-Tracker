@@ -100,13 +100,13 @@ function CourseMilestonesPage() {
             ))}
           </SimpleGrid>
         </PlaceholderWrapper>
-        <PlaceholderWrapper>
-          <SubmissionCommentsSection
-            courseId={1}
-            submissionId={1}
-            fieldIndex={0}
-          />
-        </PlaceholderWrapper>
+
+        {/* Replace here */}
+        <SubmissionCommentsSection
+          courseId={1}
+          submissionId={1}
+          fieldIndex={0}
+        />
       </Stack>
     </>
   );

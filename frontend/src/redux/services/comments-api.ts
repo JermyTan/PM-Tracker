@@ -65,8 +65,24 @@ const commentsApi = baseApi
           method: "PATCH",
           body: commentPatchData,
         }),
-        invalidatesTags: (_, error, { commentId: id }) =>
-          error ? [] : [{ type: "Comment", id }],
+        invalidatesTags: (_, error, { commentId }) =>
+          error ? [] : [{ type: "Comment", commentId }],
+      }),
+
+      deleteSubmissionComment: build.mutation<
+        SubmissionFieldComment,
+        {
+          courseId: string | number;
+          submissionId: string | number;
+          commentId: string | number;
+        }
+      >({
+        query: ({ courseId, submissionId, commentId }) => ({
+          url: `/courses/${courseId}/submissions/${submissionId}/comments/${commentId}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: (_, error, commentId) =>
+          error ? [] : [{ type: "Comment", commentId }],
       }),
     }),
   });
@@ -75,6 +91,7 @@ export const {
   useGetSubmissionCommentsQuery,
   useUpdateSubmissionCommentMutation,
   useCreateSubmissionCommentMutation,
+  useDeleteSubmissionCommentMutation,
 } = commentsApi;
 
 export default commentsApi;

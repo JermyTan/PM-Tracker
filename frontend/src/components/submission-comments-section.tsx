@@ -6,7 +6,6 @@ import {
   useCreateSubmissionCommentMutation,
   useGetSubmissionCommentsQuery,
 } from "../redux/services/comments-api";
-import { useCreateSubmissionMutation } from "../redux/services/submissions-api";
 import toastUtils from "../utils/toast-utils";
 import CommentDisplay from "./comment-display";
 import CommentEditForm, { CommentFormData } from "./comment-edit-form";
@@ -70,7 +69,11 @@ function SubmissionCommentsSection({
       >
         <Stack>
           {comments?.map((comment) => (
-            <CommentDisplay comment={comment} />
+            <CommentDisplay
+              comment={comment}
+              courseId={courseId}
+              submissionId={submissionId}
+            />
           ))}
         </Stack>
       </PlaceholderWrapper>

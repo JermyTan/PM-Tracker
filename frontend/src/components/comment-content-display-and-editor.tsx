@@ -39,7 +39,9 @@ function CommentContentDisplayAndEditor({
       commentId,
     }).unwrap();
 
-    toastUtils.success({ message: "Succesfully edited comment." });
+    toastUtils.success({
+      message: "The comment has been updated successfully.",
+    });
     onEditSuccess();
   };
 

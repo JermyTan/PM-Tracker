@@ -36,6 +36,11 @@ from pigeonhole.common.constants import (
     GROUP,
     MILESTONE,
     ID,
+    COMMENT,
+    COMMENTER,
+    FIELD_INDEX,
+    CONTENT,
+    IS_DELETED,
 )
 from pigeonhole.common.parsers import to_base_json, parse_datetime_to_ms_timestamp
 from forms.models import Form
@@ -43,6 +48,7 @@ from users.models import User
 from users.logic import user_to_json, get_users
 
 from .models import (
+    Comment,
     Course,
     CourseGroup,
     CourseGroupMember,
@@ -51,6 +57,7 @@ from .models import (
     CourseMilestoneTemplate,
     CourseSettings,
     CourseSubmission,
+    CourseSubmissionFieldComment,
     PatchCourseGroupAction,
     Role,
     SubmissionType,
@@ -188,6 +195,28 @@ def course_submission_to_json(submission: CourseSubmission) -> dict:
 
     return data
 
+def comment_to_json(comment: Comment) -> dict:
+    data = to_base_json(comment)
+
+    data |= {
+        COMMENTER: user_to_json(comment.commenter),
+        CONTENT: "" if comment.is_deleted else comment.content,
+        IS_DELETED: comment.is_deleted,
+    }
+
+    return data
+
+def course_submission_field_comment_to_json(field_comment: CourseSubmissionFieldComment) -> dict:
+    data = comment_to_json(field_comment.comment)
+
+    data |= {
+        FIELD_INDEX: field_comment.field_index,
+        ROLE: field_comment.course_membership.role or ""
+    }
+
+    data[ID] = field_comment.id
+
+    return data
 
 def get_courses(*args, **kwargs) -> QuerySet[Course]:
     return Course.objects.filter(*args, **kwargs)
@@ -803,3 +832,73 @@ def can_delete_course_submission(
     return can_update_course_submission(
         requester_membership=requester_membership, submission=submission
     )
+
+
+def can_update_course_submission_field_comment(
+    requester_membership: CourseMembership, submission_comment: CourseSubmissionFieldComment
+) -> bool:
+    return requester_membership == submission_comment.course_membership
+
+
+def can_delete_course_submission_field_comment(
+    requester_membership: CourseMembership, submission_comment: CourseSubmissionFieldComment
+) -> bool:
+    return can_update_course_submission_field_comment(
+        requester_membership=requester_membership,
+        submission_comment=submission_comment
+    )
+
+
+def comment_is_deleted(comment: Comment) -> bool:
+    return comment.is_deleted
+
+
+def submission_field_comment_is_deleted(submission_comment: CourseSubmissionFieldComment) -> bool:
+    return comment_is_deleted(submission_comment.comment)
+
+
+@transaction.atomic
+def create_course_submission_field_comment(
+    submission: CourseSubmission,
+    commenter: User,
+    content: str,
+    field_index: int,
+    course_membership: CourseMembership
+
+) -> CourseSubmissionFieldComment:
+    
+    new_comment = Comment.objects.create(content=content, commenter=commenter)
+
+    new_course_submission_field_comment = CourseSubmissionFieldComment.objects.create(
+        submission=submission,
+        comment=new_comment,
+        field_index=field_index,
+        course_membership=course_membership
+    )
+
+    return new_course_submission_field_comment
+
+@transaction.atomic
+def update_course_submission_field_comment(
+    course_submission_field_comment: CourseSubmissionFieldComment,
+    content: str
+) -> CourseSubmissionFieldComment:
+    
+    comment = course_submission_field_comment.comment
+    comment.content = content
+
+    comment.save()
+
+    return course_submission_field_comment
+
+@transaction.atomic
+def delete_course_submission_field_comment(
+    course_submission_field_comment: CourseSubmissionFieldComment,
+) -> CourseSubmissionFieldComment:
+    
+    comment = course_submission_field_comment.comment
+    comment.is_deleted = True
+
+    comment.save()
+
+    return course_submission_field_comment

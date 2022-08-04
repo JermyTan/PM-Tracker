@@ -196,3 +196,41 @@ class CourseSubmission(TimestampedModel):
 
     def __str__(self) -> str:
         return f"{self.name} | {self.creator}"
+
+class Comment(TimestampedModel):
+    content = models.TextField()
+    is_deleted = models.BooleanField(default=False)
+    commenter = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+class CourseSubmissionFieldComment(TimestampedModel):
+    submission = models.ForeignKey(CourseSubmission, on_delete=models.CASCADE)
+    comment = models.OneToOneField(Comment, on_delete=models.CASCADE)
+    field_index = models.PositiveIntegerField()
+    course_membership = models.ForeignKey(CourseMembership, on_delete=models.SET_NULL, null=True)
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["submission_id", "comment_id"],
+                name="unique_submission_comment",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.submission.name} | {self.comment.content}"
+
+
+def course_submission_field_comment_cleanup(
+    sender, instance: CourseSubmissionFieldComment, **kwargs
+):
+    if not instance.comment:
+        return
+
+    instance.comment.delete()
+
+
+## set up listener to delete comment when a course submission field comment is deleted
+post_delete.connect(
+    course_submission_field_comment_cleanup,
+    sender=CourseSubmissionFieldComment,
+    dispatch_uid="courses.course_submission_field_comment.course_submission_field_comment_cleanup",
+)

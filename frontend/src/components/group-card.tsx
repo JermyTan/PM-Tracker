@@ -4,7 +4,7 @@ import { MdGroup } from "react-icons/md";
 import { createSelector } from "@reduxjs/toolkit";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import pluralize from "pluralize";
-import { GroupSummaryView } from "../types/groups";
+import { GroupData } from "../types/groups";
 import PlaceholderWrapper from "./placeholder-wrapper";
 import UserProfileDisplay from "./user-profile-display";
 import { useGetCourseGroupsQuery } from "../redux/services/groups-api";
@@ -56,7 +56,7 @@ function GroupCard({ groupId, course }: Props) {
   const selectGroup = useMemo(
     () =>
       createSelector(
-        (data?: GroupSummaryView[]) => data,
+        (data?: GroupData[]) => data,
         (_: unknown, id?: number) => id,
         (data, id) => {
           const group = data?.find((group) => group.id === id);
@@ -98,7 +98,6 @@ function GroupCard({ groupId, course }: Props) {
           </div>
           <GroupCardActionsMenu
             course={course}
-            courseId={courseId}
             group={group}
             hasAdminPermission={hasAdminPermission}
             userIsInGroup={userIsInGroup}

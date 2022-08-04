@@ -13,6 +13,7 @@ import {
   MILESTONE_ALIAS,
   ROLE,
   OWNER_ID,
+  USER,
 } from "../constants";
 import { BaseData } from "./base";
 import { UserData } from "./users";
@@ -22,6 +23,16 @@ export enum Role {
   Instructor = "INSTRUCTOR",
   Student = "STUDENT",
 }
+
+export const roles = Object.values(Role);
+
+// Matches a user's role in a course to the set of roles which the
+// user can add/remove to a course group
+export const editableRoleMap = new Map<Role | undefined, Set<Role>>([
+  [Role.Student, new Set<Role>([Role.Student])],
+  [Role.Instructor, new Set<Role>([Role.Student, Role.Instructor])],
+  [Role.CoOwner, new Set<Role>([Role.Student, Role.Instructor, Role.CoOwner])],
+]);
 
 export type CourseSummaryData = BaseData & {
   [NAME]: string;
@@ -52,4 +63,13 @@ export type CoursePostData = Pick<
 
 export type CoursePutData = CoursePostData & {
   [OWNER_ID]?: number;
+};
+
+export type CourseMemberData = BaseData & {
+  [ROLE]: Role;
+  [USER]: UserData;
+};
+
+export type CourseMembershipPatchData = {
+  [ROLE]: Role;
 };

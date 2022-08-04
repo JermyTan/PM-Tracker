@@ -8,6 +8,8 @@ import {
   NAME,
   PASSWORD,
   PROFILE_IMAGE,
+  ROLE,
+  USER,
 } from "../constants";
 
 export enum AccountType {

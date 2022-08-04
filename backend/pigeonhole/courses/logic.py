@@ -511,6 +511,45 @@ def update_course_group(group: CourseGroup, name: str) -> CourseGroup:
 
     return group
 
+@transaction.atomic
+def batch_update_course_group_members(
+    course: Course,
+    group: CourseGroup,
+    user_ids: Sequence[int] 
+) -> CourseGroup:
+
+    # delete members whose ids are not in list of ids
+    group_members_to_delete = CourseGroupMember.objects.filter(group=group).exclude(member__user__id__in=user_ids)
+    _, _ = group_members_to_delete.delete()
+
+    # add members that are not in group
+    for user_id in user_ids:
+        try:
+            membership = course.coursemembership_set.get(user_id=user_id)
+            
+            if CourseGroupMember.objects.filter(group=group, member_id=membership.id).exists():
+                continue
+            
+            CourseGroupMember.objects.create(member=membership, group=group)
+        except CourseMembership.DoesNotExist as e:
+            logger.warning(e)
+            raise ValueError("One or more of the members are not a part of this course.")
+        except IntegrityError as e:
+            logger.warning(e)
+            raise ValueError("Unable to add a member to the group.")
+    
+    updated_group = CourseGroup.objects.prefetch_related(
+        Prefetch(
+            lookup="coursegroupmember_set",
+            queryset=CourseGroupMember.objects.select_related(
+                "member__user__profile_image"
+            ),
+        )
+    ).get(id=group.id)
+
+    return updated_group
+
+
 
 @transaction.atomic
 def update_course_group_members(

@@ -75,15 +75,13 @@ function CourseMemberEditRoleMenu({ member, onSuccess }: Props) {
           }
         }}
       >
-        {roles.map((role) => {
-          return (
-            <Radio
-              value={role}
-              label={capitalCase(role)}
-              disabled={!editableRoles.has(role)}
-            />
-          );
-        })}
+        {roles.map((role) => (
+          <Radio
+            value={role}
+            label={capitalCase(role)}
+            disabled={!editableRoles.has(role)}
+          />
+        ))}
       </RadioGroup>
       <Space h="md" />
       <Group position="right">

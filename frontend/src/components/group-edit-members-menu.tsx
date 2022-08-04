@@ -31,6 +31,7 @@ type Props = {
   courseId?: number;
   groupId?: number;
   userCourseRole?: Role;
+  userIsInGroup: boolean;
 };
 
 const convertMemberDataToTransferListData = (
@@ -80,6 +81,7 @@ function GroupEditMembersMenu({
   courseId,
   groupId,
   userCourseRole,
+  userIsInGroup: isUserInGroup,
 }: Props) {
   const { data: allCourseMembers, isLoading: isLoadingCourseMemberships } =
     useGetCourseMembershipsQuery(courseId ?? skipToken);
@@ -140,10 +142,17 @@ function GroupEditMembersMenu({
       return;
     }
 
+    const finalMemberIds = data[0].map((item) => item.value);
+    // If user is currently in the group,
+    // add current user's id to ensure that they cannot add or remove themselves
+    if (userId && isUserInGroup) {
+      finalMemberIds.push(userId.toString());
+    }
+
     const groupPatchData: GroupPatchData = {
       action: GroupPatchAction.UpdateMembers,
       payload: {
-        userIds: data[0].map((item) => item.value),
+        userIds: finalMemberIds,
       },
     };
 
@@ -175,6 +184,7 @@ function GroupEditMembersMenu({
         onChange={setData}
         searchPlaceholder="Search..."
         titles={["Group members to remove", "Course members to add to group"]}
+        // TODO: ADD SEARCH
         // filter={(query, item) =>
         //   item.label.toLowerCase().includes(query.toLowerCase().trim()) ||
         //   item.description.toLowerCase().includes(query.toLowerCase().trim())

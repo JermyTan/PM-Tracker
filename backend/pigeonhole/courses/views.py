@@ -27,6 +27,7 @@ from .models import (
     Role,
 )
 from .logic import (
+    batch_update_course_group_members,
     can_create_course_group,
     can_delete_course_group,
     can_delete_course_submission,
@@ -595,6 +596,18 @@ class SingleCourseGroupView(APIView):
                         user_id=payload["user_id"],
                         action=action,
                     )
+                except ValueError as e:
+                    logger.warning(e)
+                    raise BadRequest(detail=e)
+            case PatchCourseGroupAction.UPDATE_MEMBERS:
+                try:
+
+                    updated_course = batch_update_course_group_members(
+                        course=course,
+                        group=group,
+                        user_ids=payload["user_ids"]
+                    )
+
                 except ValueError as e:
                     logger.warning(e)
                     raise BadRequest(detail=e)

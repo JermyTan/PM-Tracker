@@ -26,6 +26,9 @@ class IdField(serializers.IntegerField):
 class UserIdSerializer(serializers.Serializer):
     user_id = IdField(required=True)
 
+class BatchUserIdSerializer(serializers.Serializer):
+    user_ids = serializers.ListField(child=IdField(required=True))
+
 
 class ObjectListField(serializers.ListField):
     child = serializers.JSONField()

@@ -9,6 +9,10 @@ export function trim<T>(value: T) {
   return typeof value === "string" ? value.trim() : value;
 }
 
+export function capitalizeFirstLetter(string: string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 export function deepTrim<T>(value: T): T {
   if (Array.isArray(value)) {
     return value.map((item) => deepTrim(item)) as unknown as T;

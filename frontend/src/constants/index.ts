@@ -39,6 +39,7 @@ export const MEMBERS = "members";
 export const MILESTONE = "milestone";
 export const OWNER_ID = "ownerId";
 export const USER_ID = "userId";
+export const USER_IDS = "userIds";
 export const ACTION = "action";
 export const PAYLOAD = "payload";
 export const START_DATE_TIME = "startDateTime";

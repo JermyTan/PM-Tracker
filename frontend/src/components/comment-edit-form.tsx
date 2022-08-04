@@ -5,7 +5,7 @@ import { z } from "zod";
 import { CONTENT } from "../constants";
 import { useResolveError } from "../utils/error-utils";
 import { handleSubmitForm } from "../utils/form-utils";
-import TextField from "./text-field";
+import TextareaField from "./textarea-field";
 
 const schema = z.object({
   [CONTENT]: z
@@ -57,7 +57,7 @@ function CommentEditForm({ defaultValue, onSubmit, confirmButtonName }: Props) {
         onSubmit={handleSubmitForm(handleSubmit(processData), resolveError)}
       >
         <Stack>
-          <TextField name={CONTENT} />
+          <TextareaField name={CONTENT} />
           <Group position="right">
             <Button
               type="submit"

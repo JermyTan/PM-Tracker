@@ -6,6 +6,7 @@ import { useUpdateSubmissionCommentMutation } from "../redux/services/comments-a
 import { SubmissionFieldComment } from "../types/comments";
 import toastUtils from "../utils/toast-utils";
 import CommentEditForm, { CommentFormData } from "./comment-edit-form";
+import TextViewer from "./text-viewer";
 
 type Props = {
   isEditingComment: boolean;
@@ -46,7 +47,6 @@ function CommentContentDisplayAndEditor({
   };
 
   return isEditingComment ? (
-    // TODO: wrap this in scrollarea
     <CommentEditForm
       defaultValue={comment.content}
       confirmButtonName="Save"
@@ -54,7 +54,9 @@ function CommentContentDisplayAndEditor({
       onSubmit={handleEditComment}
     />
   ) : (
-    <Text size="sm">{comment.content}</Text>
+    <TextViewer size="sm" preserveWhiteSpace overflowWrap withLinkify>
+      {comment.content}
+    </TextViewer>
   );
 }
 

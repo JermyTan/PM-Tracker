@@ -106,8 +106,5 @@ export const {
   useGetCourseGroupsQuery,
   useCreateCourseGroupMutation,
   usePatchCourseGroupMutation,
-  // useJoinOrLeaveCourseGroupMutation,
-  // useRenameCourseGroupMutation,
-  // useBatchUpdateCourseGroupMutation,
   useDeleteCourseGroupMutation,
 } = groupsApi;

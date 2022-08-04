@@ -181,7 +181,7 @@ class CourseSubmission(TimestampedModel):
     group = models.ForeignKey(
         CourseGroup, on_delete=models.SET_NULL, blank=True, null=True
     )
-    parent = models.ForeignKey("self", on_delete=models.SET_NULL, blank=True, null=True)
+    template = models.ForeignKey(CourseMilestoneTemplate, on_delete=models.SET_NULL, null=True)
     creator = models.ForeignKey(CourseMembership, on_delete=models.SET_NULL, null=True)
     editor = models.ForeignKey(
         CourseMembership, on_delete=models.SET_NULL, null=True, related_name="+"
@@ -189,15 +189,10 @@ class CourseSubmission(TimestampedModel):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     is_draft = models.BooleanField()
+    submission_type = models.CharField(
+        max_length=MAX_SUBMISSION_TYPE_LENGTH, choices=SubmissionType.choices
+    )
     form_response_data = models.JSONField(blank=True, default=default_list)
-
-    class Meta:
-        constraints = [
-            models.CheckConstraint(
-                check=~models.Q(id=models.F("parent_id")),
-                name="course_submission_parent_not_self_referencing",
-            ),
-        ]
 
     def __str__(self) -> str:
         return f"{self.name} | {self.creator}"

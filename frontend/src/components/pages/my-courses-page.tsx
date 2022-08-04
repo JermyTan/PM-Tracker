@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import Head from "next/head";
-import { HiViewGridAdd, HiRefresh } from "react-icons/hi";
+import { HiViewGridAdd } from "react-icons/hi";
 import { APP_NAME } from "../../constants";
 import { useGetCoursesQuery } from "../../redux/services/courses-api";
 import { AccountType } from "../../types/users";
@@ -20,16 +20,16 @@ import CourseCard from "../course-card";
 import CourseCreationForm from "../course-creation-form";
 
 function MyCoursesPage() {
-  const {
-    data: courses,
-    isLoading,
-    isFetching,
-    refetch,
-    error,
-  } = useGetCoursesQuery();
+  const { courses, isLoading, error } = useGetCoursesQuery(undefined, {
+    selectFromResult: ({ data: courses, isLoading, error }) => ({
+      courses,
+      isLoading,
+      error,
+    }),
+  });
   // important! The very first (outermost) api call needs to resolve the error
   // subsequent api calls to the same endpoint do not need to resolve error since it is already handled here
-  useResolveError(error);
+  useResolveError({ error, name: "my-courses-page" });
   const [isDrawerOpened, { open, close }] = useDisclosure(false);
 
   return (
@@ -55,23 +55,13 @@ function MyCoursesPage() {
       <Group position="apart">
         <Title>My Courses</Title>
 
-        <Group>
-          <Button
-            leftIcon={<HiRefresh />}
-            onClick={refetch}
-            loading={isFetching}
-          >
-            Refresh
+        <AccountTypeRestrictedWrapper
+          allowedAccountTypes={[AccountType.Educator, AccountType.Admin]}
+        >
+          <Button color="teal" leftIcon={<HiViewGridAdd />} onClick={open}>
+            Create new course
           </Button>
-
-          <AccountTypeRestrictedWrapper
-            allowedAccountTypes={[AccountType.Educator, AccountType.Admin]}
-          >
-            <Button color="teal" leftIcon={<HiViewGridAdd />} onClick={open}>
-              Create new course
-            </Button>
-          </AccountTypeRestrictedWrapper>
-        </Group>
+        </AccountTypeRestrictedWrapper>
       </Group>
 
       <Space h="md" />
@@ -80,7 +70,7 @@ function MyCoursesPage() {
         isLoading={isLoading}
         py={150}
         loadingMessage="Loading my courses..."
-        defaultMessage="No courses found"
+        defaultMessage="No courses found."
         showDefaultMessage={!courses || courses.length === 0}
       >
         <SimpleGrid cols={3} spacing="xs">

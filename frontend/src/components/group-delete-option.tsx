@@ -19,7 +19,7 @@ function GroupDeleteOption({ course, group, onSuccess }: Props) {
   const courseId = course?.id;
   const groupId = group?.id;
 
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError();
 
   const onDeleteCourseGroup = async () => {
     if (courseId === undefined || groupId === undefined || isLoading) {

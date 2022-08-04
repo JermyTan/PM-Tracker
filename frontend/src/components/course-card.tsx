@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 import { CourseSummaryData, Role } from "../types/courses";
 import CourseStatusBadge from "./course-status-badge";
+import TextViewer from "./text-viewer";
 
 const useStyles = createStyles(
   (theme, { userCanAccessCourse }: { userCanAccessCourse?: boolean }) => ({
@@ -23,10 +24,6 @@ const useStyles = createStyles(
 
     scrollArea: {
       height: 75,
-    },
-
-    description: {
-      whiteSpace: "break-spaces",
     },
   }),
 );
@@ -79,13 +76,15 @@ function CourseCard({
           </Text>
         </Group>
         <ScrollArea offsetScrollbars className={classes.scrollArea}>
-          <Text
-            className={classes.description}
+          <TextViewer
+            preserveWhiteSpace
+            overflowWrap
+            withLinkify
             size="sm"
             color={hasDescription ? "" : "dimmed"}
           >
             {description || "No description"}
-          </Text>
+          </TextViewer>
         </ScrollArea>
         <Group>
           <CourseStatusBadge isPublished={isPublished} />

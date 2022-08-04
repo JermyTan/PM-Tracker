@@ -39,6 +39,23 @@ export function sanitizeArray(
   return strings.map((s) => s.trim()).filter((s) => s);
 }
 
+export function sanitizeObject<T>(
+  object: Record<string, unknown>,
+  defaultValue?: T,
+) {
+  const newObject: Record<string, unknown> = {};
+
+  Object.entries(object).forEach(([key, value]) => {
+    if (value === undefined) {
+      return;
+    }
+
+    newObject[key] = value;
+  });
+
+  return Object.keys(newObject).length === 0 ? defaultValue : newObject;
+}
+
 export function displayDateTime(
   inputDateTime: string | number | Date,
   dateTimeFormat?: string,
@@ -73,6 +90,19 @@ export function getEndOfDate(date: Date, unit: dayjs.OpUnitType) {
   return dayjs(date).endOf(unit).toDate();
 }
 
+export function transformKeys(
+  transformFn: (input: string) => string,
+  object: Record<string, unknown>,
+) {
+  const newObject: Record<string, unknown> = {};
+
+  Object.entries(object).forEach(([key, value]) => {
+    newObject[transformFn(key)] = value;
+  });
+
+  return newObject;
+}
+
 // export function displayDateTimeRange(
 //   inputStartDateTime: string | number | Date,
 //   inputEndDateTime: string | number | Date,
@@ -97,9 +127,9 @@ export function getEndOfDate(date: Date, unit: dayjs.OpUnitType) {
 export function sort<T>(
   array: T[],
   {
-    props,
+    key,
     reverse = false,
-  }: { props?: Parameters<typeof arraySort>[1]; reverse?: boolean } = {},
+  }: { key?: Parameters<typeof arraySort>[1]; reverse?: boolean } = {},
 ) {
-  return arraySort([...array], props, { reverse });
+  return arraySort([...array], key, { reverse });
 }

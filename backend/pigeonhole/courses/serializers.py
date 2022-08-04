@@ -1,3 +1,4 @@
+from email.policy import default
 from rest_framework import serializers
 
 from pigeonhole.common.models import MergeSerializersMixin
@@ -84,7 +85,13 @@ class PostCourseMilestoneSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CourseMilestone
-        fields = ("name", "description", "start_date_time", "end_date_time", "is_published")
+        fields = (
+            "name",
+            "description",
+            "start_date_time",
+            "end_date_time",
+            "is_published",
+        )
 
 
 PutCourseMilestoneSerializer = PostCourseMilestoneSerializer
@@ -162,6 +169,7 @@ class GetCourseSubmissionSerializer(serializers.Serializer):
     group_id = IdField(required=False, default=None)
     creator_id = IdField(required=False, default=None)
     editor_id = IdField(required=False, default=None)
+    template_id = IdField(required=False, default=None)
 
 
 class PutCourseSubmissionSerializer(serializers.ModelSerializer):
@@ -177,12 +185,17 @@ class PutCourseSubmissionSerializer(serializers.ModelSerializer):
             "name",
             "description",
             "is_draft",
+            "submission_type",
             "form_response_data",
         )
 
 
 class PostCourseSubmissionSerializer(PutCourseSubmissionSerializer):
     milestone_id = IdField(required=True)
+    template_id = IdField(required=True)
 
     class Meta(PutCourseSubmissionSerializer.Meta):
-        fields = PutCourseSubmissionSerializer.Meta.fields + ("milestone_id",)
+        fields = PutCourseSubmissionSerializer.Meta.fields + (
+            "milestone_id",
+            "template_id",
+        )

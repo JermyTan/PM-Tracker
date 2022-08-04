@@ -12,11 +12,11 @@ import { useModals } from "@mantine/modals";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { MdDeleteForever, MdEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { useGetCourseId } from "../custom-hooks/use-get-course-id";
+import useGetCourseId from "../custom-hooks/use-get-course-id";
 import { useAppSelector } from "../redux/hooks";
 import {
   useDeleteCourseMutation,
-  useGetSingleCourseQuery,
+  useGetSingleCourseQueryState,
 } from "../redux/services/courses-api";
 import { MY_COURSES_PATH } from "../routes/paths";
 import { useResolveError } from "../utils/error-utils";
@@ -28,13 +28,13 @@ type Props = StackProps;
 function CourseActionsSection(props: Props) {
   const userId = useAppSelector(({ currentUser }) => currentUser?.user?.id);
   const courseId = useGetCourseId();
-  const { ownerId } = useGetSingleCourseQuery(courseId ?? skipToken, {
+  const { ownerId } = useGetSingleCourseQueryState(courseId ?? skipToken, {
     selectFromResult: ({ data: course }) => ({ ownerId: course?.owner.id }),
   });
   const [deleteCourse, { isLoading }] = useDeleteCourseMutation({
     selectFromResult: ({ isLoading }) => ({ isLoading }),
   });
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError({ name: "course-actions-section" });
   const [isDrawerOpened, { open, close }] = useDisclosure(false);
   const navigate = useNavigate();
   const modals = useModals();
@@ -48,7 +48,7 @@ function CourseActionsSection(props: Props) {
       await deleteCourse(courseId).unwrap();
 
       toastUtils.success({
-        message: "The course has been successfully deleted.",
+        message: "The course has been deleted successfully.",
       });
 
       // TODO: navigate will trigger after rtk query has invalidated the current course tag
@@ -76,7 +76,7 @@ function CourseActionsSection(props: Props) {
         </Text>
       ),
       labels: { confirm: "Delete course", cancel: "No don't delete" },
-      confirmProps: { color: "red", loading: isLoading },
+      confirmProps: { color: "red" },
       onConfirm: onDeleteCourse,
     });
 

@@ -66,7 +66,7 @@ function LoginAccountForm() {
     resolver: zodResolver(schema),
     defaultValues: { ...DEFAULT_VALUES, name, email, rememberMe },
   });
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError({ name: "login-account-form" });
 
   const {
     handleSubmit,
@@ -78,7 +78,7 @@ function LoginAccountForm() {
       return;
     }
 
-    const { rememberMe, ...passwordLoginPostData } = schema.parse(formData);
+    const { rememberMe, ...passwordLoginPostData } = formData;
 
     const currentUser = await passwordLogin(passwordLoginPostData).unwrap();
 
@@ -132,12 +132,7 @@ function LoginAccountForm() {
             </Group>
           </Stack>
 
-          <Button
-            fullWidth
-            disabled={isSubmitting}
-            loading={isSubmitting}
-            type="submit"
-          >
+          <Button disabled={isSubmitting} loading={isSubmitting} type="submit">
             {name ? "Login" : "Sign up"}
           </Button>
         </Stack>

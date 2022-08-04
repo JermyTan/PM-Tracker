@@ -10,10 +10,9 @@ import {
   Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { capitalCase } from "change-case";
 import { MdEdit, MdDelete } from "react-icons/md";
-import { useGetCourseId } from "../custom-hooks/use-get-course-id";
-import { useGetMilestoneAlias } from "../custom-hooks/use-get-milestone-alias";
+import useGetCourseId from "../custom-hooks/use-get-course-id";
+import useGetMilestoneAlias from "../custom-hooks/use-get-milestone-alias";
 import { useDeleteMilestoneMutation } from "../redux/services/milestones-api";
 import { MilestoneData } from "../types/milestones";
 import { useResolveError } from "../utils/error-utils";
@@ -24,7 +23,7 @@ type Props = MilestoneData;
 
 function MilestoneActionsMenu({ id: milestoneId, name }: Props) {
   const courseId = useGetCourseId();
-  const milestoneAlias = useGetMilestoneAlias();
+  const { milestoneAlias, capitalizedMilestoneAlias } = useGetMilestoneAlias();
   const [
     isDeleteModalOpened,
     { open: openDeleteModal, close: closeDeleteModal },
@@ -34,7 +33,7 @@ function MilestoneActionsMenu({ id: milestoneId, name }: Props) {
   const [deleteMilestone, { isDeleting }] = useDeleteMilestoneMutation({
     selectFromResult: ({ isLoading: isDeleting }) => ({ isDeleting }),
   });
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError({ name: "milestone-actions-menu" });
 
   const onDeleteMilestone = async () => {
     if (isDeleting || courseId === undefined) {
@@ -45,7 +44,7 @@ function MilestoneActionsMenu({ id: milestoneId, name }: Props) {
       await deleteMilestone({ courseId, milestoneId }).unwrap();
 
       toastUtils.success({
-        message: `The ${milestoneAlias} has been successfully deleted.`,
+        message: `The ${milestoneAlias} has been deleted successfully.`,
       });
       closeDeleteModal();
     } catch (error) {
@@ -62,7 +61,7 @@ function MilestoneActionsMenu({ id: milestoneId, name }: Props) {
         size="xl"
         padding="lg"
         closeButtonLabel={`Cancel ${milestoneAlias} update`}
-        title={<Title order={2}>{capitalCase(milestoneAlias)} Update</Title>}
+        title={<Title order={2}>{capitalizedMilestoneAlias} Update</Title>}
       >
         {/* special case: this conditional render is required as milestone edit form is mounted and api call will be made
         even though the drawer is not yet opened */}
@@ -81,11 +80,14 @@ function MilestoneActionsMenu({ id: milestoneId, name }: Props) {
         onClose={closeDeleteModal}
         centered
         title={`Delete ${milestoneAlias}`}
+        closeButtonLabel={`Cancel ${milestoneAlias} deletion`}
       >
         <Stack>
           <Text size="sm">
             Are you sure you want to delete this {milestoneAlias} (
             <strong>{name}</strong>)?
+            <br />
+            <strong>This action is destructive and irreversible.</strong>
           </Text>
           <Group position="right">
             <Button variant="default" onClick={closeDeleteModal}>

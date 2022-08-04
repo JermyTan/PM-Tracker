@@ -7,20 +7,11 @@ type Props = TimeInputProps & {
 
 function TimeField({ name, ...props }: Props) {
   const {
-    field: { onChange, onBlur, value, ref },
+    field,
     fieldState: { error },
-  } = useController({ name });
+  } = useController<{ [name: string]: Date | null }>({ name });
 
-  return (
-    <TimeInput
-      error={error?.message}
-      {...props}
-      onChange={onChange}
-      value={value}
-      onBlur={onBlur}
-      ref={ref}
-    />
-  );
+  return <TimeInput error={error?.message} {...props} {...field} />;
 }
 
 export default TimeField;

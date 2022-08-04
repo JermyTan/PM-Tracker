@@ -1,6 +1,5 @@
 import { Switch, SwitchProps } from "@mantine/core";
-import { useFormContext } from "react-hook-form";
-import get from "lodash/get";
+import { useFormContext, get } from "react-hook-form";
 import { useEffect } from "react";
 import toastUtils from "../utils/toast-utils";
 

@@ -7,10 +7,10 @@ import {
   Space,
   Text,
 } from "@mantine/core";
-import { useGetCourseId } from "../custom-hooks/use-get-course-id";
 import { useDeleteCourseMembershipMutation } from "../redux/services/members-api";
 import { CourseMemberData } from "../types/courses";
 import { useResolveError } from "../utils/error-utils";
+import useGetCourseId from "../custom-hooks/use-get-course-id";
 import toastUtils from "../utils/toast-utils";
 
 import UserProfileDisplay from "./user-profile-display";
@@ -24,7 +24,7 @@ function CourseMemberRemoveConfirmation({ member, onSuccess }: Props) {
   const courseId = useGetCourseId();
   const membershipId = member.id;
 
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError();
 
   const [deleteCourseMember, { isLoading }] =
     useDeleteCourseMembershipMutation();

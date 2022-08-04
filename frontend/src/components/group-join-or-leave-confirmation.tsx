@@ -1,16 +1,10 @@
-import { Menu, Text, Modal, Button, Space, Group } from "@mantine/core";
-import { useState } from "react";
-import { FaTrashAlt } from "react-icons/fa";
-import {
-  // useDeleteCourseGroupMutation,
-  // useJoinOrLeaveCourseGroupMutation,
-  usePatchCourseGroupMutation,
-} from "../redux/services/groups-api";
+import { Text, Modal, Button, Space, Group } from "@mantine/core";
+import { capitalCase } from "change-case";
+import { usePatchCourseGroupMutation } from "../redux/services/groups-api";
 import { CourseData } from "../types/courses";
 import { GroupData, GroupPatchAction, GroupPatchData } from "../types/groups";
 import { useResolveError } from "../utils/error-utils";
 import toastUtils from "../utils/toast-utils";
-import { capitalizeFirstLetter } from "../utils/transform-utils";
 
 type Props = {
   course?: CourseData;
@@ -30,11 +24,11 @@ function GroupJoinOrLeaveConfirmation({
   const courseId = course?.id;
   const groupId = group?.id;
 
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError();
 
   // TODO: use a library?
   const actionLowerCase = action.toLowerCase();
-  const actionCapitalized = capitalizeFirstLetter(actionLowerCase);
+  const actionCapitalized = capitalCase(action);
   const actionPastTense = action === GroupPatchAction.Join ? "joined" : "left";
   const oppositeActionLowerCase =
     action === GroupPatchAction.Join

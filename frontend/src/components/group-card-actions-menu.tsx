@@ -35,7 +35,7 @@ function GroupCardActionsMenu({
   const courseId = course?.id;
   const groupId = group?.id;
 
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError();
 
   const canJoinGroup =
     !userIsInGroup && (hasAdminPermission || course?.allowStudentsToJoinGroups);

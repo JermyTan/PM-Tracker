@@ -11,7 +11,7 @@ import {
   Space,
 } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/dist/query";
-import { capitalize } from "lodash";
+import { capitalCase } from "change-case";
 import pluralize from "pluralize";
 import { useEffect, useState } from "react";
 import { USER, NAME, EMAIL } from "../constants";
@@ -36,7 +36,7 @@ type Props = {
 const convertMemberDataToTransferListData = (
   courseMemberData: CourseMemberData,
 ) => {
-  const roleString = capitalize(pluralize(courseMemberData.role.toLowerCase()));
+  const roleString = capitalCase(pluralize(courseMemberData.role));
 
   return {
     value: `${courseMemberData.user.id}`,
@@ -129,7 +129,7 @@ function GroupEditMembersMenu({
     setData(transferListValues);
   }, [allCourseMembers, groupUserData, userCourseRole, userId]);
 
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError();
 
   const onUpdateGroupMembers = async () => {
     if (

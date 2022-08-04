@@ -22,7 +22,7 @@ import CourseMembershipsList from "../course-memberships-list";
 import GroupNameForm, { GroupNameData } from "../group-name-form";
 import toastUtils from "../../utils/toast-utils";
 import { Role } from "../../types/courses";
-import { useGetCourseId } from "../../custom-hooks/use-get-course-id";
+import useGetCourseId from "../../custom-hooks/use-get-course-id";
 
 function CourseGroupPage() {
   const [isCreateGroupModalOpen, setCreateGroupModalOpen] = useState(false);

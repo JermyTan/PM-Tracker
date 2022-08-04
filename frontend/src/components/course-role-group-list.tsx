@@ -1,5 +1,5 @@
 import { Stack, Text } from "@mantine/core";
-import { capitalize } from "lodash";
+import { capitalCase } from "change-case";
 import pluralize from "pluralize";
 import { useAppSelector } from "../redux/hooks";
 import {
@@ -31,8 +31,7 @@ function CourseRoleGroupList({
   return (
     <>
       <Text size="md" weight={500}>
-        {/** TODO: check if there is a better way to do this */}
-        {capitalize(pluralize(role.toLowerCase()))}
+        {capitalCase(pluralize(role))}
       </Text>
       <Stack spacing="xs">
         {personnel.map((member) => {

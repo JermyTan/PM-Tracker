@@ -95,23 +95,18 @@ function App({ Component, pageProps }: AppProps) {
             styles={{
               Tooltip: {
                 root: {
-                  display: "block",
-                },
-              },
-              Checkbox: {
-                input: {
-                  cursor: "pointer",
-                },
-                label: {
-                  cursor: "pointer",
+                  display: "flex",
                 },
               },
               Button: {
+                root: {
+                  minWidth: "150px",
+                },
                 rightIcon: {
-                  marginLeft: 6,
+                  marginLeft: "6px",
                 },
                 leftIcon: {
-                  marginRight: 6,
+                  marginRight: "6px",
                 },
               },
               Drawer: {
@@ -120,6 +115,13 @@ function App({ Component, pageProps }: AppProps) {
                   flexDirection: "column",
                 },
               },
+              Divider: (theme) => ({
+                horizontal: {
+                  borderTopColor: colorModeValue(colorScheme, {
+                    darkModeValue: theme.colors.dark[4],
+                  }),
+                },
+              }),
             }}
           >
             <NotificationsProvider position="bottom-center" limit={3}>

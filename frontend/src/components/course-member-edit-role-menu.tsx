@@ -1,9 +1,9 @@
 import { Button, Group, Radio, RadioGroup, Space } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/dist/query";
-import { capitalize } from "lodash";
+import { capitalCase } from "change-case";
 import { useState } from "react";
 import { ROLE } from "../constants";
-import { useGetCourseId } from "../custom-hooks/use-get-course-id";
+import useGetCourseId from "../custom-hooks/use-get-course-id";
 import { useGetSingleCourseQuery } from "../redux/services/courses-api";
 import { useUpdateCourseMembershipMutation } from "../redux/services/members-api";
 import {
@@ -31,7 +31,7 @@ function CourseMemberEditRoleMenu({ member, onSuccess }: Props) {
 
   const membershipId = member.id;
 
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError();
 
   const [updateCourseMemberRole, { isLoading }] =
     useUpdateCourseMembershipMutation();
@@ -76,11 +76,10 @@ function CourseMemberEditRoleMenu({ member, onSuccess }: Props) {
         }}
       >
         {roles.map((role) => {
-          const roleString = capitalize(role.toLowerCase());
           return (
             <Radio
               value={role}
-              label={roleString}
+              label={capitalCase(role)}
               disabled={!editableRoles.has(role)}
             />
           );

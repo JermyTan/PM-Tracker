@@ -27,7 +27,7 @@ function LoginEmailForm() {
   const [checkAccount] = useLazyCheckAccountQuery({
     selectFromResult: emptySelector,
   });
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError({ name: "login-email-form" });
 
   const methods = useForm<LoginEmailFormProps>({
     resolver: zodResolver(schema),
@@ -44,7 +44,7 @@ function LoginEmailForm() {
       return;
     }
 
-    const accountDetails = await checkAccount(schema.parse(formData)).unwrap();
+    const accountDetails = await checkAccount(formData).unwrap();
 
     setAccountDetails(accountDetails);
     setInputEmail(accountDetails.email);
@@ -53,7 +53,7 @@ function LoginEmailForm() {
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmitForm(handleSubmit(onSubmit), resolveError)}>
-        <Stack spacing="xl">
+        <Stack spacing="lg">
           <TextField
             name={EMAIL}
             label="Email"

@@ -7,19 +7,16 @@ type Props = DatePickerProps & {
 
 function DateField({ name, ...props }: Props) {
   const {
-    field: { onChange, onBlur, value, ref },
+    field,
     fieldState: { error },
-  } = useController({ name });
+  } = useController<{ [name: string]: Date | null }>({ name });
 
   return (
     <DatePicker
       error={error?.message}
       firstDayOfWeek="sunday"
       {...props}
-      onChange={onChange}
-      value={value}
-      onBlur={onBlur}
-      ref={ref}
+      {...field}
     />
   );
 }

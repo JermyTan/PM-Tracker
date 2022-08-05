@@ -18,6 +18,9 @@ import CourseMilestoneTemplatesCreationPage from "../components/pages/course-mil
 import CourseMilestoneTemplatesEditPage from "../components/pages/course-milestone-templates-edit-page";
 import CourseMilestoneTemplatesViewPage from "../components/pages/course-milestone-templates-view-page";
 import MilestoneTemplatesNestedLayout from "../components/milestone-templates-nested-layout";
+import CourseMilestoneSubmissionsPage from "../components/pages/course-milestone-submissions-page";
+import MilestoneLayout from "../components/milestone-layout";
+import MilestoneDetailsLayout from "../components/milestone-details-layout";
 
 function RouteHandler() {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
@@ -49,6 +52,31 @@ function RouteHandler() {
             >
               <Route index element={<Navigate to="milestones" replace />} />
               <Route path="milestones" element={<CourseMilestonesPage />} />
+              <Route
+                element={
+                  <MilestoneLayout>
+                    <Outlet />
+                  </MilestoneLayout>
+                }
+                path="milestones/:milestoneId"
+              >
+                <Route
+                  element={
+                    <MilestoneDetailsLayout>
+                      <Outlet />
+                    </MilestoneDetailsLayout>
+                  }
+                >
+                  <Route
+                    index
+                    element={<Navigate to="submissions" replace />}
+                  />
+                  <Route
+                    path="submissions"
+                    element={<CourseMilestoneSubmissionsPage />}
+                  />
+                </Route>
+              </Route>
               <Route
                 path="templates"
                 element={

@@ -1,11 +1,11 @@
-import { Alert, Badge, Group, Paper, Stack, Text } from "@mantine/core";
+import { Alert, Badge, Group, Paper, Stack } from "@mantine/core";
 import { HiEyeOff } from "react-icons/hi";
-import { DATE_TIME_MONTH_NAME_FORMAT } from "../constants";
+import { useNavigate } from "react-router-dom";
 import useGetMilestoneAlias from "../custom-hooks/use-get-milestone-alias";
 import { Role } from "../types/courses";
 import { MilestoneData } from "../types/milestones";
-import { displayDateTime } from "../utils/transform-utils";
 import MilestoneActionsMenu from "./milestone-actions-menu";
+import MilestoneActivePeriodDisplay from "./milestone-active-period-display";
 import RoleRestrictedWrapper from "./role-restricted-wrapper";
 import TextViewer from "./text-viewer";
 
@@ -13,14 +13,21 @@ type Props = MilestoneData;
 
 function MilestoneCard(props: Props) {
   const { milestoneAlias } = useGetMilestoneAlias();
+  const navigate = useNavigate();
 
-  const { name, startDateTime, endDateTime, isPublished } = props;
+  const { name, startDateTime, endDateTime, isPublished, id } = props;
   const now = Date.now();
   const isOpen =
     startDateTime <= now && (endDateTime === null || now <= endDateTime);
 
   return (
-    <Paper withBorder shadow="sm" p="md" radius="md">
+    <Paper
+      onClick={() => navigate(`${id}`)}
+      withBorder
+      shadow="sm"
+      p="md"
+      radius="md"
+    >
       <Stack spacing="xs">
         <Group noWrap spacing={4} position="apart" align="flex-start">
           <TextViewer overflowWrap weight={600} size="lg">
@@ -30,22 +37,10 @@ function MilestoneCard(props: Props) {
             <MilestoneActionsMenu {...props} />
           </RoleRestrictedWrapper>
         </Group>
-        <div>
-          <Text size="sm">
-            Start:{" "}
-            <Text<"span"> weight={500} size="sm" component="span">
-              {displayDateTime(startDateTime, DATE_TIME_MONTH_NAME_FORMAT)}
-            </Text>
-          </Text>
-          {endDateTime !== null && (
-            <Text size="sm">
-              End:{" "}
-              <Text<"span"> weight={500} size="sm" component="span">
-                {displayDateTime(endDateTime, DATE_TIME_MONTH_NAME_FORMAT)}
-              </Text>
-            </Text>
-          )}
-        </div>
+        <MilestoneActivePeriodDisplay
+          startDateTime={startDateTime}
+          endDateTime={endDateTime}
+        />
         <div>
           <Badge variant="outline" color={isOpen ? "green" : "red"}>
             {isOpen ? "Open" : "Closed"}

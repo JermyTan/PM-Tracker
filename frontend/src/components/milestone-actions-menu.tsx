@@ -53,7 +53,13 @@ function MilestoneActionsMenu({ id: milestoneId, name }: Props) {
   };
 
   return (
-    <>
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+    <div
+      onClick={(event) => {
+        event.stopPropagation();
+      }}
+      onKeyDown={() => {}}
+    >
       <Drawer
         opened={isEditDrawerOpened}
         onClose={closeEditDrawer}
@@ -112,7 +118,7 @@ function MilestoneActionsMenu({ id: milestoneId, name }: Props) {
           Delete {milestoneAlias}
         </Menu.Item>
       </Menu>
-    </>
+    </div>
   );
 }
 

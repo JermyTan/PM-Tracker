@@ -4,6 +4,7 @@ import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import useGetMilestoneAlias from "../../custom-hooks/use-get-milestone-alias";
 import { useCreateTemplateMutation } from "../../redux/services/templates-api";
 import { emptySelector } from "../../redux/utils";
+import { TemplatePostData } from "../../types/templates";
 import toastUtils from "../../utils/toast-utils";
 import MilestoneTemplateFormBuilder, {
   MilestoneTemplateFormBuilderData,
@@ -25,7 +26,7 @@ function CourseMilestoneTemplatesCreationPage() {
     }
 
     const newTemplate = await createTemplate({
-      ...formData,
+      ...(formData as TemplatePostData),
       courseId,
     }).unwrap();
 

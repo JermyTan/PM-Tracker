@@ -35,7 +35,7 @@ const schema = z.object({
   [FORM_RESPONSE_DATA]: z.array(formResponseFieldSchema),
 });
 
-type SubmissionFormProps = z.infer<typeof schema>;
+export type SubmissionFormProps = z.infer<typeof schema>;
 
 type MilestoneSubmissionFormHandler = {
   reset: UseFormReset<SubmissionFormProps>;
@@ -45,10 +45,11 @@ type Props = {
   defaultValues: SubmissionViewData;
   readOnly?: boolean;
   testMode?: boolean;
+  onSubmit?: (formData: SubmissionFormProps) => Promise<unknown>;
 };
 
 function MilestoneSubmissionForm(
-  { defaultValues, readOnly, testMode }: Props,
+  { defaultValues, readOnly, testMode, onSubmit: handleOnSubmit }: Props,
   ref: Ref<MilestoneSubmissionFormHandler>,
 ) {
   const methods = useForm<SubmissionFormProps>({
@@ -83,7 +84,7 @@ function MilestoneSubmissionForm(
     milestone,
   } = defaultValues;
 
-  const onSubmit = () => {
+  const onSubmit = async (formData: SubmissionFormProps) => {
     if (testMode) {
       console.log("test");
       toastUtils.info({
@@ -97,7 +98,7 @@ function MilestoneSubmissionForm(
       return;
     }
 
-    console.log("attempting to submit");
+    await handleOnSubmit?.(formData);
   };
 
   return (
@@ -116,9 +117,9 @@ function MilestoneSubmissionForm(
                 title="Test Mode"
               >
                 This form is in test mode. You can test this form by filling in
-                the form fields. Validations, such as checking non-empty inputs
-                for required fields, will be run. No actual submission will be
-                made in test mode.
+                the fields. Validations, such as checking non-empty inputs for
+                required fields, will be run. No actual submission will be made
+                in test mode.
               </Alert>
             )}
 

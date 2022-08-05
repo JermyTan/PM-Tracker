@@ -5,6 +5,16 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
   return !Array.isArray(value) && typeof value === "object" && value !== null;
 }
 
+export function isStringOrArray(
+  value: unknown,
+): value is string | (string | number)[] {
+  return (
+    typeof value === "string" ||
+    (Array.isArray(value) &&
+      value.every((v) => typeof v === "string" || typeof v === "number"))
+  );
+}
+
 export function trim<T>(value: T) {
   return typeof value === "string" ? value.trim() : value;
 }

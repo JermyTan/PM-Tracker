@@ -123,6 +123,7 @@ function CourseMilestoneTemplatesViewPage() {
             <MilestoneSubmissionForm
               ref={formRef}
               defaultValues={submissionView}
+              testMode
             />
           </Paper>
         </Stack>

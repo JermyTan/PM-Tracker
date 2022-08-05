@@ -1,7 +1,8 @@
 import { forwardRef, Ref, useImperativeHandle } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Stack, Title, Text } from "@mantine/core";
+import { Stack, Title, Text, Button, Group, Alert } from "@mantine/core";
+import { GoDashboard } from "react-icons/go";
 import {
   FormProvider,
   useFieldArray,
@@ -25,6 +26,7 @@ import { handleSubmitForm } from "../utils/form-utils";
 import SubmissionTypeIconLabel from "./submission-type-icon-label";
 import FormFieldRenderer from "./form-field-renderer";
 import TextViewer from "./text-viewer";
+import toastUtils from "../utils/toast-utils";
 
 const schema = z.object({
   [IS_DRAFT]: z.boolean(),
@@ -42,17 +44,23 @@ type MilestoneSubmissionFormHandler = {
 type Props = {
   defaultValues: SubmissionViewData;
   readOnly?: boolean;
+  testMode?: boolean;
 };
 
 function MilestoneSubmissionForm(
-  { defaultValues, readOnly }: Props,
+  { defaultValues, readOnly, testMode }: Props,
   ref: Ref<MilestoneSubmissionFormHandler>,
 ) {
   const methods = useForm<SubmissionFormProps>({
     resolver: zodResolver(schema),
     defaultValues,
   });
-  const { control, handleSubmit, reset } = methods;
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = methods;
   useImperativeHandle(ref, () => ({ reset }), [reset]);
 
   const { fields } = useFieldArray({
@@ -75,7 +83,22 @@ function MilestoneSubmissionForm(
     milestone,
   } = defaultValues;
 
-  const onSubmit = () => {};
+  const onSubmit = () => {
+    if (testMode) {
+      console.log("test");
+      toastUtils.info({
+        title: "Test Mode",
+        message: "Form inputs are successfully validated and can be submitted.",
+      });
+      return;
+    }
+
+    if (isSubmitting) {
+      return;
+    }
+
+    console.log("attempting to submit");
+  };
 
   return (
     <FormProvider {...methods}>
@@ -84,16 +107,32 @@ function MilestoneSubmissionForm(
         autoComplete="off"
       >
         <Stack spacing={32}>
-          <Stack spacing={2}>
-            <Title order={4}>
-              <TextViewer inherit overflowWrap>
-                {name}
-              </TextViewer>
-            </Title>
-            <Text size="sm" color="dimmed">
-              <SubmissionTypeIconLabel submissionType={submissionType} />
-            </Text>
-            <Text size="sm">{description}</Text>
+          <Stack>
+            {testMode && (
+              <Alert
+                p="xs"
+                color="orange"
+                icon={<GoDashboard />}
+                title="Test Mode"
+              >
+                This form is in test mode. You can test this form by filling in
+                the form fields. Validations, such as checking non-empty inputs
+                for required fields, will be run. No actual submission will be
+                made in test mode.
+              </Alert>
+            )}
+
+            <Stack spacing={2}>
+              <Title order={4}>
+                <TextViewer inherit overflowWrap>
+                  {name}
+                </TextViewer>
+              </Title>
+              <Text size="sm" color="dimmed">
+                <SubmissionTypeIconLabel submissionType={submissionType} />
+              </Text>
+              <Text size="sm">{description}</Text>
+            </Stack>
           </Stack>
 
           {fields.map(({ id, ...field }, index) => (
@@ -104,6 +143,16 @@ function MilestoneSubmissionForm(
               readOnly={readOnly}
             />
           ))}
+
+          <Group position="right">
+            <Button
+              disabled={isSubmitting}
+              loading={isSubmitting}
+              type="submit"
+            >
+              Save
+            </Button>
+          </Group>
         </Stack>
       </form>
     </FormProvider>

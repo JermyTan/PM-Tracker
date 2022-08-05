@@ -14,7 +14,7 @@ import {
   SUBMISSION_TYPE,
   TYPE,
 } from "../constants";
-import { sanitizeArray } from "../utils/transform-utils";
+import { isStringOrArray, sanitizeArray } from "../utils/transform-utils";
 import { BaseData } from "./base";
 
 export enum SubmissionType {
@@ -48,9 +48,14 @@ export const superFormFieldSchema = z.object({
   [REQUIRED]: z.boolean(),
   [HAS_FEEDBACK]: z.boolean(),
   [CHOICES]: z.preprocess(
-    (choicesString) =>
-      typeof choicesString === "string"
-        ? sanitizeArray(choicesString.split("\n"), { unique: false })
+    (input) =>
+      isStringOrArray(input)
+        ? sanitizeArray(
+            typeof input === "string"
+              ? input.split("\n")
+              : input.map((v) => `${v}`),
+            { unique: false },
+          )
         : [],
     z
       .array(z.string().trim().min(1, "Please enter a value"))

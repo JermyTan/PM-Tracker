@@ -13,6 +13,7 @@ import { TemplateData } from "../types/templates";
 import { colorModeValue } from "../utils/theme-utils";
 import { displayDateTime, sort } from "../utils/transform-utils";
 import SubmissionTypeIconLabel from "./submission-type-icon-label";
+import TextViewer from "./text-viewer";
 
 const useStyles = createStyles((theme) => ({
   row: {
@@ -73,7 +74,9 @@ function MilestoneTemplatesTable({ milestoneTemplates }: Props) {
                 );
               }}
             >
-              <td>{name}</td>
+              <TextViewer<"td"> component="td" inherit overflowWrap>
+                {name}
+              </TextViewer>
               <td>
                 <SubmissionTypeIconLabel submissionType={submissionType} />
               </td>

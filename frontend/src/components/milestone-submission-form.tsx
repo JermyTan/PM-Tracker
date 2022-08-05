@@ -1,7 +1,13 @@
+import { forwardRef, Ref, useImperativeHandle } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Stack, Title, Text } from "@mantine/core";
-import { FormProvider, useFieldArray, useForm } from "react-hook-form";
+import {
+  FormProvider,
+  useFieldArray,
+  useForm,
+  UseFormReset,
+} from "react-hook-form";
 import {
   FORM_RESPONSE_DATA,
   GROUP,
@@ -18,6 +24,7 @@ import { useResolveError } from "../utils/error-utils";
 import { handleSubmitForm } from "../utils/form-utils";
 import SubmissionTypeIconLabel from "./submission-type-icon-label";
 import FormFieldRenderer from "./form-field-renderer";
+import TextViewer from "./text-viewer";
 
 const schema = z.object({
   [IS_DRAFT]: z.boolean(),
@@ -28,17 +35,26 @@ const schema = z.object({
 
 type SubmissionFormProps = z.infer<typeof schema>;
 
+type MilestoneSubmissionFormHandler = {
+  reset: UseFormReset<SubmissionFormProps>;
+};
+
 type Props = {
   defaultValues: SubmissionViewData;
   readOnly?: boolean;
 };
 
-function MilestoneSubmissionForm({ defaultValues, readOnly }: Props) {
+function MilestoneSubmissionForm(
+  { defaultValues, readOnly }: Props,
+  ref: Ref<MilestoneSubmissionFormHandler>,
+) {
   const methods = useForm<SubmissionFormProps>({
     resolver: zodResolver(schema),
     defaultValues,
   });
-  const { control, handleSubmit } = methods;
+  const { control, handleSubmit, reset } = methods;
+  useImperativeHandle(ref, () => ({ reset }), [reset]);
+
   const { fields } = useFieldArray({
     control,
     name: FORM_RESPONSE_DATA,
@@ -69,7 +85,11 @@ function MilestoneSubmissionForm({ defaultValues, readOnly }: Props) {
       >
         <Stack spacing={32}>
           <Stack spacing={2}>
-            <Title order={4}>{name}</Title>
+            <Title order={4}>
+              <TextViewer inherit overflowWrap>
+                {name}
+              </TextViewer>
+            </Title>
             <Text size="sm" color="dimmed">
               <SubmissionTypeIconLabel submissionType={submissionType} />
             </Text>
@@ -81,6 +101,7 @@ function MilestoneSubmissionForm({ defaultValues, readOnly }: Props) {
               key={id}
               name={`${FORM_RESPONSE_DATA}.${index}.${RESPONSE}`}
               formField={field as FormField}
+              readOnly={readOnly}
             />
           ))}
         </Stack>
@@ -89,4 +110,4 @@ function MilestoneSubmissionForm({ defaultValues, readOnly }: Props) {
   );
 }
 
-export default MilestoneSubmissionForm;
+export default forwardRef(MilestoneSubmissionForm);

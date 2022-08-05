@@ -1,8 +1,8 @@
+import { ElementRef, useMemo, useRef } from "react";
 import { Button, Group, Paper, Stack, Text } from "@mantine/core";
+import { useDidUpdate } from "@mantine/hooks";
 import { useModals } from "@mantine/modals";
-import { createSelector } from "@reduxjs/toolkit";
 import { skipToken } from "@reduxjs/toolkit/query/react";
-import { useMemo } from "react";
 import { RiFileEditLine } from "react-icons/ri";
 import { generatePath, Link, useNavigate } from "react-router-dom";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
@@ -13,7 +13,6 @@ import {
 } from "../../redux/services/templates-api";
 import { COURSE_MILESTONE_TEMPLATES_PATH } from "../../routes/paths";
 import { transformTemplateToSubmissionView } from "../../types/submissions";
-import { TemplateData } from "../../types/templates";
 import { useResolveError } from "../../utils/error-utils";
 import toastUtils from "../../utils/toast-utils";
 import MilestoneSubmissionForm from "../milestone-submission-form";
@@ -22,25 +21,21 @@ import PlaceholderWrapper from "../placeholder-wrapper";
 function CourseMilestoneTemplatesViewPage() {
   const courseId = useGetCourseId();
   const templateId = useGetTemplateId();
-  const selectSubmissionView = useMemo(
-    () =>
-      createSelector(
-        (milestoneTemplates?: TemplateData[]) => milestoneTemplates,
-        (_: unknown, templateId?: string) => templateId,
-        (milestoneTemplates, templateId) =>
-          transformTemplateToSubmissionView({
-            template: milestoneTemplates?.find(
-              ({ id }) => `${id}` === templateId,
-            ),
-          }),
-      ),
-    [],
+  const { milestoneTemplates } = useGetTemplatesQueryState(
+    courseId ?? skipToken,
+    {
+      selectFromResult: ({ data: milestoneTemplates }) => ({
+        milestoneTemplates,
+      }),
+    },
   );
-  const { submissionView } = useGetTemplatesQueryState(courseId ?? skipToken, {
-    selectFromResult: ({ data: milestoneTemplates }) => ({
-      submissionView: selectSubmissionView(milestoneTemplates, templateId),
-    }),
-  });
+  const submissionView = useMemo(
+    () =>
+      transformTemplateToSubmissionView({
+        template: milestoneTemplates?.find(({ id }) => `${id}` === templateId),
+      }),
+    [templateId, milestoneTemplates],
+  );
   const [deleteTemplate, { isLoading }] = useDeleteTemplateMutation({
     selectFromResult: ({ isLoading }) => ({ isLoading }),
   });
@@ -49,6 +44,7 @@ function CourseMilestoneTemplatesViewPage() {
   });
   const navigate = useNavigate();
   const modals = useModals();
+  const formRef = useRef<ElementRef<typeof MilestoneSubmissionForm>>(null);
 
   const onDeleteTemplate = async () => {
     if (isLoading || courseId === undefined || templateId === undefined) {
@@ -90,6 +86,12 @@ function CourseMilestoneTemplatesViewPage() {
       onConfirm: onDeleteTemplate,
     });
 
+  // this is required to tell the form that the submissionView has changed
+  // due to useForm ignoring changes to the supplied defaultValues
+  useDidUpdate(() => {
+    formRef.current?.reset(submissionView);
+  }, [submissionView]);
+
   return (
     <PlaceholderWrapper
       py={150}
@@ -118,7 +120,10 @@ function CourseMilestoneTemplatesViewPage() {
           </Group>
 
           <Paper withBorder shadow="sm" p="md" radius="md">
-            <MilestoneSubmissionForm defaultValues={submissionView} readOnly />
+            <MilestoneSubmissionForm
+              ref={formRef}
+              defaultValues={submissionView}
+            />
           </Paper>
         </Stack>
       )}

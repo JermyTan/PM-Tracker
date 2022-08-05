@@ -20,14 +20,23 @@ import { useResolveError } from "../../utils/error-utils";
 import CourseMilestoneTemplatesTable from "../milestone-templates-table";
 import PlaceholderWrapper from "../placeholder-wrapper";
 
-const useStyles = createStyles({
-  templateContainer: {
-    flex: "1 3 auto",
-  },
-  templateTableContainer: {
-    flex: "1 1 auto",
-  },
-});
+const useStyles = createStyles(
+  (
+    _,
+    {
+      hasSelectedTemplate,
+      noWrap,
+    }: { hasSelectedTemplate?: boolean; noWrap?: boolean },
+  ) => ({
+    templateContainer: {
+      flex: "1 1 auto",
+    },
+    templateTableContainer: {
+      minWidth: hasSelectedTemplate ? "600px" : "100%",
+      width: noWrap ? undefined : "100%",
+    },
+  }),
+);
 
 type Props = {
   children: ReactNode;
@@ -54,8 +63,8 @@ function CourseMilestoneTemplatesPage({ children }: Props) {
   });
   const templateId = useGetTemplateId();
   const hasSelectedTemplate = Boolean(templateId);
-  const { cx, classes } = useStyles();
   const noWrap = useMediaQuery("(min-width: 1400px)");
+  const { classes } = useStyles({ hasSelectedTemplate, noWrap });
 
   return (
     <PlaceholderWrapper
@@ -71,7 +80,7 @@ function CourseMilestoneTemplatesPage({ children }: Props) {
             <div className={classes.templateContainer}>{children}</div>
           )}
 
-          <Stack className={cx(classes.templateTableContainer)}>
+          <Stack className={classes.templateTableContainer}>
             <Group position="apart">
               <Title order={3}>{capitalizedMilestoneAlias} Templates</Title>
               <Button<typeof Link>

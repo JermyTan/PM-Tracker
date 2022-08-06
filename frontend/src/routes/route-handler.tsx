@@ -12,7 +12,7 @@ import CourseGroupPage from "../components/pages/course-groups-page";
 import CourseDetailsPage from "../components/pages/course-details-page";
 import CourseMilestoneTemplatesPage from "../components/pages/course-milestone-templates-page";
 import RoleRestrictedWrapper from "../components/role-restricted-wrapper";
-import { Role } from "../types/courses";
+import { INSTRUCTOR_PERMISSION_ROLES } from "../types/courses";
 import MilestoneTemplatesLayout from "../components/milestone-templates-layout";
 import CourseMilestoneTemplatesCreationPage from "../components/pages/course-milestone-templates-creation-page";
 import CourseMilestoneTemplatesEditPage from "../components/pages/course-milestone-templates-edit-page";
@@ -81,7 +81,7 @@ function RouteHandler() {
                 path="templates"
                 element={
                   <RoleRestrictedWrapper
-                    allowedRoles={[Role.CoOwner, Role.Instructor]}
+                    allowedRoles={INSTRUCTOR_PERMISSION_ROLES}
                     fallback={<Navigate to="/dashboard" replace />}
                   >
                     <MilestoneTemplatesLayout>

@@ -13,7 +13,6 @@ import pluralize from "pluralize";
 import { MdOutlineLibraryAdd } from "react-icons/md";
 import { ImFilesEmpty } from "react-icons/im";
 import { Link } from "react-router-dom";
-import { Role } from "../../types/courses";
 import RoleRestrictedWrapper from "../role-restricted-wrapper";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import { useGetMilestonesQuery } from "../../redux/services/milestones-api";
@@ -23,6 +22,8 @@ import MilestoneCard from "../milestone-card";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import MilestoneCreationForm from "../milestone-creation-form";
 import SubmissionCommentsSection from "../submission-comments-section";
+import useGetMilestonePermissions from "../../custom-hooks/use-get-milestone-permissions";
+import useGetTemplatePermissions from "../../custom-hooks/use-get-template-permissions";
 
 function CourseMilestonesPage() {
   const courseId = useGetCourseId();
@@ -41,6 +42,8 @@ function CourseMilestonesPage() {
   useResolveError({ error, name: "course-milestones-page" });
   const { milestoneAlias, capitalizedMilestoneAlias } = useGetMilestoneAlias();
   const [isDrawerOpened, { open, close }] = useDisclosure(false);
+  const { canCreate: canCreateMilestone } = useGetMilestonePermissions();
+  const { canManage: canManageTemplates } = useGetTemplatePermissions();
   const pluralizedMilestoneAlias = pluralize(milestoneAlias);
 
   return (
@@ -60,22 +63,27 @@ function CourseMilestonesPage() {
       </Drawer>
 
       <Stack>
-        <RoleRestrictedWrapper allowedRoles={[Role.CoOwner, Role.Instructor]}>
+        <RoleRestrictedWrapper allow={canCreateMilestone || canManageTemplates}>
           <Group position="right">
-            <Button<typeof Link>
-              component={Link}
-              to="../templates"
-              leftIcon={<ImFilesEmpty />}
-            >
-              {capitalizedMilestoneAlias} templates
-            </Button>
-            <Button
-              color="teal"
-              leftIcon={<MdOutlineLibraryAdd />}
-              onClick={open}
-            >
-              Create new {milestoneAlias}
-            </Button>
+            <RoleRestrictedWrapper allow={canManageTemplates}>
+              <Button<typeof Link>
+                component={Link}
+                to="../templates"
+                leftIcon={<ImFilesEmpty />}
+              >
+                {capitalizedMilestoneAlias} templates
+              </Button>
+            </RoleRestrictedWrapper>
+
+            <RoleRestrictedWrapper allow={canCreateMilestone}>
+              <Button
+                color="teal"
+                leftIcon={<MdOutlineLibraryAdd />}
+                onClick={open}
+              >
+                Create new {milestoneAlias}
+              </Button>
+            </RoleRestrictedWrapper>
           </Group>
         </RoleRestrictedWrapper>
 

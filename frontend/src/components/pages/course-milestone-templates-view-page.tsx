@@ -17,6 +17,8 @@ import { useResolveError } from "../../utils/error-utils";
 import toastUtils from "../../utils/toast-utils";
 import MilestoneSubmissionForm from "../milestone-submission-form";
 import PlaceholderWrapper from "../placeholder-wrapper";
+import useGetTemplatePermissions from "../../custom-hooks/use-get-template-permissions";
+import RoleRestrictedWrapper from "../role-restricted-wrapper";
 
 function CourseMilestoneTemplatesViewPage() {
   const courseId = useGetCourseId();
@@ -45,6 +47,9 @@ function CourseMilestoneTemplatesViewPage() {
   const navigate = useNavigate();
   const modals = useModals();
   const formRef = useRef<ElementRef<typeof MilestoneSubmissionForm>>(null);
+  const { canModify, canDelete } = useGetTemplatePermissions(
+    submissionView?.template ?? undefined,
+  );
 
   const onDeleteTemplate = async () => {
     if (isLoading || courseId === undefined || templateId === undefined) {
@@ -100,24 +105,30 @@ function CourseMilestoneTemplatesViewPage() {
     >
       {submissionView && (
         <Stack>
-          <Group position="right">
-            <Button<typeof Link>
-              component={Link}
-              to="edit"
-              leftIcon={<RiFileEditLine />}
-            >
-              Edit template
-            </Button>
-            <Button
-              color="red"
-              leftIcon={<RiFileEditLine />}
-              onClick={openDeleteModal}
-              loading={isLoading}
-              disabled={isLoading}
-            >
-              Delete template
-            </Button>
-          </Group>
+          <RoleRestrictedWrapper allow={canModify || canDelete}>
+            <Group position="right">
+              <RoleRestrictedWrapper allow={canModify}>
+                <Button<typeof Link>
+                  component={Link}
+                  to="edit"
+                  leftIcon={<RiFileEditLine />}
+                >
+                  Edit template
+                </Button>
+              </RoleRestrictedWrapper>
+              <RoleRestrictedWrapper allow={canDelete}>
+                <Button
+                  color="red"
+                  leftIcon={<RiFileEditLine />}
+                  onClick={openDeleteModal}
+                  loading={isLoading}
+                  disabled={isLoading}
+                >
+                  Delete template
+                </Button>
+              </RoleRestrictedWrapper>
+            </Group>
+          </RoleRestrictedWrapper>
 
           <Paper withBorder shadow="sm" p="md" radius="md">
             <MilestoneSubmissionForm

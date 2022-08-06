@@ -1,26 +1,25 @@
-import { skipToken } from "@reduxjs/toolkit/query/react";
 import { ReactNode } from "react";
-import useGetCourseId from "../custom-hooks/use-get-course-id";
-import { useGetSingleCourseQueryState } from "../redux/services/courses-api";
+import useGetCurrentUserRole from "../custom-hooks/use-get-current-user-role";
 import { Role } from "../types/courses";
 
 type Props = {
   children: ReactNode;
-  allowedRoles: Role[];
+  allowedRoles?: Role[];
+  allow?: boolean;
   fallback?: ReactNode;
 };
 
 function RoleRestrictedWrapper({
   children,
   allowedRoles,
+  allow,
   fallback = null,
 }: Props) {
-  const courseId = useGetCourseId();
-  const { role } = useGetSingleCourseQueryState(courseId ?? skipToken, {
-    selectFromResult: ({ data: course }) => ({ role: course?.role }),
-  });
+  const role = useGetCurrentUserRole();
 
-  return <>{role && allowedRoles.includes(role) ? children : fallback}</>;
+  return (
+    <>{role && (allow || allowedRoles?.includes(role)) ? children : fallback}</>
+  );
 }
 
 export default RoleRestrictedWrapper;

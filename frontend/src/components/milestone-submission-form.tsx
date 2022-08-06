@@ -94,7 +94,7 @@ function MilestoneSubmissionForm(
       return;
     }
 
-    if (isSubmitting) {
+    if (isSubmitting || readOnly) {
       return;
     }
 
@@ -145,15 +145,17 @@ function MilestoneSubmissionForm(
             />
           ))}
 
-          <Group position="right">
-            <Button
-              disabled={isSubmitting}
-              loading={isSubmitting}
-              type="submit"
-            >
-              Save
-            </Button>
-          </Group>
+          {!readOnly && (
+            <Group position="right">
+              <Button
+                disabled={isSubmitting}
+                loading={isSubmitting}
+                type="submit"
+              >
+                Save
+              </Button>
+            </Group>
+          )}
         </Stack>
       </form>
     </FormProvider>

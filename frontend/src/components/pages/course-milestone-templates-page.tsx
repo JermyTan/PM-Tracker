@@ -14,11 +14,13 @@ import { generatePath, Link } from "react-router-dom";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import useGetMilestoneAlias from "../../custom-hooks/use-get-milestone-alias";
 import useGetTemplateId from "../../custom-hooks/use-get-template-id";
+import useGetTemplatePermissions from "../../custom-hooks/use-get-template-permissions";
 import { useGetTemplatesQuery } from "../../redux/services/templates-api";
 import { COURSE_MILESTONE_TEMPLATES_CREATION_PATH } from "../../routes/paths";
 import { useResolveError } from "../../utils/error-utils";
 import CourseMilestoneTemplatesTable from "../milestone-templates-table";
 import PlaceholderWrapper from "../placeholder-wrapper";
+import RoleRestrictedWrapper from "../role-restricted-wrapper";
 
 const useStyles = createStyles(
   (
@@ -65,6 +67,7 @@ function CourseMilestoneTemplatesPage({ children }: Props) {
   const hasSelectedTemplate = Boolean(templateId);
   const noWrap = useMediaQuery("(min-width: 1400px)");
   const { classes } = useStyles({ hasSelectedTemplate, noWrap });
+  const { canCreate } = useGetTemplatePermissions();
 
   return (
     <PlaceholderWrapper
@@ -83,16 +86,19 @@ function CourseMilestoneTemplatesPage({ children }: Props) {
           <Stack className={classes.templateTableContainer}>
             <Group position="apart">
               <Title order={3}>{capitalizedMilestoneAlias} Templates</Title>
-              <Button<typeof Link>
-                component={Link}
-                to={generatePath(COURSE_MILESTONE_TEMPLATES_CREATION_PATH, {
-                  courseId,
-                })}
-                color="teal"
-                leftIcon={<RiFileAddLine />}
-              >
-                Create new template
-              </Button>
+
+              <RoleRestrictedWrapper allow={canCreate}>
+                <Button<typeof Link>
+                  component={Link}
+                  to={generatePath(COURSE_MILESTONE_TEMPLATES_CREATION_PATH, {
+                    courseId,
+                  })}
+                  color="teal"
+                  leftIcon={<RiFileAddLine />}
+                >
+                  Create new template
+                </Button>
+              </RoleRestrictedWrapper>
             </Group>
 
             <Paper withBorder shadow="sm" p="md" radius="md">

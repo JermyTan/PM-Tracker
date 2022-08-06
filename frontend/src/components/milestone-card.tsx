@@ -1,19 +1,27 @@
-import { Alert, Badge, Group, Paper, Stack } from "@mantine/core";
+import { Alert, Badge, createStyles, Group, Paper, Stack } from "@mantine/core";
 import { HiEyeOff } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import useGetMilestoneAlias from "../custom-hooks/use-get-milestone-alias";
-import { Role } from "../types/courses";
+import useGetMilestonePermissions from "../custom-hooks/use-get-milestone-permissions";
 import { MilestoneData } from "../types/milestones";
 import MilestoneActionsMenu from "./milestone-actions-menu";
 import MilestoneActivePeriodDisplay from "./milestone-active-period-display";
 import RoleRestrictedWrapper from "./role-restricted-wrapper";
 import TextViewer from "./text-viewer";
 
+const useStyles = createStyles((_, { canAccess }: { canAccess?: boolean }) => ({
+  card: {
+    cursor: canAccess ? "pointer" : "not-allowed",
+  },
+}));
+
 type Props = MilestoneData;
 
 function MilestoneCard(props: Props) {
   const { milestoneAlias } = useGetMilestoneAlias();
   const navigate = useNavigate();
+  const { canAccess, canModify, canDelete } = useGetMilestonePermissions(props);
+  const { classes } = useStyles({ canAccess });
 
   const { name, startDateTime, endDateTime, isPublished, id } = props;
   const now = Date.now();
@@ -22,18 +30,19 @@ function MilestoneCard(props: Props) {
 
   return (
     <Paper
-      onClick={() => navigate(`${id}`)}
+      onClick={canAccess ? () => navigate(`${id}`) : undefined}
       withBorder
       shadow="sm"
       p="md"
       radius="md"
+      className={classes.card}
     >
       <Stack spacing="xs">
         <Group noWrap spacing={4} position="apart" align="flex-start">
           <TextViewer overflowWrap weight={600} size="lg">
             {name}
           </TextViewer>
-          <RoleRestrictedWrapper allowedRoles={[Role.CoOwner, Role.Instructor]}>
+          <RoleRestrictedWrapper allow={canModify || canDelete}>
             <MilestoneActionsMenu {...props} />
           </RoleRestrictedWrapper>
         </Group>

@@ -6,7 +6,7 @@ import useGetMilestonePermissions from "../custom-hooks/use-get-milestone-permis
 import { MilestoneData } from "../types/milestones";
 import MilestoneActionsMenu from "./milestone-actions-menu";
 import MilestoneActivePeriodDisplay from "./milestone-active-period-display";
-import RoleRestrictedWrapper from "./role-restricted-wrapper";
+import ConditionalRenderer from "./conditional-renderer";
 import TextViewer from "./text-viewer";
 
 const useStyles = createStyles((_, { canAccess }: { canAccess?: boolean }) => ({
@@ -42,9 +42,9 @@ function MilestoneCard(props: Props) {
           <TextViewer overflowWrap weight={600} size="lg">
             {name}
           </TextViewer>
-          <RoleRestrictedWrapper allow={canModify || canDelete}>
+          <ConditionalRenderer allow={canModify || canDelete}>
             <MilestoneActionsMenu {...props} />
-          </RoleRestrictedWrapper>
+          </ConditionalRenderer>
         </Group>
         <MilestoneActivePeriodDisplay
           startDateTime={startDateTime}

@@ -11,8 +11,7 @@ import CourseMilestonesPage from "../components/pages/course-milestones-page";
 import CourseGroupPage from "../components/pages/course-groups-page";
 import CourseDetailsPage from "../components/pages/course-details-page";
 import CourseMilestoneTemplatesPage from "../components/pages/course-milestone-templates-page";
-import RoleRestrictedWrapper from "../components/role-restricted-wrapper";
-import { INSTRUCTOR_PERMISSION_ROLES } from "../types/courses";
+import ConditionalRenderer from "../components/conditional-renderer";
 import MilestoneTemplatesLayout from "../components/milestone-templates-layout";
 import CourseMilestoneTemplatesCreationPage from "../components/pages/course-milestone-templates-creation-page";
 import CourseMilestoneTemplatesEditPage from "../components/pages/course-milestone-templates-edit-page";
@@ -21,6 +20,7 @@ import MilestoneTemplatesNestedLayout from "../components/milestone-templates-ne
 import CourseMilestoneSubmissionsPage from "../components/pages/course-milestone-submissions-page";
 import MilestoneLayout from "../components/milestone-layout";
 import MilestoneDetailsLayout from "../components/milestone-details-layout";
+import useGetTemplatePermissions from "../custom-hooks/use-get-template-permissions";
 
 function RouteHandler() {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
@@ -80,14 +80,17 @@ function RouteHandler() {
               <Route
                 path="templates"
                 element={
-                  <RoleRestrictedWrapper
-                    allowedRoles={INSTRUCTOR_PERMISSION_ROLES}
+                  <ConditionalRenderer
+                    permissionGetter={{
+                      fn: useGetTemplatePermissions,
+                      key: "canManage",
+                    }}
                     fallback={<Navigate to="/dashboard" replace />}
                   >
                     <MilestoneTemplatesLayout>
                       <Outlet />
                     </MilestoneTemplatesLayout>
-                  </RoleRestrictedWrapper>
+                  </ConditionalRenderer>
                 }
               >
                 <Route

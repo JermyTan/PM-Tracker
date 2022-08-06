@@ -15,10 +15,11 @@ import { skipToken } from "@reduxjs/toolkit/query/react";
 import { FaQuestion } from "react-icons/fa";
 import { useGetSingleCourseQuery } from "../../redux/services/courses-api";
 import CourseActionsSection from "../course-actions-section";
-import RoleRestrictedWrapper from "../role-restricted-wrapper";
+import ConditionalRenderer from "../conditional-renderer";
 import { Role } from "../../types/courses";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import TextViewer from "../text-viewer";
+import useGetCoursePermissions from "../../custom-hooks/use-get-course-permissions";
 
 const useStyles = createStyles({
   detailsSection: {
@@ -36,6 +37,8 @@ function CourseDetailsPage() {
     selectFromResult: ({ data: course }) => ({ course }),
   });
   const { classes } = useStyles();
+  const { canAccessFullDetails, canModify, canDelete } =
+    useGetCoursePermissions();
 
   const {
     name,
@@ -99,7 +102,7 @@ function CourseDetailsPage() {
             </Spoiler>
           </Stack>
 
-          <RoleRestrictedWrapper allowedRoles={[Role.CoOwner, Role.Instructor]}>
+          <ConditionalRenderer allow={canAccessFullDetails}>
             <Stack spacing="xs">
               <Group spacing={4}>
                 <Title order={4}>Milestone alias</Title>
@@ -300,11 +303,11 @@ function CourseDetailsPage() {
                 {allowStudentsToAddOrRemoveGroupMembers ? "Yes" : "No"}
               </Text>
             </Stack>
-          </RoleRestrictedWrapper>
+          </ConditionalRenderer>
         </Stack>
       </Paper>
 
-      <RoleRestrictedWrapper allowedRoles={[Role.CoOwner]}>
+      <ConditionalRenderer allow={canModify || canDelete}>
         <Paper
           className={classes.actionsSection}
           withBorder
@@ -314,7 +317,7 @@ function CourseDetailsPage() {
         >
           <CourseActionsSection />
         </Paper>
-      </RoleRestrictedWrapper>
+      </ConditionalRenderer>
     </Group>
   );
 }

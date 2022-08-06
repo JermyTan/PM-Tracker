@@ -19,7 +19,7 @@ import { MilestoneData } from "../types/milestones";
 import { useResolveError } from "../utils/error-utils";
 import toastUtils from "../utils/toast-utils";
 import MilestoneEditForm from "./milestone-edit-form";
-import RoleRestrictedWrapper from "./role-restricted-wrapper";
+import ConditionalRenderer from "./conditional-renderer";
 
 type Props = MilestoneData;
 
@@ -64,7 +64,7 @@ function MilestoneActionsMenu(props: Props) {
       }}
       onKeyDown={() => {}}
     >
-      <RoleRestrictedWrapper allow={canModify}>
+      <ConditionalRenderer allow={canModify}>
         <Drawer
           opened={isEditDrawerOpened}
           onClose={closeEditDrawer}
@@ -85,9 +85,9 @@ function MilestoneActionsMenu(props: Props) {
             </ScrollArea>
           )}
         </Drawer>
-      </RoleRestrictedWrapper>
+      </ConditionalRenderer>
 
-      <RoleRestrictedWrapper allow={canDelete}>
+      <ConditionalRenderer allow={canDelete}>
         <Modal
           opened={isDeleteModalOpened}
           onClose={closeDeleteModal}
@@ -116,20 +116,20 @@ function MilestoneActionsMenu(props: Props) {
             </Group>
           </Stack>
         </Modal>
-      </RoleRestrictedWrapper>
+      </ConditionalRenderer>
 
       <Menu>
-        <RoleRestrictedWrapper allow={canModify}>
+        <ConditionalRenderer allow={canModify}>
           <Menu.Item icon={<MdEdit />} onClick={openEditDrawer}>
             Edit {milestoneAlias}
           </Menu.Item>
-        </RoleRestrictedWrapper>
+        </ConditionalRenderer>
 
-        <RoleRestrictedWrapper allow={canDelete}>
+        <ConditionalRenderer allow={canDelete}>
           <Menu.Item color="red" icon={<MdDelete />} onClick={openDeleteModal}>
             Delete {milestoneAlias}
           </Menu.Item>
-        </RoleRestrictedWrapper>
+        </ConditionalRenderer>
       </Menu>
     </div>
   );

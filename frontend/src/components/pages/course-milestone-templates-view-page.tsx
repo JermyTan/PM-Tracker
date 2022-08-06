@@ -18,7 +18,7 @@ import toastUtils from "../../utils/toast-utils";
 import MilestoneSubmissionForm from "../milestone-submission-form";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import useGetTemplatePermissions from "../../custom-hooks/use-get-template-permissions";
-import RoleRestrictedWrapper from "../role-restricted-wrapper";
+import ConditionalRenderer from "../conditional-renderer";
 
 function CourseMilestoneTemplatesViewPage() {
   const courseId = useGetCourseId();
@@ -105,9 +105,9 @@ function CourseMilestoneTemplatesViewPage() {
     >
       {submissionView && (
         <Stack>
-          <RoleRestrictedWrapper allow={canModify || canDelete}>
+          <ConditionalRenderer allow={canModify || canDelete}>
             <Group position="right">
-              <RoleRestrictedWrapper allow={canModify}>
+              <ConditionalRenderer allow={canModify}>
                 <Button<typeof Link>
                   component={Link}
                   to="edit"
@@ -115,8 +115,8 @@ function CourseMilestoneTemplatesViewPage() {
                 >
                   Edit template
                 </Button>
-              </RoleRestrictedWrapper>
-              <RoleRestrictedWrapper allow={canDelete}>
+              </ConditionalRenderer>
+              <ConditionalRenderer allow={canDelete}>
                 <Button
                   color="red"
                   leftIcon={<RiFileEditLine />}
@@ -126,9 +126,9 @@ function CourseMilestoneTemplatesViewPage() {
                 >
                   Delete template
                 </Button>
-              </RoleRestrictedWrapper>
+              </ConditionalRenderer>
             </Group>
-          </RoleRestrictedWrapper>
+          </ConditionalRenderer>
 
           <Paper withBorder shadow="sm" p="md" radius="md">
             <MilestoneSubmissionForm

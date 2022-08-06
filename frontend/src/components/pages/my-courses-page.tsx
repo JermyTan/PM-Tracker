@@ -14,10 +14,11 @@ import { APP_NAME } from "../../constants";
 import { useGetCoursesQuery } from "../../redux/services/courses-api";
 import { AccountType } from "../../types/users";
 import PlaceholderWrapper from "../placeholder-wrapper";
-import AccountTypeRestrictedWrapper from "../account-type-restricted-wrapper";
+import ConditionalRenderer from "../conditional-renderer";
 import { useResolveError } from "../../utils/error-utils";
 import CourseCard from "../course-card";
 import CourseCreationForm from "../course-creation-form";
+import useGetCoursePermissions from "../../custom-hooks/use-get-course-permissions";
 
 function MyCoursesPage() {
   const { courses, isLoading, error } = useGetCoursesQuery(undefined, {
@@ -55,13 +56,13 @@ function MyCoursesPage() {
       <Group position="apart">
         <Title>My Courses</Title>
 
-        <AccountTypeRestrictedWrapper
-          allowedAccountTypes={[AccountType.Educator, AccountType.Admin]}
+        <ConditionalRenderer
+          permissionGetter={{ fn: useGetCoursePermissions, key: "canCreate" }}
         >
           <Button color="teal" leftIcon={<HiViewGridAdd />} onClick={open}>
             Create new course
           </Button>
-        </AccountTypeRestrictedWrapper>
+        </ConditionalRenderer>
       </Group>
 
       <Space h="md" />

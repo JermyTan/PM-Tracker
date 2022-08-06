@@ -13,7 +13,7 @@ import pluralize from "pluralize";
 import { MdOutlineLibraryAdd } from "react-icons/md";
 import { ImFilesEmpty } from "react-icons/im";
 import { Link } from "react-router-dom";
-import RoleRestrictedWrapper from "../role-restricted-wrapper";
+import ConditionalRenderer from "../conditional-renderer";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import { useGetMilestonesQuery } from "../../redux/services/milestones-api";
 import { useResolveError } from "../../utils/error-utils";
@@ -63,9 +63,9 @@ function CourseMilestonesPage() {
       </Drawer>
 
       <Stack>
-        <RoleRestrictedWrapper allow={canCreateMilestone || canManageTemplates}>
+        <ConditionalRenderer allow={canCreateMilestone || canManageTemplates}>
           <Group position="right">
-            <RoleRestrictedWrapper allow={canManageTemplates}>
+            <ConditionalRenderer allow={canManageTemplates}>
               <Button<typeof Link>
                 component={Link}
                 to="../templates"
@@ -73,9 +73,9 @@ function CourseMilestonesPage() {
               >
                 {capitalizedMilestoneAlias} templates
               </Button>
-            </RoleRestrictedWrapper>
+            </ConditionalRenderer>
 
-            <RoleRestrictedWrapper allow={canCreateMilestone}>
+            <ConditionalRenderer allow={canCreateMilestone}>
               <Button
                 color="teal"
                 leftIcon={<MdOutlineLibraryAdd />}
@@ -83,9 +83,9 @@ function CourseMilestonesPage() {
               >
                 Create new {milestoneAlias}
               </Button>
-            </RoleRestrictedWrapper>
+            </ConditionalRenderer>
           </Group>
-        </RoleRestrictedWrapper>
+        </ConditionalRenderer>
 
         <PlaceholderWrapper
           isLoading={isLoading}

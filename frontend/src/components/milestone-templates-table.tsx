@@ -1,14 +1,13 @@
 import { createStyles, Table } from "@mantine/core";
+import path from "path";
 import { useMemo } from "react";
-import { generatePath, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   DATE_TIME_MONTH_NAME_FORMAT,
   NAME,
   SUBMISSION_TYPE,
 } from "../constants";
-import useGetCourseId from "../custom-hooks/use-get-course-id";
 import useGetTemplateId from "../custom-hooks/use-get-template-id";
-import { COURSE_MILESTONE_TEMPLATES_PATH } from "../routes/paths";
 import { TemplateData } from "../types/templates";
 import { colorModeValue } from "../utils/theme-utils";
 import { displayDateTime, sort } from "../utils/transform-utils";
@@ -29,20 +28,26 @@ const useStyles = createStyles((theme) => ({
 
 type Props = {
   milestoneTemplates: TemplateData[];
+  studentView?: boolean;
 };
 
-function MilestoneTemplatesTable({ milestoneTemplates }: Props) {
+function MilestoneTemplatesTable({ milestoneTemplates, studentView }: Props) {
   const { cx, classes } = useStyles();
   const navigate = useNavigate();
   const sortedMilestoneTemplates = useMemo(
     () =>
-      sort(milestoneTemplates, {
-        key: [NAME, SUBMISSION_TYPE, (a, b) => b.updatedAt - a.updatedAt],
-      }),
-    [milestoneTemplates],
+      sort(
+        milestoneTemplates.filter(
+          ({ isPublished }) => !studentView || isPublished,
+        ),
+        {
+          key: [NAME, SUBMISSION_TYPE, (a, b) => b.updatedAt - a.updatedAt],
+        },
+      ),
+    [milestoneTemplates, studentView],
   );
   const templateId = useGetTemplateId();
-  const courseId = useGetCourseId();
+  const { pathname } = useLocation();
 
   return (
     <Table highlightOnHover>
@@ -50,7 +55,7 @@ function MilestoneTemplatesTable({ milestoneTemplates }: Props) {
         <tr>
           <th>Name</th>
           <th>Submission type</th>
-          <th>Published</th>
+          {!studentView && <th>Published</th>}
           <th>Last updated at</th>
         </tr>
       </thead>
@@ -67,9 +72,7 @@ function MilestoneTemplatesTable({ milestoneTemplates }: Props) {
                 const stringId = `${id}`;
                 navigate(
                   templateId === stringId
-                    ? generatePath(COURSE_MILESTONE_TEMPLATES_PATH, {
-                        courseId,
-                      })
+                    ? path.resolve(pathname, "../")
                     : stringId,
                 );
               }}
@@ -80,7 +83,7 @@ function MilestoneTemplatesTable({ milestoneTemplates }: Props) {
               <td>
                 <SubmissionTypeIconLabel submissionType={submissionType} />
               </td>
-              <td>{isPublished ? "✅" : "❌"}</td>
+              {!studentView && <td>{isPublished ? "✅" : "❌"}</td>}
               <td>{displayDateTime(updatedAt, DATE_TIME_MONTH_NAME_FORMAT)}</td>
             </tr>
           ),

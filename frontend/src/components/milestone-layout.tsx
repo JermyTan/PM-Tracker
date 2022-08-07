@@ -49,24 +49,29 @@ function MilestoneLayout({ children }: Props) {
     const components: { name: string; path: string }[] = [
       {
         name: milestone.name,
-        path: generatePath(COURSE_SINGLE_MILESTONE_PATH, {
+        path: generatePath(COURSE_MILESTONE_SUBMISSIONS_PATH, {
           courseId,
           milestoneId,
         }),
       },
     ];
 
-    if (matchPath(COURSE_MILESTONE_SUBMISSIONS_PATH, pathname)) {
-      components.push({
-        name: "Submissions",
-        path: generatePath(COURSE_MILESTONE_SUBMISSIONS_PATH, {
-          courseId,
-          milestoneId,
-        }),
-      });
-    }
+    // if (matchPath(COURSE_MILESTONE_SUBMISSIONS_PATH, pathname)) {
+    //   components.push({
+    //     name: "Submissions",
+    //     path: generatePath(COURSE_MILESTONE_SUBMISSIONS_PATH, {
+    //       courseId,
+    //       milestoneId,
+    //     }),
+    //   });
+    // }
 
-    if (matchPath(COURSE_MILESTONE_SUBMISSIONS_TEMPLATES_PATH, pathname)) {
+    if (
+      matchPath(
+        { path: COURSE_MILESTONE_SUBMISSIONS_TEMPLATES_PATH, end: false },
+        pathname,
+      )
+    ) {
       components.push({
         name: "Templates",
         path: generatePath(COURSE_MILESTONE_SUBMISSIONS_TEMPLATES_PATH, {
@@ -76,19 +81,16 @@ function MilestoneLayout({ children }: Props) {
       });
     }
 
-    return components.map(({ name, path }, index) =>
-      index === 0 ? (
-        <Text key={`${index}.${name}`}>{name}</Text>
-      ) : (
-        <Anchor<typeof Link>
-          key={`${index}.${name}`}
-          component={Link}
-          to={path}
-        >
-          {name}
-        </Anchor>
-      ),
-    );
+    return components.map(({ name, path }, index) => (
+      <Anchor<typeof Link>
+        size="lg"
+        key={`${index}.${name}`}
+        component={Link}
+        to={path}
+      >
+        {name}
+      </Anchor>
+    ));
   })();
 
   return (

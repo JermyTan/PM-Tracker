@@ -42,9 +42,10 @@ const useStyles = createStyles(
 
 type Props = {
   children: ReactNode;
+  studentView?: boolean;
 };
 
-function CourseMilestoneTemplatesPage({ children }: Props) {
+function CourseMilestoneTemplatesPage({ children, studentView }: Props) {
   const courseId = useGetCourseId();
   const { capitalizedMilestoneAlias } = useGetMilestoneAlias();
   const { milestoneTemplates, isLoading, error } = useGetTemplatesQuery(
@@ -86,28 +87,31 @@ function CourseMilestoneTemplatesPage({ children }: Props) {
             <Group position="apart">
               <Title order={3}>{capitalizedMilestoneAlias} Templates</Title>
 
-              <ConditionalRenderer
-                permissionGetter={{
-                  fn: useGetTemplatePermissions,
-                  key: "canCreate",
-                }}
-              >
-                <Button<typeof Link>
-                  component={Link}
-                  to={generatePath(COURSE_MILESTONE_TEMPLATES_CREATION_PATH, {
-                    courseId,
-                  })}
-                  color="teal"
-                  leftIcon={<RiFileAddLine />}
+              {!studentView && (
+                <ConditionalRenderer
+                  permissionGetter={{
+                    fn: useGetTemplatePermissions,
+                    key: "canCreate",
+                  }}
                 >
-                  Create new template
-                </Button>
-              </ConditionalRenderer>
+                  <Button<typeof Link>
+                    component={Link}
+                    to={generatePath(COURSE_MILESTONE_TEMPLATES_CREATION_PATH, {
+                      courseId,
+                    })}
+                    color="teal"
+                    leftIcon={<RiFileAddLine />}
+                  >
+                    Create new template
+                  </Button>
+                </ConditionalRenderer>
+              )}
             </Group>
 
             <Paper withBorder shadow="sm" p="md" radius="md">
               <CourseMilestoneTemplatesTable
                 milestoneTemplates={milestoneTemplates}
+                studentView={studentView}
               />
             </Paper>
           </Stack>

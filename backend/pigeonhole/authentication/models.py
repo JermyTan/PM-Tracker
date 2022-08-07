@@ -11,7 +11,7 @@ from pigeonhole.common.exceptions import BadRequest
 from pigeonhole.common.models import TimestampedModel
 
 from content_delivery_service.models import Image
-from users.models import User, UserInvite
+from users.models import User
 
 logger = logging.getLogger("main")
 
@@ -121,7 +121,7 @@ class AuthenticationData(ABC):
 
     @transaction.atomic
     def authenticate(self) -> Optional[User]:
-        from users.logic import get_users, get_user_invites
+        from users.logic import get_users
 
         ## try to login to associated user account if any
         if self.auth_method_class is not PasswordAuthentication:
@@ -134,9 +134,6 @@ class AuthenticationData(ABC):
                 ).get(auth_id=self.auth_id)
 
                 user = auth_method.user
-
-                ## remove user invite with same email if any
-                get_user_invites(email=user.email).delete()
 
                 ## update custom profile auth method if required
                 if isinstance(auth_method, CustomProfileAuthenticationMethod) and (
@@ -166,38 +163,22 @@ class AuthenticationData(ABC):
             )
         except User.DoesNotExist as e:
             logger.warning(e)
-            user = None
-
-        try:
-            user_invite = get_user_invites(email=self.email).get()
-        except UserInvite.DoesNotExist as e:
-            logger.warning(e)
-            user_invite = None
-
-        ## no existing user nor user invite
-        if user is None and user_invite is None:
             return None
+        
 
-        ## user invite exists but not user
-        if user is None:
+        ## user has been created, but has not logged in for the first time yet
+        if not user.name:
             image = None
 
             if self.profile_image:
                 image = Image(image_url=self.profile_image)
                 image.upload_image_to_server()
                 image.save()
+            
+            user.name = self.name
+            user.profile_image = image
+            user.save()
 
-            ## create a new user and delete user invite
-            user = User.objects.create(
-                name=self.name,
-                email=self.email,
-                profile_image=image,
-            )
-
-        ## since user exists, user invite should be deleted if it exists
-        if user_invite is not None:
-            ## delete user invite
-            user_invite.delete()
 
         try:
             auth_method = self.auth_method_class.objects.get(user=user)

@@ -23,7 +23,7 @@ MAX_ACCOUNT_TYPE_LENGTH = max(map(len, AccountType))
 
 
 class User(TimestampedModel):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True)
     email = models.EmailField(unique=True)
     account_type = models.CharField(
         max_length=MAX_ACCOUNT_TYPE_LENGTH,
@@ -51,10 +51,3 @@ post_delete.connect(
     sender=User,
     dispatch_uid="users.user.user_cleanup",
 )
-
-
-class UserInvite(TimestampedModel):
-    email = models.EmailField(unique=True)
-
-    def __str__(self) -> str:
-        return f"{self.email}"

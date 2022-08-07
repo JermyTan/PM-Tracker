@@ -21,8 +21,8 @@ from pigeonhole.common.constants import (
     TOKENS,
 )
 from pigeonhole.common.exceptions import InternalServerError, BadRequest
-from users.models import User, UserInvite
-from users.logic import requester_to_json, get_users, get_user_invites
+from users.models import User
+from users.logic import requester_to_json, get_users
 
 ## from email_service.logic import send_password_reset_email
 from .logic import get_authenticated_data, reset_password
@@ -259,13 +259,6 @@ class CheckAccountSerializer(BaseAuthenticationSerializer):
             user = get_users(email=email).get()
             return {EMAIL: user.email, NAME: user.name}
         except User.DoesNotExist as e:
-            logger.warning(e)
-            pass
-
-        try:
-            user_invite = get_user_invites(email=email).get()
-            return {EMAIL: user_invite.email}
-        except UserInvite.DoesNotExist as e:
             logger.warning(e)
             pass
 

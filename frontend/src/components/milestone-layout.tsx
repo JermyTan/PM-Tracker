@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import Head from "next/head";
-import { Anchor, Breadcrumbs, Stack, Text } from "@mantine/core";
+import { Anchor, Badge, Breadcrumbs, Group, Stack, Text } from "@mantine/core";
 import { generatePath, Link, matchPath, useLocation } from "react-router-dom";
 import { APP_NAME } from "../constants";
 import useGetCourseId from "../custom-hooks/use-get-course-id";
@@ -13,8 +13,8 @@ import PlaceholderWrapper from "./placeholder-wrapper";
 import {
   COURSE_MILESTONE_SUBMISSIONS_PATH,
   COURSE_MILESTONE_SUBMISSIONS_TEMPLATES_PATH,
-  COURSE_SINGLE_MILESTONE_PATH,
 } from "../routes/paths";
+import { checkIsMilestoneOpen } from "../utils/misc-utils";
 
 type Props = {
   children: ReactNode;
@@ -40,15 +40,25 @@ function MilestoneLayout({ children }: Props) {
   // subsequent api calls to the same endpoint do not need to resolve error since it is already handled here
   useResolveError({ error, name: "milestone-layout" });
   const { pathname } = useLocation();
+  const isOpen = checkIsMilestoneOpen(milestone);
 
   const crumbs = (() => {
     if (!milestone?.name) {
       return [];
     }
 
-    const components: { name: string; path: string }[] = [
+    const components: { label: ReactNode; path: string }[] = [
       {
-        name: milestone.name,
+        label: (
+          <Group spacing={4}>
+            <Text<"span"> component="span" inherit>
+              {milestone.name}
+            </Text>
+            <Badge variant="outline" color={isOpen ? "green" : "red"}>
+              {isOpen ? "Open" : "Closed"}
+            </Badge>
+          </Group>
+        ),
         path: generatePath(COURSE_MILESTONE_SUBMISSIONS_PATH, {
           courseId,
           milestoneId,
@@ -73,7 +83,7 @@ function MilestoneLayout({ children }: Props) {
       )
     ) {
       components.push({
-        name: "Templates",
+        label: "Templates",
         path: generatePath(COURSE_MILESTONE_SUBMISSIONS_TEMPLATES_PATH, {
           courseId,
           milestoneId,
@@ -81,14 +91,14 @@ function MilestoneLayout({ children }: Props) {
       });
     }
 
-    return components.map(({ name, path }, index) => (
+    return components.map(({ label, path }, index) => (
       <Anchor<typeof Link>
         size="lg"
-        key={`${index}.${name}`}
+        key={`${index}.${path}`}
         component={Link}
         to={path}
       >
-        {name}
+        {label}
       </Anchor>
     ));
   })();

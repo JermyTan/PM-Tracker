@@ -27,24 +27,22 @@ const useStyles = createStyles((theme) => ({
 }));
 
 type Props = {
-  milestoneTemplates: TemplateData[];
+  templates: TemplateData[];
   studentView?: boolean;
 };
 
-function MilestoneTemplatesTable({ milestoneTemplates, studentView }: Props) {
+function CourseTemplatesTable({ templates, studentView }: Props) {
   const { cx, classes } = useStyles();
   const navigate = useNavigate();
-  const sortedMilestoneTemplates = useMemo(
+  const sortedTemplates = useMemo(
     () =>
       sort(
-        milestoneTemplates.filter(
-          ({ isPublished }) => !studentView || isPublished,
-        ),
+        templates.filter(({ isPublished }) => !studentView || isPublished),
         {
           key: [NAME, SUBMISSION_TYPE, (a, b) => b.updatedAt - a.updatedAt],
         },
       ),
-    [milestoneTemplates, studentView],
+    [templates, studentView],
   );
   const templateId = useGetTemplateId();
   const { pathname } = useLocation();
@@ -60,7 +58,7 @@ function MilestoneTemplatesTable({ milestoneTemplates, studentView }: Props) {
         </tr>
       </thead>
       <tbody>
-        {sortedMilestoneTemplates.map(
+        {sortedTemplates.map(
           ({ id, name, submissionType, isPublished, updatedAt }) => (
             <tr
               key={id}
@@ -93,4 +91,4 @@ function MilestoneTemplatesTable({ milestoneTemplates, studentView }: Props) {
   );
 }
 
-export default MilestoneTemplatesTable;
+export default CourseTemplatesTable;

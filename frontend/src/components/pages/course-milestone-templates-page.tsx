@@ -18,7 +18,7 @@ import useGetTemplatePermissions from "../../custom-hooks/use-get-template-permi
 import { useGetTemplatesQuery } from "../../redux/services/templates-api";
 import { COURSE_MILESTONE_TEMPLATES_CREATION_PATH } from "../../routes/paths";
 import { useResolveError } from "../../utils/error-utils";
-import CourseMilestoneTemplatesTable from "../milestone-templates-table";
+import CourseTemplatesTable from "../course-templates-table";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import ConditionalRenderer from "../conditional-renderer";
 
@@ -109,8 +109,8 @@ function CourseMilestoneTemplatesPage({ children, studentView }: Props) {
             </Group>
 
             <Paper withBorder shadow="sm" p="md" radius="md">
-              <CourseMilestoneTemplatesTable
-                milestoneTemplates={milestoneTemplates}
+              <CourseTemplatesTable
+                templates={milestoneTemplates}
                 studentView={studentView}
               />
             </Paper>

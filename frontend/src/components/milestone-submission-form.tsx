@@ -12,7 +12,9 @@ import {
 import {
   FORM_RESPONSE_DATA,
   GROUP,
+  ID,
   IS_DRAFT,
+  NAME,
   RESPONSE,
   SUBMISSION_TYPE,
 } from "../constants";
@@ -31,7 +33,7 @@ import toastUtils from "../utils/toast-utils";
 const schema = z.object({
   [IS_DRAFT]: z.boolean(),
   [SUBMISSION_TYPE]: z.nativeEnum(SubmissionType),
-  [GROUP]: z.null(), // TODO: update to GroupData
+  [GROUP]: z.object({ [ID]: z.number(), [NAME]: z.string() }).nullable(), // TODO: update to GroupData
   [FORM_RESPONSE_DATA]: z.array(formResponseFieldSchema),
 });
 

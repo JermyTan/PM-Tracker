@@ -22,6 +22,7 @@ import MilestoneLayout from "../components/milestone-layout";
 import MilestoneDetailsLayout from "../components/milestone-details-layout";
 import useGetTemplatePermissions from "../custom-hooks/use-get-template-permissions";
 import CourseMilestoneSubmissionsTemplatesViewPage from "../components/pages/course-milestone-submissions-templates-view-page";
+import CourseMilestoneSubmissionsViewPage from "../components/pages/course-milestone-submissions-view-page";
 
 function RouteHandler() {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
@@ -90,6 +91,10 @@ function RouteHandler() {
                     element={<CourseMilestoneSubmissionsTemplatesViewPage />}
                   />
                 </Route>
+                <Route
+                  path="submissions/:submissionId"
+                  element={<CourseMilestoneSubmissionsViewPage />}
+                />
               </Route>
               <Route
                 path="templates"

@@ -36,7 +36,13 @@ function MilestoneDetailsLayout({ children }: Props) {
           <Text size="sm" weight={500}>
             Description
           </Text>
-          <TextViewer size="sm" preserveWhiteSpace overflowWrap withLinkify>
+          <TextViewer
+            color="dimmed"
+            size="sm"
+            preserveWhiteSpace
+            overflowWrap
+            withLinkify
+          >
             {milestone.description}
           </TextViewer>
         </div>

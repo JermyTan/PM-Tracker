@@ -18,6 +18,7 @@ import {
   TYPE,
 } from "../constants";
 import { BaseData } from "./base";
+import { GroupData } from "./groups";
 import { MilestoneData } from "./milestones";
 import {
   SubmissionType,
@@ -177,7 +178,7 @@ export type SubmissionViewData = Partial<BaseData> & {
   [CREATOR]: UserData | null;
   [EDITOR]: UserData | null;
   [MILESTONE]: Pick<MilestoneData, typeof ID | typeof NAME> | null;
-  [GROUP]: null; // TODO: update to GroupData | null
+  [GROUP]: Pick<GroupData, typeof ID | typeof NAME> | null;
   [TEMPLATE]: TemplateData | null;
   [FORM_RESPONSE_DATA]: FormResponseField[];
 };

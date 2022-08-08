@@ -6,20 +6,12 @@ import {
   Group,
   Text,
   Box,
-  createStyles,
 } from "@mantine/core";
 import { ReactNode } from "react";
 import { HiOutlineChevronLeft } from "react-icons/hi";
 import { Link, useLocation } from "react-router-dom";
 import { colorModeValue } from "../utils/theme-utils";
-
-const useStyles = createStyles({
-  childrenContainer: {
-    width: "100%",
-    alignSelf: "center",
-    maxWidth: "800px",
-  },
-});
+import useGetFormContainerStyles from "../custom-hooks/use-get-form-container-style";
 
 type Props = {
   children: ReactNode;
@@ -28,7 +20,7 @@ type Props = {
 function MilestoneTemplatesNestedLayout({ children }: Props) {
   const { colorScheme } = useMantineTheme();
   const { pathname } = useLocation();
-  const { classes } = useStyles();
+  const formContainerClassName = useGetFormContainerStyles();
 
   return (
     <Stack>
@@ -50,7 +42,7 @@ function MilestoneTemplatesNestedLayout({ children }: Props) {
         </Anchor>
       </div>
 
-      <Box className={classes.childrenContainer}>{children}</Box>
+      <Box className={formContainerClassName}>{children}</Box>
     </Stack>
   );
 }

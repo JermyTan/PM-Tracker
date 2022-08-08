@@ -55,7 +55,7 @@ function CourseMilestonesPage() {
         size="xl"
         padding="lg"
         closeButtonLabel={`Cancel ${milestoneAlias} creation`}
-        title={<Title order={2}>{capitalizedMilestoneAlias} Creation</Title>}
+        title={<Title order={3}>{capitalizedMilestoneAlias} Creation</Title>}
       >
         <ScrollArea offsetScrollbars pr="xs" scrollbarSize={8}>
           <MilestoneCreationForm onSuccess={close} />

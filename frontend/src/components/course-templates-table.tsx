@@ -51,6 +51,7 @@ function CourseTemplatesTable({ templates, studentView }: Props) {
     <Table highlightOnHover>
       <thead>
         <tr>
+          <th>ID</th>
           <th>Name</th>
           <th>Submission type</th>
           {!studentView && <th>Published</th>}
@@ -75,6 +76,7 @@ function CourseTemplatesTable({ templates, studentView }: Props) {
                 );
               }}
             >
+              <td>{id}</td>
               <TextViewer<"td"> component="td" inherit overflowWrap>
                 {name}
               </TextViewer>

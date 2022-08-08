@@ -1,24 +1,28 @@
-import { Text } from "@mantine/core";
+import { Text, TextProps } from "@mantine/core";
 import { DATE_TIME_MONTH_NAME_FORMAT } from "../constants";
 import { displayDateTime } from "../utils/transform-utils";
 
-type Props = {
+type Props<T> = {
   startDateTime: number;
   endDateTime: number | null;
-};
+} & Omit<TextProps<T>, "children">;
 
-function MilestoneActivePeriodDisplay({ startDateTime, endDateTime }: Props) {
+function MilestoneActivePeriodDisplay<T = "div">({
+  startDateTime,
+  endDateTime,
+  ...props
+}: Props<T>) {
   return (
-    <div>
-      <Text size="sm" weight={500}>
+    <Text {...props}>
+      <Text inherit>
         Start: {displayDateTime(startDateTime, DATE_TIME_MONTH_NAME_FORMAT)}
       </Text>
       {endDateTime !== null && (
-        <Text size="sm" weight={500}>
+        <Text inherit>
           End: {displayDateTime(endDateTime, DATE_TIME_MONTH_NAME_FORMAT)}
         </Text>
       )}
-    </div>
+    </Text>
   );
 }
 

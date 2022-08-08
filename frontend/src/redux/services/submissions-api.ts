@@ -105,6 +105,9 @@ const submissionsApi = baseApi
     }),
   });
 
+export const useGetSingleSubmissionQueryState =
+  submissionsApi.endpoints.getSingleSubmission.useQueryState;
+
 export const {
   useGetSubmissionsQuery,
   useCreateSubmissionMutation,

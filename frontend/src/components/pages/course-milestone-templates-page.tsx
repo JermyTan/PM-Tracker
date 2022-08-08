@@ -21,21 +21,22 @@ import { useResolveError } from "../../utils/error-utils";
 import CourseTemplatesTable from "../course-templates-table";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import ConditionalRenderer from "../conditional-renderer";
+import { MAX_FORM_WIDTH } from "../../custom-hooks/use-get-form-container-style";
 
 const useStyles = createStyles(
-  (
-    _,
-    {
-      hasSelectedTemplate,
-      noWrap,
-    }: { hasSelectedTemplate?: boolean; noWrap?: boolean },
-  ) => ({
+  (_, { noWrap }: { hasSelectedTemplate?: boolean; noWrap?: boolean }) => ({
+    pageContainer: {
+      flexDirection: !noWrap ? "column-reverse" : undefined,
+    },
     templateContainer: {
       flex: "1 1 auto",
+      width: "100%",
+      maxWidth: noWrap ? MAX_FORM_WIDTH : undefined,
     },
     templateTableContainer: {
-      minWidth: hasSelectedTemplate ? "600px" : "100%",
-      width: noWrap ? undefined : "100%",
+      minWidth: "650px",
+      width: !noWrap ? "100%" : undefined,
+      flex: "1 1 auto",
     },
   }),
 );
@@ -66,8 +67,8 @@ function CourseMilestoneTemplatesPage({ children, studentView }: Props) {
   });
   const templateId = useGetTemplateId();
   const hasSelectedTemplate = Boolean(templateId);
-  const noWrap = useMediaQuery("(min-width: 1400px)");
-  const { classes } = useStyles({ hasSelectedTemplate, noWrap });
+  const noWrap = useMediaQuery("(min-width: 1500px)");
+  const { classes } = useStyles({ noWrap });
 
   return (
     <PlaceholderWrapper
@@ -78,7 +79,11 @@ function CourseMilestoneTemplatesPage({ children, studentView }: Props) {
       showDefaultMessage={Boolean(errorMessage)}
     >
       {milestoneTemplates && (
-        <Group noWrap={noWrap} align="flex-start">
+        <Group
+          className={classes.pageContainer}
+          noWrap={noWrap}
+          align="flex-start"
+        >
           {hasSelectedTemplate && (
             <div className={classes.templateContainer}>{children}</div>
           )}

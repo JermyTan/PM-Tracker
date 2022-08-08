@@ -48,6 +48,8 @@ function MilestoneCard(props: Props) {
         <MilestoneActivePeriodDisplay
           startDateTime={startDateTime}
           endDateTime={endDateTime}
+          size="sm"
+          weight={500}
         />
         <div>
           <Badge variant="outline" color={isOpen ? "green" : "red"}>

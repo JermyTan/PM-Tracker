@@ -19,10 +19,12 @@ import MilestoneSubmissionForm from "../milestone-submission-form";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import useGetTemplatePermissions from "../../custom-hooks/use-get-template-permissions";
 import ConditionalRenderer from "../conditional-renderer";
+import useGetFormContainerStyles from "../../custom-hooks/use-get-form-container-style";
 
 function CourseMilestoneTemplatesViewPage() {
   const courseId = useGetCourseId();
   const templateId = useGetTemplateId();
+  const formContainerClassName = useGetFormContainerStyles();
   const { milestoneTemplates } = useGetTemplatesQueryState(
     courseId ?? skipToken,
     {
@@ -130,7 +132,13 @@ function CourseMilestoneTemplatesViewPage() {
             </Group>
           </ConditionalRenderer>
 
-          <Paper withBorder shadow="sm" p="md" radius="md">
+          <Paper
+            withBorder
+            shadow="sm"
+            p="md"
+            radius="md"
+            className={formContainerClassName}
+          >
             <MilestoneSubmissionForm
               ref={formRef}
               defaultValues={submissionView}

@@ -12,7 +12,6 @@ import Head from "next/head";
 import { HiViewGridAdd } from "react-icons/hi";
 import { APP_NAME } from "../../constants";
 import { useGetCoursesQuery } from "../../redux/services/courses-api";
-import { AccountType } from "../../types/users";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import ConditionalRenderer from "../conditional-renderer";
 import { useResolveError } from "../../utils/error-utils";
@@ -46,7 +45,7 @@ function MyCoursesPage() {
         size="xl"
         padding="lg"
         closeButtonLabel="Cancel course creation"
-        title={<Title order={2}>Course Creation</Title>}
+        title={<Title order={3}>Course Creation</Title>}
       >
         <ScrollArea offsetScrollbars pr="xs" scrollbarSize={8}>
           <CourseCreationForm onSuccess={close} />

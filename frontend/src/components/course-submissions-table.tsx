@@ -34,7 +34,7 @@ function CourseSubmissionsTable({ submissions }: Props) {
     [submissions],
   );
   const [searchParams, setSearchParams] = useSearchParams();
-  const submissionId = searchParams.get("id");
+  const selectedSubmissionId = searchParams.get("id");
 
   return (
     <Table highlightOnHover>
@@ -55,12 +55,12 @@ function CourseSubmissionsTable({ submissions }: Props) {
               key={id}
               className={cx(
                 classes.row,
-                submissionId === `${id}` && classes.active,
+                selectedSubmissionId === `${id}` && classes.active,
               )}
               onClick={() => {
                 const stringId = `${id}`;
 
-                if (submissionId === stringId) {
+                if (selectedSubmissionId === stringId) {
                   searchParams.delete("id");
                 } else {
                   searchParams.set("id", stringId);
@@ -93,7 +93,7 @@ function CourseSubmissionsTable({ submissions }: Props) {
                 <SubmissionTypeIconLabel submissionType={submissionType} />
               </td>
               <TextViewer<"td"> component="td" inherit overflowWrap>
-                {group?.name ?? ""}{" "}
+                {group?.name ?? ""}
               </TextViewer>
               <TextViewer<"td"> component="td" inherit overflowWrap>
                 {editor?.name ?? ""}

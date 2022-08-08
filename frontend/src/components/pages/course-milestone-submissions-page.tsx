@@ -18,11 +18,12 @@ import { useGetSubmissionsQuery } from "../../redux/services/submissions-api";
 import { useResolveError } from "../../utils/error-utils";
 import CourseSubmissionsTable from "../course-submissions-table";
 import PlaceholderWrapper from "../placeholder-wrapper";
+import SubmissionSummarySection from "../submission-summary-section";
 
 enum SubmissionViewOption {
-  All = "ALL",
-  Final = "FINAL",
-  Draft = "DRAFT",
+  All = "all",
+  Final = "final",
+  Draft = "draft",
 }
 
 const SUBMISSION_VIEW_OPTIONS = Object.values(SubmissionViewOption) as string[];
@@ -66,6 +67,16 @@ function CourseMilestoneSubmissionsPage() {
     return submissionViewOption;
   })();
 
+  const onSelectedViewChange = (value: string) => {
+    if (value === SubmissionViewOption.All) {
+      searchParams.delete("view");
+    } else {
+      searchParams.set("view", value);
+    }
+
+    setSearchParams(searchParams);
+  };
+
   const filteredSubmissions = useMemo(() => {
     if (selectedView === SubmissionViewOption.All) {
       return submissions;
@@ -76,6 +87,17 @@ function CourseMilestoneSubmissionsPage() {
         isDraft === (selectedView === SubmissionViewOption.Draft),
     );
   }, [selectedView, submissions]);
+
+  const selectedSubmissionId = searchParams.get("id");
+  const selectedSubmission = useMemo(() => {
+    if (selectedSubmissionId === null) {
+      return undefined;
+    }
+
+    return filteredSubmissions?.find(
+      ({ id }) => selectedSubmissionId === `${id}`,
+    );
+  }, [selectedSubmissionId, filteredSubmissions]);
 
   return (
     <Stack>
@@ -100,22 +122,26 @@ function CourseMilestoneSubmissionsPage() {
         showDefaultMessage={Boolean(errorMessage)}
       >
         {filteredSubmissions && (
-          <Paper withBorder shadow="sm" p="md" radius="md">
-            <Stack>
-              <div>
-                <SegmentedControl
-                  data={SUBMISSION_VIEW_OPTION_ITEMS}
-                  value={selectedView}
-                  onChange={(value) =>
-                    setSearchParams(
-                      value === SubmissionViewOption.All ? {} : { view: value },
-                    )
-                  }
-                />
-              </div>
-              <CourseSubmissionsTable submissions={filteredSubmissions} />
-            </Stack>
-          </Paper>
+          <>
+            <Paper withBorder shadow="sm" p="md" radius="md">
+              <Stack>
+                <div>
+                  <SegmentedControl
+                    data={SUBMISSION_VIEW_OPTION_ITEMS}
+                    value={selectedView}
+                    onChange={onSelectedViewChange}
+                  />
+                </div>
+                <CourseSubmissionsTable submissions={filteredSubmissions} />
+              </Stack>
+            </Paper>
+
+            {selectedSubmission && (
+              <Paper withBorder shadow="sm" p="md" radius="md">
+                <SubmissionSummarySection {...selectedSubmission} />
+              </Paper>
+            )}
+          </>
         )}
       </PlaceholderWrapper>
     </Stack>

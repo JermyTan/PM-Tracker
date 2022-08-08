@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Stack, Text } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import useGetCourseId from "../custom-hooks/use-get-course-id";
 import useGetMilestoneId from "../custom-hooks/use-get-milestone-id";
@@ -29,23 +29,14 @@ function MilestoneDetailsLayout({ children }: Props) {
       <MilestoneActivePeriodDisplay
         startDateTime={milestone.startDateTime}
         endDateTime={milestone.endDateTime}
+        size="sm"
+        weight={500}
       />
 
       {milestone.description && (
-        <div>
-          <Text size="sm" weight={500}>
-            Description
-          </Text>
-          <TextViewer
-            color="dimmed"
-            size="sm"
-            preserveWhiteSpace
-            overflowWrap
-            withLinkify
-          >
-            {milestone.description}
-          </TextViewer>
-        </div>
+        <TextViewer size="sm" preserveWhiteSpace overflowWrap withLinkify>
+          {milestone.description}
+        </TextViewer>
       )}
 
       <div>{children}</div>

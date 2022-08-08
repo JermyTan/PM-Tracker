@@ -11,10 +11,14 @@ import { useGetSingleMilestoneQuery } from "../redux/services/milestones-api";
 import { useResolveError } from "../utils/error-utils";
 import PlaceholderWrapper from "./placeholder-wrapper";
 import {
+  COURSE_MILESTONE_SINGLE_SUBMISSION_PATH,
   COURSE_MILESTONE_SUBMISSIONS_PATH,
   COURSE_MILESTONE_SUBMISSIONS_TEMPLATES_PATH,
 } from "../routes/paths";
 import { checkIsMilestoneOpen } from "../utils/misc-utils";
+import useGetSubmissionId from "../custom-hooks/use-get-submission-id";
+import { useGetSingleSubmissionQueryState } from "../redux/services/submissions-api";
+import { useGetSingleCourseQueryState } from "../redux/services/courses-api";
 
 type Props = {
   children: ReactNode;
@@ -24,6 +28,23 @@ function MilestoneLayout({ children }: Props) {
   const courseId = useGetCourseId();
   const milestoneId = useGetMilestoneId();
   const { milestoneAlias } = useGetMilestoneAlias();
+  const { courseName } = useGetSingleCourseQueryState(courseId ?? skipToken, {
+    selectFromResult: ({ data: course }) => ({
+      courseName: course?.name,
+    }),
+  });
+  const submissionId = useGetSubmissionId();
+  const { submission, isFetching } = useGetSingleSubmissionQueryState(
+    courseId === undefined || submissionId === undefined
+      ? skipToken
+      : { courseId, submissionId },
+    {
+      selectFromResult: ({ data: submission, isFetching }) => ({
+        submission,
+        isFetching,
+      }),
+    },
+  );
   const { milestone, isLoading, error } = useGetSingleMilestoneQuery(
     courseId === undefined || milestoneId === undefined
       ? skipToken
@@ -89,6 +110,23 @@ function MilestoneLayout({ children }: Props) {
           milestoneId,
         }),
       });
+    } else if (
+      submissionId !== undefined &&
+      submission &&
+      !isFetching &&
+      matchPath(
+        { path: COURSE_MILESTONE_SINGLE_SUBMISSION_PATH, end: false },
+        pathname,
+      )
+    ) {
+      components.push({
+        label: submission.name,
+        path: generatePath(COURSE_MILESTONE_SINGLE_SUBMISSION_PATH, {
+          courseId,
+          milestoneId,
+          submissionId,
+        }),
+      });
     }
 
     return components.map(({ label, path }, index) => (
@@ -113,7 +151,7 @@ function MilestoneLayout({ children }: Props) {
     >
       <Head>
         <title>
-          {milestone?.name} | {APP_NAME}
+          {milestone?.name} - {courseName} | {APP_NAME}
         </title>
       </Head>
 

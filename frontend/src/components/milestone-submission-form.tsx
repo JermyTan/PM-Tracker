@@ -75,16 +75,7 @@ function MilestoneSubmissionForm(
     name: "milestone-submission-form",
   });
 
-  const {
-    createdAt,
-    updatedAt,
-    name,
-    description,
-    submissionType,
-    creator,
-    editor,
-    milestone,
-  } = defaultValues;
+  const { name, description, submissionType } = defaultValues;
 
   const onSubmit = async (formData: SubmissionFormProps) => {
     if (testMode) {

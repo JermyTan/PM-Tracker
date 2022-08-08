@@ -81,7 +81,7 @@ function CourseCard({
             overflowWrap
             withLinkify
             size="sm"
-            color={hasDescription ? "" : "dimmed"}
+            color={hasDescription ? undefined : "dimmed"}
           >
             {description || "No description"}
           </TextViewer>

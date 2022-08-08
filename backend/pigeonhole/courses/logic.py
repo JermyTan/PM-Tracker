@@ -195,6 +195,7 @@ def course_submission_to_json(submission: CourseSubmission) -> dict:
 
     return data
 
+
 def comment_to_json(comment: Comment) -> dict:
     data = to_base_json(comment)
 
@@ -206,17 +207,21 @@ def comment_to_json(comment: Comment) -> dict:
 
     return data
 
-def course_submission_field_comment_to_json(field_comment: CourseSubmissionFieldComment) -> dict:
+
+def course_submission_field_comment_to_json(
+    field_comment: CourseSubmissionFieldComment,
+) -> dict:
     data = comment_to_json(field_comment.comment)
 
     data |= {
         FIELD_INDEX: field_comment.field_index,
-        ROLE: field_comment.course_membership.role or ""
+        ROLE: field_comment.course_membership.role or "",
     }
 
     data[ID] = field_comment.id
 
     return data
+
 
 def get_courses(*args, **kwargs) -> QuerySet[Course]:
     return Course.objects.filter(*args, **kwargs)
@@ -540,33 +545,38 @@ def update_course_group(group: CourseGroup, name: str) -> CourseGroup:
 
     return group
 
+
 @transaction.atomic
 def batch_update_course_group_members(
-    course: Course,
-    group: CourseGroup,
-    user_ids: Sequence[int] 
+    course: Course, group: CourseGroup, user_ids: Sequence[int]
 ) -> CourseGroup:
 
     # delete members whose ids are not in list of ids
-    group_members_to_delete = CourseGroupMember.objects.filter(group=group).exclude(member__user__id__in=user_ids)
+    group_members_to_delete = CourseGroupMember.objects.filter(group=group).exclude(
+        member__user__id__in=user_ids
+    )
     _, _ = group_members_to_delete.delete()
 
     # add members that are not in group
     for user_id in user_ids:
         try:
             membership = course.coursemembership_set.get(user_id=user_id)
-            
-            if CourseGroupMember.objects.filter(group=group, member_id=membership.id).exists():
+
+            if CourseGroupMember.objects.filter(
+                group=group, member_id=membership.id
+            ).exists():
                 continue
-            
+
             CourseGroupMember.objects.create(member=membership, group=group)
         except CourseMembership.DoesNotExist as e:
             logger.warning(e)
-            raise ValueError("One or more of the members are not a part of this course.")
+            raise ValueError(
+                "One or more of the members are not a part of this course."
+            )
         except IntegrityError as e:
             logger.warning(e)
             raise ValueError("Unable to add a member to the group.")
-    
+
     updated_group = CourseGroup.objects.prefetch_related(
         Prefetch(
             lookup="coursegroupmember_set",
@@ -577,7 +587,6 @@ def batch_update_course_group_members(
     ).get(id=group.id)
 
     return updated_group
-
 
 
 @transaction.atomic
@@ -801,7 +810,10 @@ def update_course_submission(
 def can_view_course_submission(
     requester_membership: CourseMembership, submission: CourseSubmission
 ) -> bool:
-    if requester_membership.role != Role.STUDENT:
+    if (
+        requester_membership.role != Role.STUDENT
+        or submission.creator == requester_membership
+    ):
         return True
 
     if submission.group is not None:
@@ -809,7 +821,7 @@ def can_view_course_submission(
             membership=requester_membership, group=submission.group, force_query_db=True
         )
 
-    return submission.creator == requester_membership
+    return False
 
 
 def can_update_course_submission(
@@ -835,17 +847,18 @@ def can_delete_course_submission(
 
 
 def can_update_course_submission_field_comment(
-    requester_membership: CourseMembership, submission_comment: CourseSubmissionFieldComment
+    requester_membership: CourseMembership,
+    submission_comment: CourseSubmissionFieldComment,
 ) -> bool:
     return requester_membership == submission_comment.course_membership
 
 
 def can_delete_course_submission_field_comment(
-    requester_membership: CourseMembership, submission_comment: CourseSubmissionFieldComment
+    requester_membership: CourseMembership,
+    submission_comment: CourseSubmissionFieldComment,
 ) -> bool:
     return can_update_course_submission_field_comment(
-        requester_membership=requester_membership,
-        submission_comment=submission_comment
+        requester_membership=requester_membership, submission_comment=submission_comment
     )
 
 
@@ -853,7 +866,9 @@ def comment_is_deleted(comment: Comment) -> bool:
     return comment.is_deleted
 
 
-def submission_field_comment_is_deleted(submission_comment: CourseSubmissionFieldComment) -> bool:
+def submission_field_comment_is_deleted(
+    submission_comment: CourseSubmissionFieldComment,
+) -> bool:
     return comment_is_deleted(submission_comment.comment)
 
 
@@ -863,27 +878,26 @@ def create_course_submission_field_comment(
     commenter: User,
     content: str,
     field_index: int,
-    course_membership: CourseMembership
-
+    course_membership: CourseMembership,
 ) -> CourseSubmissionFieldComment:
-    
+
     new_comment = Comment.objects.create(content=content, commenter=commenter)
 
     new_course_submission_field_comment = CourseSubmissionFieldComment.objects.create(
         submission=submission,
         comment=new_comment,
         field_index=field_index,
-        course_membership=course_membership
+        course_membership=course_membership,
     )
 
     return new_course_submission_field_comment
 
+
 @transaction.atomic
 def update_course_submission_field_comment(
-    course_submission_field_comment: CourseSubmissionFieldComment,
-    content: str
+    course_submission_field_comment: CourseSubmissionFieldComment, content: str
 ) -> CourseSubmissionFieldComment:
-    
+
     comment = course_submission_field_comment.comment
     comment.content = content
 
@@ -891,11 +905,12 @@ def update_course_submission_field_comment(
 
     return course_submission_field_comment
 
+
 @transaction.atomic
 def delete_course_submission_field_comment(
     course_submission_field_comment: CourseSubmissionFieldComment,
 ) -> CourseSubmissionFieldComment:
-    
+
     comment = course_submission_field_comment.comment
     comment.is_deleted = True
 

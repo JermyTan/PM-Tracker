@@ -1,13 +1,37 @@
-import { Button, Group, Paper, Stack, Title } from "@mantine/core";
+import {
+  Button,
+  Group,
+  Paper,
+  SegmentedControl,
+  SegmentedControlItem,
+  Stack,
+  Title,
+} from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/query/react";
+import { capitalCase } from "change-case";
+import { useMemo } from "react";
 import { FaPlus } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import useGetMilestoneId from "../../custom-hooks/use-get-milestone-id";
 import { useGetSubmissionsQuery } from "../../redux/services/submissions-api";
 import { useResolveError } from "../../utils/error-utils";
 import CourseSubmissionsTable from "../course-submissions-table";
 import PlaceholderWrapper from "../placeholder-wrapper";
+
+enum SubmissionViewOption {
+  All = "ALL",
+  Final = "FINAL",
+  Draft = "DRAFT",
+}
+
+const SUBMISSION_VIEW_OPTIONS = Object.values(SubmissionViewOption) as string[];
+
+const SUBMISSION_VIEW_OPTION_ITEMS: SegmentedControlItem[] =
+  SUBMISSION_VIEW_OPTIONS.map((option) => ({
+    label: capitalCase(option),
+    value: option,
+  }));
 
 function CourseMilestoneSubmissionsPage() {
   const courseId = useGetCourseId();
@@ -28,6 +52,30 @@ function CourseMilestoneSubmissionsPage() {
     error,
     name: "course-milestone-submissions-page",
   });
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const selectedView = (() => {
+    const submissionViewOption = searchParams.get("view");
+    if (
+      submissionViewOption === null ||
+      !SUBMISSION_VIEW_OPTIONS.includes(submissionViewOption)
+    ) {
+      return SubmissionViewOption.All;
+    }
+
+    return submissionViewOption;
+  })();
+
+  const filteredSubmissions = useMemo(() => {
+    if (selectedView === SubmissionViewOption.All) {
+      return submissions;
+    }
+
+    return submissions?.filter(
+      ({ isDraft }) =>
+        isDraft === (selectedView === SubmissionViewOption.Draft),
+    );
+  }, [selectedView, submissions]);
 
   return (
     <Stack>
@@ -51,9 +99,22 @@ function CourseMilestoneSubmissionsPage() {
         defaultMessage={errorMessage}
         showDefaultMessage={Boolean(errorMessage)}
       >
-        {submissions && (
+        {filteredSubmissions && (
           <Paper withBorder shadow="sm" p="md" radius="md">
-            <CourseSubmissionsTable submissions={submissions} />
+            <Stack>
+              <div>
+                <SegmentedControl
+                  data={SUBMISSION_VIEW_OPTION_ITEMS}
+                  value={selectedView}
+                  onChange={(value) =>
+                    setSearchParams(
+                      value === SubmissionViewOption.All ? {} : { view: value },
+                    )
+                  }
+                />
+              </div>
+              <CourseSubmissionsTable submissions={filteredSubmissions} />
+            </Stack>
           </Paper>
         )}
       </PlaceholderWrapper>

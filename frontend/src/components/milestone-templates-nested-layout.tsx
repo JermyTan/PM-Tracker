@@ -1,12 +1,5 @@
 import path from "path";
-import {
-  useMantineTheme,
-  Stack,
-  Anchor,
-  Group,
-  Text,
-  Box,
-} from "@mantine/core";
+import { useMantineTheme, Stack, Anchor, Group, Text } from "@mantine/core";
 import { ReactNode } from "react";
 import { HiOutlineChevronLeft } from "react-icons/hi";
 import { Link, useLocation } from "react-router-dom";
@@ -42,7 +35,7 @@ function MilestoneTemplatesNestedLayout({ children }: Props) {
         </Anchor>
       </div>
 
-      <Box className={formContainerClassName}>{children}</Box>
+      <div className={formContainerClassName}>{children}</div>
     </Stack>
   );
 }

@@ -116,7 +116,7 @@ export const formResponseFieldSchema = z
           return !required || response.length > 0;
         }
         default:
-          return false;
+          return true;
       }
     },
     (field) => {

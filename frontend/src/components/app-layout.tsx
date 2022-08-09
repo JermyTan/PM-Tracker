@@ -37,7 +37,7 @@ function AppLayout({ children }: Props) {
   const { classes } = useStyles();
 
   return (
-    <Box className={classes.layout}>
+    <div className={classes.layout}>
       {/* Sidebar */}
       <Sidebar
         className={classes.sidebar}
@@ -47,7 +47,7 @@ function AppLayout({ children }: Props) {
       <Divider orientation="vertical" />
 
       {/* Main page */}
-      <Box className={classes.mainContainer}>
+      <div className={classes.mainContainer}>
         {/* Header */}
         <Header
           isSiderbarExpanded={isSidebarExpanded}
@@ -62,8 +62,8 @@ function AppLayout({ children }: Props) {
             {children}
           </Box>
         </ScrollArea>
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }
 

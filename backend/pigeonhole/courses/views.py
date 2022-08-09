@@ -603,9 +603,7 @@ class SingleCourseGroupView(APIView):
                 try:
 
                     updated_course = batch_update_course_group_members(
-                        course=course,
-                        group=group,
-                        user_ids=payload["user_ids"]
+                        course=course, group=group, user_ids=payload["user_ids"]
                     )
 
                 except ValueError as e:
@@ -794,7 +792,11 @@ class CourseSubmissionsView(APIView):
         )
 
         data = [
-            course_submission_summary_to_json(submission) for submission in submissions
+            course_submission_summary_to_json(submission)
+            for submission in submissions
+            if can_view_course_submission(
+                requester_membership=requester_membership, submission=submission
+            )
         ]
 
         return Response(data, status=status.HTTP_200_OK)
@@ -921,6 +923,7 @@ class SingleCourseSubmissionView(APIView):
 
         return Response(data=data, status=status.HTTP_200_OK)
 
+
 class CourseSubmissionFieldCommentsView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
@@ -933,7 +936,7 @@ class CourseSubmissionFieldCommentsView(APIView):
         course: Course,
         requester_membership: CourseMembership,
         submission: CourseSubmission,
-        field_index: int
+        field_index: int,
     ):
         if not can_view_course_submission(
             requester_membership=requester_membership, submission=submission
@@ -947,10 +950,12 @@ class CourseSubmissionFieldCommentsView(APIView):
             field_index=field_index
         )
 
-        data = [course_submission_field_comment_to_json(comment) for comment in field_comments]
+        data = [
+            course_submission_field_comment_to_json(comment)
+            for comment in field_comments
+        ]
 
         return Response(data=data, status=status.HTTP_200_OK)
-
 
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
@@ -963,7 +968,7 @@ class CourseSubmissionFieldCommentsView(APIView):
         course: Course,
         requester_membership: CourseMembership,
         submission: CourseSubmission,
-        field_index: int
+        field_index: int,
     ):
         if not can_view_course_submission(
             requester_membership=requester_membership, submission=submission
@@ -972,7 +977,7 @@ class CourseSubmissionFieldCommentsView(APIView):
 
         if field_index < 0 or field_index >= len(submission.form_response_data):
             raise BadRequest(detail="Invalid field index provided.")
-        
+
         serializer = PostCourseSubmissionFieldCommentSerializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)
@@ -981,10 +986,10 @@ class CourseSubmissionFieldCommentsView(APIView):
         try:
             new_comment = create_course_submission_field_comment(
                 submission=submission,
-                commenter = requester,
+                commenter=requester,
                 content=validated_data["content"],
                 field_index=field_index,
-                course_membership=requester_membership
+                course_membership=requester_membership,
             )
         except ValueError as e:
             raise BadRequest(detail=e)
@@ -1007,12 +1012,12 @@ class SingleCourseSubmissionFieldCommentsView(APIView):
         course: Course,
         requester_membership: CourseMembership,
         submission: CourseSubmission,
-        submission_comment: CourseSubmissionFieldComment
+        submission_comment: CourseSubmissionFieldComment,
     ):
-        
+
         if not can_update_course_submission_field_comment(
             requester_membership=requester_membership,
-            submission_comment=submission_comment
+            submission_comment=submission_comment,
         ):
             raise PermissionDenied()
 
@@ -1027,7 +1032,7 @@ class SingleCourseSubmissionFieldCommentsView(APIView):
         try:
             updated_comment = update_course_submission_field_comment(
                 course_submission_field_comment=submission_comment,
-                content = validated_data['content']
+                content=validated_data["content"],
             )
         except ValueError as e:
             raise BadRequest(detail=e)
@@ -1048,18 +1053,18 @@ class SingleCourseSubmissionFieldCommentsView(APIView):
         course: Course,
         requester_membership: CourseMembership,
         submission: CourseSubmission,
-        submission_comment: CourseSubmissionFieldComment
+        submission_comment: CourseSubmissionFieldComment,
     ):
-        
+
         if not can_delete_course_submission_field_comment(
             requester_membership=requester_membership,
-            submission_comment=submission_comment
+            submission_comment=submission_comment,
         ):
             raise PermissionDenied()
 
         if submission_field_comment_is_deleted(submission_comment=submission_comment):
             raise BadRequest(detail="The comment is already deleted.")
-        
+
         try:
             deleted_comment = delete_course_submission_field_comment(
                 course_submission_field_comment=submission_comment,

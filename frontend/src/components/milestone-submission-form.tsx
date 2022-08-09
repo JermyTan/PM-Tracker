@@ -37,7 +37,9 @@ const schema = z.object({
   [FORM_RESPONSE_DATA]: z.array(formResponseFieldSchema),
 });
 
-export type SubmissionFormProps = z.infer<typeof schema>;
+type SubmissionFormProps = z.infer<typeof schema>;
+
+export type SubmissionFormData = SubmissionFormProps;
 
 type MilestoneSubmissionFormHandler = {
   reset: UseFormReset<SubmissionFormProps>;
@@ -47,7 +49,7 @@ type Props = {
   defaultValues: SubmissionViewData;
   readOnly?: boolean;
   testMode?: boolean;
-  onSubmit?: (formData: SubmissionFormProps) => Promise<unknown>;
+  onSubmit?: (formData: SubmissionFormData) => Promise<unknown>;
 };
 
 function MilestoneSubmissionForm(
@@ -62,7 +64,7 @@ function MilestoneSubmissionForm(
     control,
     handleSubmit,
     reset,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = methods;
   useImperativeHandle(ref, () => ({ reset }), [reset]);
 
@@ -79,7 +81,6 @@ function MilestoneSubmissionForm(
 
   const onSubmit = async (formData: SubmissionFormProps) => {
     if (testMode) {
-      console.log("test");
       toastUtils.info({
         title: "Test Mode",
         message: "Form inputs are successfully validated and can be submitted.",
@@ -93,6 +94,8 @@ function MilestoneSubmissionForm(
 
     await handleOnSubmit?.(formData);
   };
+
+  console.log(errors);
 
   return (
     <FormProvider {...methods}>

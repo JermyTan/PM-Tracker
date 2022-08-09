@@ -57,7 +57,7 @@ from .models import (
     CourseMilestoneTemplate,
     CourseSettings,
     CourseSubmission,
-    CourseSubmissionFieldComment,
+    CourseSubmissionComment,
     PatchCourseGroupAction,
     Role,
     SubmissionType,
@@ -208,17 +208,19 @@ def comment_to_json(comment: Comment) -> dict:
     return data
 
 
-def course_submission_field_comment_to_json(
-    field_comment: CourseSubmissionFieldComment,
+def course_submission_comment_to_json(
+    submission_comment: CourseSubmissionComment,
 ) -> dict:
-    data = comment_to_json(field_comment.comment)
+    data = comment_to_json(submission_comment.comment)
 
     data |= {
-        FIELD_INDEX: field_comment.field_index,
-        ROLE: field_comment.course_membership.role or "",
+        FIELD_INDEX: submission_comment.field_index,
+        ROLE: submission_comment.member.role
+        if submission_comment.member is not None
+        else "",
     }
 
-    data[ID] = field_comment.id
+    data[ID] = submission_comment.id
 
     return data
 
@@ -838,82 +840,61 @@ def can_update_course_submission(
     return True
 
 
-def can_delete_course_submission(
-    requester_membership: CourseMembership, submission: CourseSubmission
-) -> bool:
-    return can_update_course_submission(
-        requester_membership=requester_membership, submission=submission
-    )
+can_delete_course_submission = can_update_course_submission
 
 
-def can_update_course_submission_field_comment(
+def can_update_course_submission_comment(
     requester_membership: CourseMembership,
-    submission_comment: CourseSubmissionFieldComment,
+    submission_comment: CourseSubmissionComment,
 ) -> bool:
-    return requester_membership == submission_comment.course_membership
+    return requester_membership == submission_comment.member
 
 
-def can_delete_course_submission_field_comment(
-    requester_membership: CourseMembership,
-    submission_comment: CourseSubmissionFieldComment,
-) -> bool:
-    return can_update_course_submission_field_comment(
-        requester_membership=requester_membership, submission_comment=submission_comment
-    )
-
-
-def comment_is_deleted(comment: Comment) -> bool:
-    return comment.is_deleted
-
-
-def submission_field_comment_is_deleted(
-    submission_comment: CourseSubmissionFieldComment,
-) -> bool:
-    return comment_is_deleted(submission_comment.comment)
+can_delete_course_submission_comment = can_update_course_submission_comment
 
 
 @transaction.atomic
-def create_course_submission_field_comment(
+def create_course_submission_comment(
     submission: CourseSubmission,
     commenter: User,
     content: str,
     field_index: int,
-    course_membership: CourseMembership,
-) -> CourseSubmissionFieldComment:
+    member: CourseMembership,
+) -> CourseSubmissionComment:
 
     new_comment = Comment.objects.create(content=content, commenter=commenter)
 
-    new_course_submission_field_comment = CourseSubmissionFieldComment.objects.create(
+    new_submission_comment = CourseSubmissionComment.objects.create(
         submission=submission,
         comment=new_comment,
         field_index=field_index,
-        course_membership=course_membership,
+        member=member,
     )
 
-    return new_course_submission_field_comment
+    return new_submission_comment
 
 
 @transaction.atomic
-def update_course_submission_field_comment(
-    course_submission_field_comment: CourseSubmissionFieldComment, content: str
-) -> CourseSubmissionFieldComment:
+def update_course_submission_comment(
+    submission_comment: CourseSubmissionComment, content: str
+) -> CourseSubmissionComment:
 
-    comment = course_submission_field_comment.comment
+    comment = submission_comment.comment
     comment.content = content
 
     comment.save()
 
-    return course_submission_field_comment
+    return submission_comment
 
 
 @transaction.atomic
-def delete_course_submission_field_comment(
-    course_submission_field_comment: CourseSubmissionFieldComment,
-) -> CourseSubmissionFieldComment:
+def delete_course_submission_comment(
+    submission_comment: CourseSubmissionComment,
+) -> CourseSubmissionComment:
 
-    comment = course_submission_field_comment.comment
+    comment = submission_comment.comment
     comment.is_deleted = True
 
     comment.save()
 
-    return course_submission_field_comment
+    return submission_comment

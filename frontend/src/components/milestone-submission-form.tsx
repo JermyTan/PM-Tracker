@@ -125,7 +125,16 @@ function MilestoneSubmissionForm(
               <Text size="sm" color="dimmed">
                 <SubmissionTypeIconLabel submissionType={submissionType} />
               </Text>
-              <Text size="sm">{description}</Text>
+              {description && (
+                <TextViewer
+                  size="sm"
+                  preserveWhiteSpace
+                  overflowWrap
+                  withLinkify
+                >
+                  {description}
+                </TextViewer>
+              )}
             </Stack>
           </Stack>
 

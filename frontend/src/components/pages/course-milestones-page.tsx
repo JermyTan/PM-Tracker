@@ -21,7 +21,7 @@ import useGetMilestoneAlias from "../../custom-hooks/use-get-milestone-alias";
 import MilestoneCard from "../milestone-card";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import MilestoneCreationForm from "../milestone-creation-form";
-import SubmissionCommentsSection from "../submission-comments-section";
+import CourseSubmissionCommentsSection from "../course-submission-comments-section";
 import useGetMilestonePermissions from "../../custom-hooks/use-get-milestone-permissions";
 import useGetTemplatePermissions from "../../custom-hooks/use-get-template-permissions";
 
@@ -110,7 +110,7 @@ function CourseMilestonesPage() {
         </PlaceholderWrapper>
 
         {/* Replace here */}
-        <SubmissionCommentsSection
+        <CourseSubmissionCommentsSection
           courseId={1}
           submissionId={1}
           fieldIndex={0}

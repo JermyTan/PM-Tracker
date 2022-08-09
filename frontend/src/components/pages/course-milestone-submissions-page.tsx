@@ -18,7 +18,7 @@ import { useGetSubmissionsQuery } from "../../redux/services/submissions-api";
 import { useResolveError } from "../../utils/error-utils";
 import CourseSubmissionsTable from "../course-submissions-table";
 import PlaceholderWrapper from "../placeholder-wrapper";
-import SubmissionSummarySection from "../submission-summary-section";
+import CourseSubmissionSummarySection from "../course-submission-summary-section";
 
 enum SubmissionViewOption {
   All = "all",
@@ -138,7 +138,7 @@ function CourseMilestoneSubmissionsPage() {
 
             {selectedSubmission && (
               <Paper withBorder shadow="sm" p="md" radius="md">
-                <SubmissionSummarySection {...selectedSubmission} />
+                <CourseSubmissionSummarySection {...selectedSubmission} />
               </Paper>
             )}
           </>

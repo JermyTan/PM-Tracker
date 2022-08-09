@@ -7,7 +7,7 @@ import TextViewer from "./text-viewer";
 
 type Props = SubmissionSummaryData;
 
-function SubmissionSummarySection({
+function CourseSubmissionSummarySection({
   id,
   createdAt,
   updatedAt,
@@ -30,15 +30,19 @@ function SubmissionSummarySection({
           { maxWidth: "md", cols: 2 },
           { maxWidth: "xl", cols: 3 },
         ]}
-        spacing="xs"
       >
+        <div>
+          <Text size="sm" weight={700}>
+            ID
+          </Text>
+          <Text size="sm">{id}</Text>
+        </div>
+
         <div>
           <Text size="sm" weight={700}>
             Name
           </Text>
-          <TextViewer size="sm" overflowWrap>
-            {name}
-          </TextViewer>
+          <Text size="sm">{name}</Text>
         </div>
 
         <div>
@@ -78,53 +82,48 @@ function SubmissionSummarySection({
           <Text size="sm" weight={700}>
             Group
           </Text>
-          <TextViewer
-            size="sm"
-            overflowWrap
-            color={!group ? "dimmed" : undefined}
-          >
+          <Text size="sm" color={!group ? "dimmed" : undefined}>
             {group?.name || "No group"}
-          </TextViewer>
+          </Text>
         </div>
 
         <div>
           <Text size="sm" weight={700}>
             Created by
           </Text>
-          <TextViewer
-            color={!creator?.name ? "red" : undefined}
-            size="sm"
-            overflowWrap
-          >
+          <Text color={!creator?.name ? "red" : undefined} size="sm">
             {creator?.name
               ? `${creator.name} @ ${displayDateTime(
                   createdAt,
                   DATE_TIME_MONTH_NAME_FORMAT,
                 )}`
               : "Unknown"}
-          </TextViewer>
+          </Text>
         </div>
 
         <div>
           <Text size="sm" weight={700}>
             Last updated by
           </Text>
-          <TextViewer
-            color={!editor?.name ? "red" : undefined}
-            size="sm"
-            overflowWrap
-          >
+          <Text color={!editor?.name ? "red" : undefined} size="sm">
             {editor?.name
               ? `${editor.name} @ ${displayDateTime(
                   updatedAt,
                   DATE_TIME_MONTH_NAME_FORMAT,
                 )}`
               : "Unknown"}
-          </TextViewer>
+          </Text>
+        </div>
+
+        <div>
+          <Text size="sm" weight={700}>
+            Visibility
+          </Text>
+          <Text size="sm">Private</Text>
         </div>
       </SimpleGrid>
     </Stack>
   );
 }
 
-export default SubmissionSummarySection;
+export default CourseSubmissionSummarySection;

@@ -6,7 +6,6 @@ import { SubmissionSummaryData } from "../types/submissions";
 import { colorModeValue } from "../utils/theme-utils";
 import { sort, displayDateTime } from "../utils/transform-utils";
 import SubmissionTypeIconLabel from "./submission-type-icon-label";
-import TextViewer from "./text-viewer";
 
 const useStyles = createStyles((theme) => ({
   row: {
@@ -40,6 +39,7 @@ function CourseSubmissionsTable({ submissions }: Props) {
     <Table highlightOnHover>
       <thead>
         <tr>
+          <th>ID</th>
           <th>Name</th>
           <th>Submission type</th>
           <th>Group</th>
@@ -69,7 +69,8 @@ function CourseSubmissionsTable({ submissions }: Props) {
                 setSearchParams(searchParams);
               }}
             >
-              <TextViewer<"td"> component="td" inherit overflowWrap>
+              <td>{id}</td>
+              <td>
                 <Group spacing="xs">
                   <Anchor<typeof Link>
                     inherit
@@ -88,16 +89,12 @@ function CourseSubmissionsTable({ submissions }: Props) {
                     </Badge>
                   )}
                 </Group>
-              </TextViewer>
+              </td>
               <td>
                 <SubmissionTypeIconLabel submissionType={submissionType} />
               </td>
-              <TextViewer<"td"> component="td" inherit overflowWrap>
-                {group?.name ?? ""}
-              </TextViewer>
-              <TextViewer<"td"> component="td" inherit overflowWrap>
-                {editor?.name ?? ""}
-              </TextViewer>
+              <td>{group?.name ?? ""}</td>
+              <td>{editor?.name ?? ""}</td>
               <td>{displayDateTime(updatedAt, DATE_TIME_MONTH_NAME_FORMAT)}</td>
               <td>Private</td>
             </tr>

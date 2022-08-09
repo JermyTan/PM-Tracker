@@ -17,7 +17,7 @@ type Props = {
   submissionId: number;
 };
 
-function SubmissionCommentsSection({
+function CourseSubmissionCommentsSection({
   fieldIndex,
   courseId,
   submissionId,
@@ -95,4 +95,4 @@ function SubmissionCommentsSection({
   );
 }
 
-export default SubmissionCommentsSection;
+export default CourseSubmissionCommentsSection;

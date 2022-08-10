@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import (
+    CourseMembershipsWithNewUserCreationView,
     CourseSubmissionFieldCommentsView,
     MyCoursesView,
     SingleCourseSubmissionFieldCommentsView,
@@ -54,6 +55,11 @@ urlpatterns = [
         "<int:course_id>/memberships/",
         CourseMembershipsView.as_view(),
         name="course_memberships",
+    ),
+    path(
+        "<int:course_id>/memberships/new",
+        CourseMembershipsWithNewUserCreationView.as_view(),
+        name="course_memberships_with_new_user_creation",
     ),
     path(
         "<int:course_id>/memberships/<int:member_id>/",

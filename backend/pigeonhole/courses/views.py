@@ -71,6 +71,7 @@ from .serializers import (
     GetCourseSubmissionSerializer,
     PatchCourseGroupSerializer,
     PostCourseGroupSerializer,
+    PostCourseMembershipsWithNewUserCreationSerializer,
     PostCourseMilestoneTemplateSerializer,
     PostCourseSerializer,
     PostCourseSubmissionFieldCommentSerializer,
@@ -1068,5 +1069,45 @@ class SingleCourseSubmissionFieldCommentsView(APIView):
             raise BadRequest(detail=e)
 
         data = course_submission_field_comment_to_json(deleted_comment)
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+
+class CourseMembershipsWithNewUserCreationView(APIView):
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.INSTRUCTOR, Role.CO_OWNER)
+    def post(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership
+    ):
+        serializer = PostCourseMembershipsWithNewUserCreationSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+        emails = validated_data["user_emails"]
+
+        # get users that already exist
+        existing_users = User.objects.filter(email__in=emails)
+        existing_users_emails = existing_users.values_list("email", flat=True)
+        
+        emails_without_user = [email for email in emails if email not in existing_users_emails]
+
+        # create users that don't exist yet
+        new_users_to_be_created = (
+            User(email=email) 
+            for email in emails_without_user
+        )
+        new_users = User.objects.bulk_create(new_users_to_be_created)
+
+        all_users = list(existing_users) + new_users
+        new_memberships_to_be_created = (CourseMembership(course=course, user=user) for user in all_users)
+        CourseMembership.objects.bulk_create(new_memberships_to_be_created, ignore_conflicts=True)
+
+        memberships = CourseMembership.objects.filter(user__email__in=emails)
+        data = [course_membership_to_json(membership) for membership in memberships]
 
         return Response(data=data, status=status.HTTP_200_OK)

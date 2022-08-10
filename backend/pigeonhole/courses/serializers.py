@@ -206,3 +206,6 @@ class PutCourseSubmissionFieldCommentSerializer(serializers.Serializer):
     
 class PostCourseSubmissionFieldCommentSerializer(PutCourseSubmissionFieldCommentSerializer):
     pass
+
+class PostCourseMembershipsWithNewUserCreationSerializer(serializers.Serializer):
+    user_emails = serializers.ListField(child=serializers.EmailField())

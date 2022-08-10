@@ -902,3 +902,7 @@ def delete_course_submission_field_comment(
     comment.save()
 
     return course_submission_field_comment
+
+@transaction.atomic
+def create_memberships_or_new_users():
+    pass

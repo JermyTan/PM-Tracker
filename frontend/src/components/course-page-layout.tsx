@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Head from "next/head";
 import { Text, Title, Tabs, Space } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/query/react";
@@ -47,6 +47,7 @@ function CoursePageLayout({ children }: Props) {
   useResolveError({ error, name: "course-page-layout" });
   const { pathname } = useLocation();
   const { capitalizedMilestoneAlias } = useGetMilestoneAlias();
+  const navigate = useNavigate();
 
   // update label during runtime
   tabDetails[0].label = pluralize(capitalizedMilestoneAlias);
@@ -77,13 +78,24 @@ function CoursePageLayout({ children }: Props) {
 
       <Space h="md" />
 
-      <Tabs tabPadding="md" active={activeIndex}>
+      <Tabs
+        tabPadding="md"
+        active={activeIndex}
+        onTabChange={(_, key) => key !== undefined && navigate(key)}
+      >
         {tabDetails.map(({ key, label }) => (
           <Tabs.Tab
             key={key}
             tabKey={key}
             label={
-              <Text<typeof Link> component={Link} to={key} weight={500}>
+              <Text<typeof Link>
+                component={Link}
+                to={key}
+                weight={500}
+                onClick={(event) => {
+                  event.stopPropagation();
+                }}
+              >
                 {label}
               </Text>
             }

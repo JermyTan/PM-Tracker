@@ -64,12 +64,7 @@ function CourseMemberRemoveConfirmation({ member, onSuccess }: Props) {
         <Button color="gray" onClick={onSuccess}>
           Cancel
         </Button>
-        <Button
-          color="red"
-          disabled={isLoading}
-          loading={isLoading}
-          onClick={onDeleteCourseMember}
-        >
+        <Button color="red" loading={isLoading} onClick={onDeleteCourseMember}>
           Remove member
         </Button>
       </Group>

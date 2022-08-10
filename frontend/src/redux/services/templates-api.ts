@@ -15,7 +15,8 @@ const templatesApi = baseApi
           url: `/courses/${courseId}/templates/`,
           method: "GET",
         }),
-        providesTags: (result) => cacher.providesList(result, "Template"),
+        providesTags: (result, _, courseId) =>
+          cacher.providesList(result, "Template", [`${courseId}`]),
       }),
 
       createTemplate: build.mutation<
@@ -29,8 +30,8 @@ const templatesApi = baseApi
           method: "POST",
           body: templatePostData,
         }),
-        invalidatesTags: (_, error) =>
-          error ? [] : cacher.invalidatesList("Template"),
+        invalidatesTags: (_, error, { courseId }) =>
+          error ? [] : cacher.invalidatesList("Template", [`${courseId}`]),
       }),
 
       getSingleTemplate: build.query<
@@ -41,7 +42,9 @@ const templatesApi = baseApi
           url: `/courses/${courseId}/templates/${templateId}/`,
           method: "GET",
         }),
-        providesTags: (_, __, { templateId: id }) => [{ type: "Template", id }],
+        providesTags: (_, __, { templateId: id, courseId }) => [
+          cacher.getIdTag(id, "Template", [`${courseId}`]),
+        ],
       }),
 
       updateTemplate: build.mutation<
@@ -56,8 +59,8 @@ const templatesApi = baseApi
           method: "PUT",
           body: templatePutData,
         }),
-        invalidatesTags: (_, error, { templateId: id }) =>
-          error ? [] : [{ type: "Template", id }],
+        invalidatesTags: (_, error, { templateId: id, courseId }) =>
+          error ? [] : [cacher.getIdTag(id, "Template", [`${courseId}`])],
       }),
 
       deleteTemplate: build.mutation<
@@ -71,8 +74,8 @@ const templatesApi = baseApi
           url: `/courses/${courseId}/templates/${templateId}/`,
           method: "DELETE",
         }),
-        invalidatesTags: (_, error, { templateId: id }) =>
-          error ? [] : [{ type: "Template", id }],
+        invalidatesTags: (_, error, { templateId: id, courseId }) =>
+          error ? [] : [cacher.getIdTag(id, "Template", [`${courseId}`])],
       }),
     }),
   });

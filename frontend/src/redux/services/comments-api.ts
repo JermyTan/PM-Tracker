@@ -10,6 +10,22 @@ const commentsApi = baseApi
   .enhanceEndpoints({ addTagTypes: ["Comment"] })
   .injectEndpoints({
     endpoints: (build) => ({
+      getSubmissionCommentCount: build.query<
+        [number, ...number[]],
+        { courseId: string | number; submissionId: string | number }
+      >({
+        query: ({ courseId, submissionId }) => ({
+          url: `/courses/${courseId}/submissions/${submissionId}/fields/comments/`,
+          method: "GET",
+        }),
+        providesTags: (_, __, { courseId, submissionId }) => [
+          cacher.getCustomTag("COUNT", "Comment", [
+            `${courseId}`,
+            `${submissionId}`,
+          ]),
+        ],
+      }),
+
       getSubmissionComments: build.query<
         SubmissionCommentsData,
         {
@@ -22,7 +38,12 @@ const commentsApi = baseApi
           url: `/courses/${courseId}/submissions/${submissionId}/fields/${fieldIndex}/comments/`,
           method: "GET",
         }),
-        providesTags: (result) => cacher.providesList(result, "Comment"),
+        providesTags: (result, _, { courseId, submissionId, fieldIndex }) =>
+          cacher.providesList(result, "Comment", [
+            `${courseId}`,
+            `${submissionId}`,
+            `${fieldIndex}`,
+          ]),
       }),
 
       createSubmissionComment: build.mutation<
@@ -43,8 +64,20 @@ const commentsApi = baseApi
           method: "POST",
           body: commentPostData,
         }),
-        invalidatesTags: (_, error) =>
-          error ? [] : cacher.invalidatesList("Comment"),
+        invalidatesTags: (_, error, { courseId, submissionId, fieldIndex }) =>
+          error
+            ? []
+            : [
+                ...cacher.invalidatesList("Comment", [
+                  `${courseId}`,
+                  `${submissionId}`,
+                  `${fieldIndex}`,
+                ]),
+                cacher.getCustomTag("COUNT", "Comment", [
+                  `${courseId}`,
+                  `${submissionId}`,
+                ]),
+              ],
       }),
 
       updateSubmissionComment: build.mutation<
@@ -65,8 +98,24 @@ const commentsApi = baseApi
           method: "PATCH",
           body: commentPatchData,
         }),
-        invalidatesTags: (_, error, { commentId }) =>
-          error ? [] : [{ type: "Comment", commentId }],
+        invalidatesTags: (
+          result,
+          error,
+          { commentId: id, courseId, submissionId },
+        ) =>
+          error || !result
+            ? []
+            : [
+                cacher.getIdTag(id, "Comment", [
+                  `${courseId}`,
+                  `${submissionId}`,
+                  `${result.fieldIndex}`,
+                ]),
+                cacher.getCustomTag("COUNT", "Comment", [
+                  `${courseId}`,
+                  `${submissionId}`,
+                ]),
+              ],
       }),
 
       deleteSubmissionComment: build.mutation<
@@ -81,13 +130,33 @@ const commentsApi = baseApi
           url: `/courses/${courseId}/submissions/${submissionId}/comments/${commentId}`,
           method: "DELETE",
         }),
-        invalidatesTags: (_, error, commentId) =>
-          error ? [] : [{ type: "Comment", commentId }],
+        invalidatesTags: (
+          result,
+          error,
+          { commentId: id, courseId, submissionId },
+        ) =>
+          error || !result
+            ? []
+            : [
+                cacher.getIdTag(id, "Comment", [
+                  `${courseId}`,
+                  `${submissionId}`,
+                  `${result.fieldIndex}`,
+                ]),
+                cacher.getCustomTag("COUNT", "Comment", [
+                  `${courseId}`,
+                  `${submissionId}`,
+                ]),
+              ],
       }),
     }),
   });
 
+export const useGetSubmissionCommentCountQueryState =
+  commentsApi.endpoints.getSubmissionCommentCount.useQueryState;
+
 export const {
+  useGetSubmissionCommentCountQuery,
   useGetSubmissionCommentsQuery,
   useUpdateSubmissionCommentMutation,
   useCreateSubmissionCommentMutation,

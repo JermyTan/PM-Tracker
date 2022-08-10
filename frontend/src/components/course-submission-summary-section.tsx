@@ -1,4 +1,5 @@
-import { Stack, Title, Text, SimpleGrid } from "@mantine/core";
+import { Stack, Title, Text, SimpleGrid, Anchor } from "@mantine/core";
+import { Link } from "react-router-dom";
 import { DATE_TIME_MONTH_NAME_FORMAT } from "../constants";
 import { SubmissionSummaryData } from "../types/submissions";
 import { displayDateTime } from "../utils/transform-utils";
@@ -42,7 +43,9 @@ function CourseSubmissionSummarySection({
           <Text size="sm" weight={700}>
             Name
           </Text>
-          <Text size="sm">{name}</Text>
+          <Anchor<typeof Link> size="sm" component={Link} to={`${id}`}>
+            {name}
+          </Anchor>
         </div>
 
         <div>

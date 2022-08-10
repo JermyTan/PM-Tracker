@@ -4,7 +4,7 @@ import { useResolveError } from "../utils/error-utils";
 import toastUtils from "../utils/toast-utils";
 
 type Props = {
-  courseId: number;
+  courseId: number | string;
   submissionId: number;
   commentId: number;
   onSuccess?: () => void;
@@ -46,12 +46,7 @@ function CommentDeleteConfirmation({
         <Button color="gray" onClick={onSuccess}>
           Cancel
         </Button>
-        <Button
-          color="red"
-          onClick={onDeleteComment}
-          loading={isLoading}
-          disabled={isLoading}
-        >
+        <Button color="red" onClick={onDeleteComment} loading={isLoading}>
           Delete comment
         </Button>
       </Group>

@@ -259,11 +259,7 @@ function MilestoneCreationForm({ onSuccess }: Props) {
           </Stack>
 
           <Group position="right">
-            <Button
-              disabled={isSubmitting}
-              loading={isSubmitting}
-              type="submit"
-            >
+            <Button loading={isSubmitting} type="submit">
               Create
             </Button>
           </Group>

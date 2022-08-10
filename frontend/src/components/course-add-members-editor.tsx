@@ -5,14 +5,21 @@ import {
   MantineTheme,
   useMantineTheme,
   Stack,
+  Loader,
 } from "@mantine/core";
 import papaparse from "papaparse";
 import { Dropzone, DropzoneStatus, MIME_TYPES } from "@mantine/dropzone";
 import { IconType } from "react-icons";
-import { GrDocumentCsv, GrClose } from "react-icons/gr";
+import { MdPersonAdd } from "react-icons/md";
+import { GrDocumentCsv, GrClose, GrClear } from "react-icons/gr";
+import { RiFileDownloadLine } from "react-icons/ri";
 import { FiUpload } from "react-icons/fi";
 import { useState } from "react";
 import toastUtils from "../utils/toast-utils";
+import { useResolveError } from "../utils/error-utils";
+import { useBatchCreateCourseMembershipsMutation } from "../redux/services/members-api";
+import { emptySelector } from "../redux/utils";
+import { CourseMembershipBatchCreateData } from "../types/courses";
 
 type Props = {
   courseId?: number | string;
@@ -20,16 +27,6 @@ type Props = {
 };
 
 type UserCreationCsvRowData = [string];
-
-type UserCreationData = {
-  email: string;
-};
-
-function csvToDisplayData(data: UserCreationCsvRowData): UserCreationData {
-  return {
-    email: data[0],
-  };
-}
 
 function getIconColor(status: DropzoneStatus, theme: MantineTheme) {
   // if (status.accepted) {
@@ -53,7 +50,6 @@ function FileUploadIcon({
   status,
   ...props
 }: React.ComponentProps<IconType> & { status: DropzoneStatus }) {
-  console.log("STATUS:", status);
   // if (status.accepted) {
   //   return <FiUpload {...props} />;
   // }
@@ -89,10 +85,42 @@ const dropzoneChildren = (status: DropzoneStatus, theme: MantineTheme) => (
 
 function CourseAddMembersEditor({ courseId, onSuccess }: Props) {
   const [isParsingCSV, setIsParsingCSV] = useState(false);
-  const [userCreationDataList, setUserCreationDataList] =
-    useState<UserCreationData[]>();
+  const [userCreationDataList, setUserCreationDataList] = useState<string[]>(
+    [],
+  );
+
+  const { resolveError } = useResolveError();
+  const [batchCreateCourseMemberships, { isLoading }] =
+    useBatchCreateCourseMembershipsMutation({
+      selectFromResult: ({ isLoading }) => ({ isLoading }),
+    });
+
+  const handleSubmitBatchMembershipCreation = async () => {
+    if (courseId === undefined) {
+      return;
+    }
+
+    const membershipsData: CourseMembershipBatchCreateData = {
+      user_emails: userCreationDataList,
+    };
+
+    console.log("MEMBERSHIPS DATA", membershipsData);
+
+    try {
+      await batchCreateCourseMemberships({
+        courseId,
+        ...membershipsData,
+      }).unwrap();
+
+      toastUtils.success({ message: "Succesfully created memberships." });
+    } catch (error) {
+      resolveError(error);
+    }
+  };
 
   const theme = useMantineTheme();
+
+  const hasEmailData = userCreationDataList.length !== 0;
 
   const downloadCSVTemplate = () => {};
 
@@ -116,7 +144,9 @@ function CourseAddMembersEditor({ courseId, onSuccess }: Props) {
         // removes column headers
         data.shift();
 
-        const userCreationData = data.map((row) => csvToDisplayData(row));
+        const userCreationData = data
+          .filter((row) => row.length)
+          .map((row) => row[0]);
         setUserCreationDataList(userCreationData);
 
         toastUtils.info({
@@ -135,18 +165,28 @@ function CourseAddMembersEditor({ courseId, onSuccess }: Props) {
   return (
     <Stack>
       <Group position="apart">
-        <Button onClick={downloadCSVTemplate}>Download CSV Template</Button>
-        <Group hidden={!userCreationDataList}>
-          <Button onClick={clearData} color="red">
+        <Button onClick={downloadCSVTemplate} leftIcon={<RiFileDownloadLine />}>
+          Download CSV Template
+        </Button>
+        <Group hidden={!hasEmailData}>
+          <Button onClick={clearData} disabled={isLoading} color="red">
             Clear Data
           </Button>
-          <Button onClick={downloadCSVTemplate}>Submit</Button>
+          <Button
+            onClick={handleSubmitBatchMembershipCreation}
+            disabled={isLoading}
+            leftIcon={
+              isLoading ? <Loader size={14} /> : <MdPersonAdd size={14} />
+            }
+          >
+            Submit
+          </Button>
         </Group>
       </Group>
-      {userCreationDataList ? (
+      {hasEmailData ? (
         <>
-          {userCreationDataList.map((data) => (
-            <Text>{data.email}</Text>
+          {userCreationDataList.map((email) => (
+            <Text>{email}</Text>
           ))}
         </>
       ) : (

@@ -1,6 +1,8 @@
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { Text, Stack, ScrollArea, Group, Button } from "@mantine/core";
+import { useModals } from "@mantine/modals";
 import { useMemo } from "react";
+import { MdPersonAdd } from "react-icons/md";
 import PlaceholderWrapper from "./placeholder-wrapper";
 import { Role, CourseMemberData, ALL_ROLES } from "../types/courses";
 import { useGetCourseMembershipsQuery } from "../redux/services/members-api";
@@ -9,9 +11,7 @@ import { sort } from "../utils/transform-utils";
 import { EMAIL, NAME, USER } from "../constants";
 import { useGetSingleCourseQuery } from "../redux/services/courses-api";
 import UserProfileDisplay from "./user-profile-display";
-import { useModals } from "@mantine/modals";
 import CourseAddMembersEditor from "./course-add-members-editor";
-import { MdPersonAdd } from "react-icons/md";
 
 type Props = {
   courseId: number | string | undefined;

@@ -2,6 +2,7 @@ import baseApi from "./base-api";
 import { cacher } from "./api-cache-utils";
 import {
   CourseMemberData,
+  CourseMembershipBatchCreateData,
   CourseMembershipPatchData,
 } from "../../types/courses";
 
@@ -45,6 +46,21 @@ const membersApi = baseApi
         invalidatesTags: (_, error, { membershipId: id, courseId }) =>
           error ? [] : [cacher.getIdTag(id, "Member", [`${courseId}`])],
       }),
+
+      batchCreateCourseMemberships: build.mutation<
+        CourseMemberData[],
+        CourseMembershipBatchCreateData & {
+          courseId: number | string;
+        }
+      >({
+        query: ({ courseId, ...courseMembershipBatchCreateData }) => ({
+          url: `/courses/${courseId}/memberships/new`,
+          method: "POST",
+          body: courseMembershipBatchCreateData,
+        }),
+        invalidatesTags: (_, error) =>
+          error ? [] : cacher.invalidatesList("Member"),
+      }),
     }),
   });
 
@@ -52,4 +68,5 @@ export const {
   useGetCourseMembershipsQuery,
   useUpdateCourseMembershipMutation,
   useDeleteCourseMembershipMutation,
+  useBatchCreateCourseMembershipsMutation,
 } = membersApi;

@@ -14,6 +14,7 @@ import {
   ROLE,
   OWNER_ID,
   USER,
+  USER_EMAILS,
 } from "../constants";
 import { BaseData } from "./base";
 import { UserData } from "./users";
@@ -76,4 +77,8 @@ export type CourseMemberData = BaseData & {
 
 export type CourseMembershipPatchData = {
   [ROLE]: Role;
+};
+
+export type CourseMembershipBatchCreateData = {
+  [USER_EMAILS]: string[];
 };

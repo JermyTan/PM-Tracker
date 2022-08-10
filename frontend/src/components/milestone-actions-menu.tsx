@@ -10,7 +10,7 @@ import {
   Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { MdEdit, MdDelete } from "react-icons/md";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import useGetCourseId from "../custom-hooks/use-get-course-id";
 import useGetMilestoneAlias from "../custom-hooks/use-get-milestone-alias";
 import useGetMilestonePermissions from "../custom-hooks/use-get-milestone-permissions";
@@ -120,13 +120,17 @@ function MilestoneActionsMenu(props: Props) {
 
       <Menu>
         <ConditionalRenderer allow={canModify}>
-          <Menu.Item icon={<MdEdit />} onClick={openEditDrawer}>
+          <Menu.Item icon={<FaEdit />} onClick={openEditDrawer}>
             Edit {milestoneAlias}
           </Menu.Item>
         </ConditionalRenderer>
 
         <ConditionalRenderer allow={canDelete}>
-          <Menu.Item color="red" icon={<MdDelete />} onClick={openDeleteModal}>
+          <Menu.Item
+            color="red"
+            icon={<FaTrashAlt size={12} />}
+            onClick={openDeleteModal}
+          >
             Delete {milestoneAlias}
           </Menu.Item>
         </ConditionalRenderer>

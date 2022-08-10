@@ -53,7 +53,7 @@ function MyCoursesPage() {
       </Drawer>
 
       <Group position="apart">
-        <Title>My Courses</Title>
+        <Title order={2}>My Courses</Title>
 
         <ConditionalRenderer
           permissionGetter={{ fn: useGetCoursePermissions, key: "canCreate" }}

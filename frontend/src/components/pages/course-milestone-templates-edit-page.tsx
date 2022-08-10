@@ -8,7 +8,6 @@ import {
   useGetSingleTemplateQuery,
   useUpdateTemplateMutation,
 } from "../../redux/services/templates-api";
-import { emptySelector } from "../../redux/utils";
 import { COURSE_MILESTONE_SINGLE_TEMPLATE_PATH } from "../../routes/paths";
 import { TemplatePutData } from "../../types/templates";
 import { useResolveError } from "../../utils/error-utils";
@@ -39,15 +38,15 @@ function CourseMilestoneTemplatesEditPage() {
     },
   );
   useResolveError({ error, name: "course-milestone-templates-edit-page" });
-  const [updateTemplate] = useUpdateTemplateMutation({
-    selectFromResult: emptySelector,
+  const [updateTemplate, { isUpdating }] = useUpdateTemplateMutation({
+    selectFromResult: ({ isLoading: isUpdating }) => ({ isUpdating }),
   });
   const navigate = useNavigate();
 
   const onUpdateTemplate = async (
     formData: MilestoneTemplateFormBuilderData,
   ) => {
-    if (courseId === undefined || templateId === undefined) {
+    if (isUpdating || courseId === undefined || templateId === undefined) {
       return;
     }
 

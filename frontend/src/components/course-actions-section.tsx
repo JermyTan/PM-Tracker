@@ -99,7 +99,7 @@ function CourseActionsSection(props: Props) {
       <ConditionalRenderer allow={canModify || canDelete}>
         <Stack {...props}>
           <ConditionalRenderer allow={canModify}>
-            <Button onClick={open} leftIcon={<MdEdit />}>
+            <Button onClick={open} leftIcon={<MdEdit size={16} />}>
               Edit course
             </Button>
           </ConditionalRenderer>
@@ -107,7 +107,7 @@ function CourseActionsSection(props: Props) {
             <Button
               onClick={openDeleteModal}
               color="red"
-              leftIcon={<MdDeleteForever />}
+              leftIcon={<MdDeleteForever size={16} />}
               loading={isLoading}
             >
               Delete course

@@ -72,3 +72,4 @@ export const CREATOR = "creator";
 export const EDITOR = "editor";
 export const GROUP = "group";
 export const TEMPLATE = "template";
+export const UNKNOWN_USER = "unknown user";

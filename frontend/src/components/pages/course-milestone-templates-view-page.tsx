@@ -4,6 +4,7 @@ import { useDidUpdate } from "@mantine/hooks";
 import { useModals } from "@mantine/modals";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { RiFileEditLine } from "react-icons/ri";
+import { FaTrash, FaTrashAlt } from "react-icons/fa";
 import { generatePath, Link, useNavigate } from "react-router-dom";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import useGetTemplateId from "../../custom-hooks/use-get-template-id";
@@ -40,11 +41,9 @@ function CourseMilestoneTemplatesViewPage() {
       }),
     [templateId, milestoneTemplates],
   );
-  const [deleteTemplate, { isLoading: isDeleting }] = useDeleteTemplateMutation(
-    {
-      selectFromResult: ({ isLoading }) => ({ isLoading }),
-    },
-  );
+  const [deleteTemplate, { isDeleting }] = useDeleteTemplateMutation({
+    selectFromResult: ({ isLoading: isDeleting }) => ({ isDeleting }),
+  });
   const { resolveError } = useResolveError({
     name: "course-milestone-templates-view-page",
   });
@@ -123,7 +122,7 @@ function CourseMilestoneTemplatesViewPage() {
               <ConditionalRenderer allow={canDelete}>
                 <Button
                   color="red"
-                  leftIcon={<RiFileEditLine />}
+                  leftIcon={<FaTrashAlt size={12} />}
                   onClick={openDeleteModal}
                   loading={isDeleting}
                 >

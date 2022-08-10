@@ -207,5 +207,7 @@ class PostCourseSubmissionCommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ("content",)
 
-
 PutCourseSubmissionCommentSerializer = PostCourseSubmissionCommentSerializer
+
+class PostCourseMembershipsWithNewUserCreationSerializer(serializers.Serializer):
+    user_emails = serializers.ListField(child=serializers.EmailField())

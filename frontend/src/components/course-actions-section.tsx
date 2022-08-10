@@ -84,7 +84,7 @@ function CourseActionsSection(props: Props) {
           size="xl"
           padding="lg"
           closeButtonLabel="Cancel course update"
-          title={<Title order={2}>Course Update</Title>}
+          title={<Title order={3}>Course Update</Title>}
         >
           {/* special case: this conditional render is required as course edit form is mounted and api call will be made
         even though the drawer is not yet opened */}
@@ -108,7 +108,6 @@ function CourseActionsSection(props: Props) {
               onClick={openDeleteModal}
               color="red"
               leftIcon={<MdDeleteForever />}
-              disabled={isLoading}
               loading={isLoading}
             >
               Delete course

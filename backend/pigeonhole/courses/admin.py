@@ -1,4 +1,7 @@
 from django.contrib import admin
+from django.db import models
+
+from django_json_widget.widgets import JSONEditorWidget
 
 from pigeonhole.common.admin import BaseAdmin
 from .models import (
@@ -10,7 +13,7 @@ from .models import (
     CourseMilestone,
     CourseMilestoneTemplate,
     CourseSubmission,
-    CourseSubmissionFieldComment,
+    CourseSubmissionComment,
 )
 
 # Register your models here.
@@ -22,4 +25,4 @@ admin.site.register(CourseGroupMember, BaseAdmin)
 admin.site.register(CourseMilestone, BaseAdmin)
 admin.site.register(CourseMilestoneTemplate, BaseAdmin)
 admin.site.register(CourseSubmission, BaseAdmin)
-admin.site.register(CourseSubmissionFieldComment, BaseAdmin)
+admin.site.register(CourseSubmissionComment, BaseAdmin)

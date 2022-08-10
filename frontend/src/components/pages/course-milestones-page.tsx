@@ -21,7 +21,7 @@ import useGetMilestoneAlias from "../../custom-hooks/use-get-milestone-alias";
 import MilestoneCard from "../milestone-card";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import MilestoneCreationForm from "../milestone-creation-form";
-import SubmissionCommentsSection from "../submission-comments-section";
+import CourseSubmissionCommentsSection from "../course-submission-comments-section";
 import useGetMilestonePermissions from "../../custom-hooks/use-get-milestone-permissions";
 import useGetTemplatePermissions from "../../custom-hooks/use-get-template-permissions";
 
@@ -55,7 +55,7 @@ function CourseMilestonesPage() {
         size="xl"
         padding="lg"
         closeButtonLabel={`Cancel ${milestoneAlias} creation`}
-        title={<Title order={2}>{capitalizedMilestoneAlias} Creation</Title>}
+        title={<Title order={3}>{capitalizedMilestoneAlias} Creation</Title>}
       >
         <ScrollArea offsetScrollbars pr="xs" scrollbarSize={8}>
           <MilestoneCreationForm onSuccess={close} />
@@ -109,10 +109,10 @@ function CourseMilestonesPage() {
           </SimpleGrid>
         </PlaceholderWrapper>
 
-        {/* Replace here */}
-        <SubmissionCommentsSection
-          courseId={1}
-          submissionId={1}
+        {/* TODO: Replace here */}
+        <CourseSubmissionCommentsSection
+          courseId={courseId ?? 1}
+          submissionId={4}
           fieldIndex={0}
         />
       </Stack>

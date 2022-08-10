@@ -30,7 +30,7 @@ function GroupNameForm({
     resolver: zodResolver(schema),
     defaultValues: { [NAME]: defaultValue },
   });
-  const resolveError = useResolveError();
+  const { resolveError } = useResolveError();
 
   const {
     handleSubmit,
@@ -61,11 +61,7 @@ function GroupNameForm({
             <Button color="gray" onClick={onSuccess}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              loading={isSubmitting}
-            >
+            <Button type="submit" loading={isSubmitting}>
               {confirmButtonName}
             </Button>
           </Group>

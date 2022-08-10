@@ -34,7 +34,7 @@ const coursesApi = baseApi
           url: `/courses/${courseId}/`,
           method: "GET",
         }),
-        providesTags: (_, __, id) => [{ type: "Course", id }],
+        providesTags: (_, __, id) => [cacher.getIdTag(id, "Course")],
       }),
 
       updateCourse: build.mutation<
@@ -47,7 +47,7 @@ const coursesApi = baseApi
           body: coursePutData,
         }),
         invalidatesTags: (_, error, { courseId: id }) =>
-          error ? [] : [{ type: "Course", id }],
+          error ? [] : [cacher.getIdTag(id, "Course")],
       }),
 
       deleteCourse: build.mutation<CourseData, string | number>({
@@ -56,7 +56,7 @@ const coursesApi = baseApi
           method: "DELETE",
         }),
         invalidatesTags: (_, error, id) =>
-          error ? [] : [{ type: "Course", id }],
+          error ? [] : [cacher.getIdTag(id, "Course")],
       }),
     }),
   });

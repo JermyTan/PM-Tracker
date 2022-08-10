@@ -234,7 +234,6 @@ function MilestoneTemplateFormBuilder({
                 {...submitButtonProps}
                 type="submit"
                 loading={isSubmitting}
-                disabled={isSubmitting}
               />
             </Group>
           </Stack>

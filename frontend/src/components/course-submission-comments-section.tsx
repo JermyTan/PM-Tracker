@@ -13,11 +13,11 @@ import PlaceholderWrapper from "./placeholder-wrapper";
 
 type Props = {
   fieldIndex: number;
-  courseId: number;
+  courseId: string | number;
   submissionId: number;
 };
 
-function SubmissionCommentsSection({
+function CourseSubmissionCommentsSection({
   fieldIndex,
   courseId,
   submissionId,
@@ -95,4 +95,4 @@ function SubmissionCommentsSection({
   );
 }
 
-export default SubmissionCommentsSection;
+export default CourseSubmissionCommentsSection;

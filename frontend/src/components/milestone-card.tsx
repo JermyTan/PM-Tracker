@@ -8,6 +8,7 @@ import MilestoneActionsMenu from "./milestone-actions-menu";
 import MilestoneActivePeriodDisplay from "./milestone-active-period-display";
 import ConditionalRenderer from "./conditional-renderer";
 import TextViewer from "./text-viewer";
+import { checkIsMilestoneOpen } from "../utils/misc-utils";
 
 const useStyles = createStyles((_, { canAccess }: { canAccess?: boolean }) => ({
   card: {
@@ -24,9 +25,7 @@ function MilestoneCard(props: Props) {
   const { classes } = useStyles({ canAccess });
 
   const { name, startDateTime, endDateTime, isPublished, id } = props;
-  const now = Date.now();
-  const isOpen =
-    startDateTime <= now && (endDateTime === null || now <= endDateTime);
+  const isOpen = checkIsMilestoneOpen(props);
 
   return (
     <Paper
@@ -49,6 +48,8 @@ function MilestoneCard(props: Props) {
         <MilestoneActivePeriodDisplay
           startDateTime={startDateTime}
           endDateTime={endDateTime}
+          size="sm"
+          weight={500}
         />
         <div>
           <Badge variant="outline" color={isOpen ? "green" : "red"}>

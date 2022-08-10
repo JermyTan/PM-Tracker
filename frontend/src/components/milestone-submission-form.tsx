@@ -1,4 +1,5 @@
 import { forwardRef, Ref, useImperativeHandle } from "react";
+import { skipToken } from "@reduxjs/toolkit/query/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Stack, Title, Text, Button, Group, Alert } from "@mantine/core";
@@ -12,7 +13,9 @@ import {
 import {
   FORM_RESPONSE_DATA,
   GROUP,
+  ID,
   IS_DRAFT,
+  NAME,
   RESPONSE,
   SUBMISSION_TYPE,
 } from "../constants";
@@ -27,15 +30,20 @@ import SubmissionTypeIconLabel from "./submission-type-icon-label";
 import FormFieldRenderer from "./form-field-renderer";
 import TextViewer from "./text-viewer";
 import toastUtils from "../utils/toast-utils";
+import { useGetSubmissionCommentCountQuery } from "../redux/services/comments-api";
+import useGetCourseId from "../custom-hooks/use-get-course-id";
+import useGetSubmissionId from "../custom-hooks/use-get-submission-id";
 
 const schema = z.object({
   [IS_DRAFT]: z.boolean(),
   [SUBMISSION_TYPE]: z.nativeEnum(SubmissionType),
-  [GROUP]: z.null(), // TODO: update to GroupData
+  [GROUP]: z.object({ [ID]: z.number(), [NAME]: z.string() }).nullable(), // TODO: update to GroupData
   [FORM_RESPONSE_DATA]: z.array(formResponseFieldSchema),
 });
 
-export type SubmissionFormProps = z.infer<typeof schema>;
+type SubmissionFormProps = z.infer<typeof schema>;
+
+export type SubmissionFormData = SubmissionFormProps;
 
 type MilestoneSubmissionFormHandler = {
   reset: UseFormReset<SubmissionFormProps>;
@@ -45,11 +53,18 @@ type Props = {
   defaultValues: SubmissionViewData;
   readOnly?: boolean;
   testMode?: boolean;
-  onSubmit?: (formData: SubmissionFormProps) => Promise<unknown>;
+  withComments?: boolean;
+  onSubmit?: (formData: SubmissionFormData) => Promise<unknown>;
 };
 
 function MilestoneSubmissionForm(
-  { defaultValues, readOnly, testMode, onSubmit: handleOnSubmit }: Props,
+  {
+    defaultValues,
+    readOnly,
+    testMode,
+    withComments,
+    onSubmit: handleOnSubmit,
+  }: Props,
   ref: Ref<MilestoneSubmissionFormHandler>,
 ) {
   const methods = useForm<SubmissionFormProps>({
@@ -63,6 +78,19 @@ function MilestoneSubmissionForm(
     formState: { isSubmitting },
   } = methods;
   useImperativeHandle(ref, () => ({ reset }), [reset]);
+  const courseId = useGetCourseId();
+  const submissionId = useGetSubmissionId();
+  const { error } = useGetSubmissionCommentCountQuery(
+    !withComments || courseId === undefined || submissionId === undefined
+      ? skipToken
+      : { courseId, submissionId },
+    {
+      selectFromResult: ({ error }) => ({
+        error,
+      }),
+    },
+  );
+  useResolveError({ error, name: "milestone-submission-form" });
 
   const { fields } = useFieldArray({
     control,
@@ -73,20 +101,10 @@ function MilestoneSubmissionForm(
     name: "milestone-submission-form",
   });
 
-  const {
-    createdAt,
-    updatedAt,
-    name,
-    description,
-    submissionType,
-    creator,
-    editor,
-    milestone,
-  } = defaultValues;
+  const { name, description, submissionType } = defaultValues;
 
   const onSubmit = async (formData: SubmissionFormProps) => {
     if (testMode) {
-      console.log("test");
       toastUtils.info({
         title: "Test Mode",
         message: "Form inputs are successfully validated and can be submitted.",
@@ -132,7 +150,16 @@ function MilestoneSubmissionForm(
               <Text size="sm" color="dimmed">
                 <SubmissionTypeIconLabel submissionType={submissionType} />
               </Text>
-              <Text size="sm">{description}</Text>
+              {description && (
+                <TextViewer
+                  size="sm"
+                  preserveWhiteSpace
+                  overflowWrap
+                  withLinkify
+                >
+                  {description}
+                </TextViewer>
+              )}
             </Stack>
           </Stack>
 
@@ -140,18 +167,16 @@ function MilestoneSubmissionForm(
             <FormFieldRenderer
               key={id}
               name={`${FORM_RESPONSE_DATA}.${index}.${RESPONSE}`}
+              index={index}
               formField={field as FormField}
               readOnly={readOnly}
+              withComments={withComments}
             />
           ))}
 
           {!readOnly && (
             <Group position="right">
-              <Button
-                disabled={isSubmitting}
-                loading={isSubmitting}
-                type="submit"
-              >
+              <Button loading={isSubmitting} type="submit">
                 Save
               </Button>
             </Group>

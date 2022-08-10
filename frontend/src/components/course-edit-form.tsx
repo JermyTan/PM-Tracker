@@ -369,11 +369,7 @@ function CourseEditForm({ onSuccess }: Props) {
           </Stack>
 
           <Group position="right">
-            <Button
-              disabled={isSubmitting}
-              loading={isSubmitting}
-              type="submit"
-            >
+            <Button loading={isSubmitting} type="submit">
               Save
             </Button>
           </Group>

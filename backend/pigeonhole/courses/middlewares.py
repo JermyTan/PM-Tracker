@@ -15,7 +15,7 @@ from .models import (
     CourseMilestone,
     CourseMilestoneTemplate,
     CourseSubmission,
-    CourseSubmissionFieldComment,
+    CourseSubmissionComment,
     Role,
 )
 
@@ -183,19 +183,29 @@ def check_submission(view_method):
 
 def check_submission_comment(view_method):
     def _arguments_wrapper(
-        instance, request, comment_id: int, *args, **kwargs
+        instance,
+        request,
+        submission: CourseSubmission,
+        comment_id: int,
+        *args,
+        **kwargs,
     ):
         try:
-            submission_comment = CourseSubmissionFieldComment.objects.get(
-                id=comment_id
-            )
+            submission_comment = submission.coursesubmissioncomment_set.select_related(
+                "comment__commenter__profile_image", "member"
+            ).get(id=comment_id)
 
-        except CourseSubmissionFieldComment.DoesNotExist as e:
+        except CourseSubmissionComment.DoesNotExist as e:
             logger.warning(e)
-            raise NotFound(detail="No submission field comment found.")
+            raise NotFound(detail="No comment found.")
 
         return view_method(
-            instance, request, submission_comment=submission_comment, *args, **kwargs
+            instance,
+            request,
+            submission=submission,
+            submission_comment=submission_comment,
+            *args,
+            **kwargs,
         )
 
     return _arguments_wrapper

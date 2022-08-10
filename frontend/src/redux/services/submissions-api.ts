@@ -41,7 +41,8 @@ const submissionsApi = baseApi
             templateId,
           }),
         }),
-        providesTags: (result) => cacher.providesList(result, "Submission"),
+        providesTags: (result, _, { courseId }) =>
+          cacher.providesList(result, "Submission", [`${courseId}`]),
       }),
 
       createSubmission: build.mutation<
@@ -55,8 +56,8 @@ const submissionsApi = baseApi
           method: "POST",
           body: submissionPostData,
         }),
-        invalidatesTags: (_, error) =>
-          error ? [] : cacher.invalidatesList("Submission"),
+        invalidatesTags: (_, error, { courseId }) =>
+          error ? [] : cacher.invalidatesList("Submission", [`${courseId}`]),
       }),
 
       getSingleSubmission: build.query<
@@ -67,8 +68,8 @@ const submissionsApi = baseApi
           url: `/courses/${courseId}/submissions/${submissionId}/`,
           method: "GET",
         }),
-        providesTags: (_, __, { submissionId: id }) => [
-          { type: "Submission", id },
+        providesTags: (_, __, { submissionId: id, courseId }) => [
+          cacher.getIdTag(id, "Submission", [`${courseId}`]),
         ],
       }),
 
@@ -84,8 +85,8 @@ const submissionsApi = baseApi
           method: "PUT",
           body: submissionPutData,
         }),
-        invalidatesTags: (_, error, { submissionId: id }) =>
-          error ? [] : [{ type: "Submission", id }],
+        invalidatesTags: (_, error, { submissionId: id, courseId }) =>
+          error ? [] : [cacher.getIdTag(id, "Submission", [`${courseId}`])],
       }),
 
       deleteSubmission: build.mutation<
@@ -99,11 +100,14 @@ const submissionsApi = baseApi
           url: `/courses/${courseId}/submissions/${submissionId}/`,
           method: "DELETE",
         }),
-        invalidatesTags: (_, error, { submissionId: id }) =>
-          error ? [] : [{ type: "Submission", id }],
+        invalidatesTags: (_, error, { submissionId: id, courseId }) =>
+          error ? [] : [cacher.getIdTag(id, "Submission", [`${courseId}`])],
       }),
     }),
   });
+
+export const useGetSingleSubmissionQueryState =
+  submissionsApi.endpoints.getSingleSubmission.useQueryState;
 
 export const {
   useGetSubmissionsQuery,

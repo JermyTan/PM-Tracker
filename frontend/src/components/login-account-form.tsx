@@ -132,7 +132,7 @@ function LoginAccountForm() {
             </Group>
           </Stack>
 
-          <Button disabled={isSubmitting} loading={isSubmitting} type="submit">
+          <Button loading={isSubmitting} type="submit">
             {name ? "Login" : "Sign up"}
           </Button>
         </Stack>

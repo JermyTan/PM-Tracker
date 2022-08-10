@@ -1,10 +1,7 @@
 from django.urls import path
 
 from .views import (
-    CourseMembershipsWithNewUserCreationView,
-    CourseSubmissionFieldCommentsView,
     MyCoursesView,
-    SingleCourseSubmissionFieldCommentsView,
     SingleCourseView,
     CourseMilestonesView,
     SingleCourseMilestoneView,
@@ -16,6 +13,10 @@ from .views import (
     SingleCourseMilestoneTemplateView,
     CourseSubmissionsView,
     SingleCourseSubmissionView,
+    CourseSubmissionFieldCommentsView,
+    CourseSubmissionSingleFieldCommentsView,
+    SingleCourseSubmissionCommentView,
+    CourseMembershipsWithNewUserCreationView
 )
 
 urlpatterns = [
@@ -77,13 +78,18 @@ urlpatterns = [
         name="single_course_group",
     ),
     path(
-        "<int:course_id>/submissions/<int:submission_id>/fields/<int:field_index>/comments/",
+        "<int:course_id>/submissions/<int:submission_id>/fields/comments/",
         CourseSubmissionFieldCommentsView.as_view(),
         name="course_submission_field_comments",
     ),
     path(
+        "<int:course_id>/submissions/<int:submission_id>/fields/<int:field_index>/comments/",
+        CourseSubmissionSingleFieldCommentsView.as_view(),
+        name="course_submission_single_field_comments",
+    ),
+    path(
         "<int:course_id>/submissions/<int:submission_id>/comments/<int:comment_id>",
-        SingleCourseSubmissionFieldCommentsView.as_view(),
-        name="course_submission_field_comments",
+        SingleCourseSubmissionCommentView.as_view(),
+        name="single_course_submission_comment",
     ),
 ]

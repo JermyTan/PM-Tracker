@@ -72,7 +72,7 @@ function MilestoneActionsMenu(props: Props) {
           size="xl"
           padding="lg"
           closeButtonLabel={`Cancel ${milestoneAlias} update`}
-          title={<Title order={2}>{capitalizedMilestoneAlias} Update</Title>}
+          title={<Title order={3}>{capitalizedMilestoneAlias} Update</Title>}
         >
           {/* special case: this conditional render is required as milestone edit form is mounted and api call will be made
         even though the drawer is not yet opened */}

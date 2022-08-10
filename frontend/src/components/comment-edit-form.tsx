@@ -59,11 +59,7 @@ function CommentEditForm({ defaultValue, onSubmit, confirmButtonName }: Props) {
         <Stack>
           <TextareaField name={CONTENT} />
           <Group position="right">
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              loading={isSubmitting}
-            >
+            <Button type="submit" loading={isSubmitting}>
               {confirmButtonName}
             </Button>
           </Group>

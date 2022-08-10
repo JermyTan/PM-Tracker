@@ -134,12 +134,17 @@ export function transformKeys(
 //     : `${displayDateTime(startDateTime)} - ${displayDateTime(endDateTime)}`;
 // }
 
+// Reference: https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/array-sort/index.d.ts
+type Comparator<T> = (a: T, b: T) => number;
+type ComparisonArg<T> = string | Comparator<T>;
+type ComparisonArgs<T> = ComparisonArg<T> | Array<ComparisonArg<T>>;
+
 export function sort<T>(
   array: T[],
   {
     key,
     reverse = false,
-  }: { key?: Parameters<typeof arraySort>[1]; reverse?: boolean } = {},
+  }: { key?: ComparisonArgs<T> | undefined; reverse?: boolean } = {},
 ) {
-  return arraySort([...array], key, { reverse });
+  return arraySort<T>([...array], key, { reverse });
 }

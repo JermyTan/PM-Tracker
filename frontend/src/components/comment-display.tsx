@@ -20,7 +20,7 @@ import CommentDeleteConfirmation from "./comment-delete-confirmation";
 
 type Props = {
   comment: SubmissionFieldComment;
-  courseId: number;
+  courseId: number | string;
   submissionId: number;
 };
 

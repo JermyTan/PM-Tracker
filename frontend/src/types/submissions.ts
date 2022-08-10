@@ -18,6 +18,7 @@ import {
   TYPE,
 } from "../constants";
 import { BaseData } from "./base";
+import { GroupData } from "./groups";
 import { MilestoneData } from "./milestones";
 import {
   SubmissionType,
@@ -36,22 +37,48 @@ import { UserData } from "./users";
 export const textFormResponseFieldSchema = textFormFieldSchema.extend({
   [RESPONSE]: z.string().trim(),
 });
+// .refine(
+//   ({ required, response }) => !required || response !== "",
+//   () => ({ message: "This field is required", path: [RESPONSE] }),
+// );
 
 export const textAreaFormResponseFieldSchema = textAreaFormFieldSchema.extend({
   [RESPONSE]: z.string().trim(),
 });
+// .refine(
+//   ({ required, response }) => !required || response !== "",
+//   () => ({ message: "This field is required", path: [RESPONSE] }),
+// );
 
 export const numericFormResponseFieldSchema = numericFormFieldSchema.extend({
   [RESPONSE]: z.string().trim(),
 });
+// .refine(
+//   ({ required, response }) => !required || response !== "",
+//   () => ({ message: "This field is required", path: [RESPONSE] }),
+// );
 
 export const mcqFormResponseFieldSchema = mcqFormFieldSchema.extend({
   [RESPONSE]: z.string(),
 });
+// .refine(
+//   ({ required, response }) => !required || response !== "",
+//   () => ({ message: "Please select an option", path: [RESPONSE] }),
+// );
 
 export const mrqFormResponseFieldSchema = mrqFormFieldSchema.extend({
   [RESPONSE]: z.array(z.string()),
 });
+// .refine(
+//   ({ required, response }) => !required || response.length > 0,
+//   ({ choices }) => ({
+//     message:
+//       choices.length === 1
+//         ? "Please check the option"
+//         : "Please select at least 1 option",
+//     path: [RESPONSE],
+//   }),
+// );
 
 // NOTE: this list should contain all available form response field schemas
 type UnionSchemaType = ZodDiscriminatedUnionOption<typeof TYPE, FormFieldType>;
@@ -68,10 +95,57 @@ const allFormResponseFieldSchemas: [
   textDisplayFormFieldSchema,
 ];
 
-export const formResponseFieldSchema = z.discriminatedUnion(
-  TYPE,
-  allFormResponseFieldSchemas,
-);
+export const formResponseFieldSchema = z
+  .discriminatedUnion(TYPE, allFormResponseFieldSchemas)
+  // NOTE: zod currently doesn't support composition after refinement
+  // as such refinement is done here instead of above
+  .refine(
+    (field) => {
+      const typedField = field as FormResponseField;
+
+      switch (typedField.type) {
+        case FormFieldType.Text:
+        case FormFieldType.TextArea:
+        case FormFieldType.Numeric:
+        case FormFieldType.Mcq: {
+          const { required, response } = typedField;
+          return !required || response !== "";
+        }
+        case FormFieldType.Mrq: {
+          const { required, response } = typedField;
+          return !required || response.length > 0;
+        }
+        default:
+          return true;
+      }
+    },
+    (field) => {
+      const typedField = field as FormResponseField;
+
+      switch (typedField.type) {
+        case FormFieldType.Text:
+        case FormFieldType.TextArea:
+        case FormFieldType.Numeric: {
+          return { message: "This field is required", path: [RESPONSE] };
+        }
+        case FormFieldType.Mcq: {
+          return { message: "Please select an option", path: [RESPONSE] };
+        }
+        case FormFieldType.Mrq: {
+          const { choices } = typedField;
+          return {
+            message:
+              choices.length === 1
+                ? "Please check the option"
+                : "Please select at least 1 option",
+            path: [RESPONSE],
+          };
+        }
+        default:
+          return { message: "An unknown error has occurred", path: [RESPONSE] };
+      }
+    },
+  );
 
 export type TextFormResponseField = z.infer<typeof textFormResponseFieldSchema>;
 
@@ -104,7 +178,7 @@ export type SubmissionViewData = Partial<BaseData> & {
   [CREATOR]: UserData | null;
   [EDITOR]: UserData | null;
   [MILESTONE]: Pick<MilestoneData, typeof ID | typeof NAME> | null;
-  [GROUP]: null; // TODO: update to GroupData | null
+  [GROUP]: Pick<GroupData, typeof ID | typeof NAME> | null;
   [TEMPLATE]: TemplateData | null;
   [FORM_RESPONSE_DATA]: FormResponseField[];
 };

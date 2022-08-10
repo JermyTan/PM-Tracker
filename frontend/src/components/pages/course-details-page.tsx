@@ -15,12 +15,12 @@ import { skipToken } from "@reduxjs/toolkit/query/react";
 import { FaQuestion } from "react-icons/fa";
 import { useGetSingleCourseQuery } from "../../redux/services/courses-api";
 import CourseActionsSection from "../course-actions-section";
-import RoleRestrictedWrapper from "../role-restricted-wrapper";
-import { Role } from "../../types/courses";
+import ConditionalRenderer from "../conditional-renderer";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import TextViewer from "../text-viewer";
+import useGetCoursePermissions from "../../custom-hooks/use-get-course-permissions";
 
-const useStyles = createStyles({
+const useStyles = createStyles((theme) => ({
   detailsSection: {
     flex: "1 1 auto",
   },
@@ -28,7 +28,10 @@ const useStyles = createStyles({
     width: "250px",
     flex: "1 0 auto",
   },
-});
+  spoilerControl: {
+    fontSize: theme.fontSizes.sm,
+  },
+}));
 
 function CourseDetailsPage() {
   const courseId = useGetCourseId();
@@ -36,6 +39,8 @@ function CourseDetailsPage() {
     selectFromResult: ({ data: course }) => ({ course }),
   });
   const { classes } = useStyles();
+  const { canAccessFullDetails, canModify, canDelete } =
+    useGetCoursePermissions();
 
   const {
     name,
@@ -61,34 +66,44 @@ function CourseDetailsPage() {
         p="md"
         radius="md"
       >
-        <Stack spacing={36}>
+        <Stack spacing={32}>
           <Stack spacing="xs">
-            <Title order={4}>Course owner</Title>
+            <Title order={5}>Course owner</Title>
             <Group spacing="xl">
               <Avatar
-                size={70}
-                radius={70}
+                size={60}
+                radius={60}
                 alt=""
                 src={owner?.profileImage || undefined}
               />
               <div>
-                <Text weight={500}>{owner?.name}</Text>
+                <Text size="sm" weight={500}>
+                  {owner?.name}
+                </Text>
                 {owner?.email && (
-                  <Anchor href={`mailto:${owner.email}`}>{owner.email}</Anchor>
+                  <Anchor size="sm" href={`mailto:${owner.email}`}>
+                    {owner.email}
+                  </Anchor>
                 )}
               </div>
             </Group>
           </Stack>
 
-          <Stack spacing="xs">
-            <Title order={4}>Course name</Title>
-            <Text>{name}</Text>
+          <Stack spacing={6}>
+            <Title order={5}>Course name</Title>
+            <Text size="sm">{name}</Text>
           </Stack>
 
-          <Stack spacing="xs">
-            <Title order={4}>Course description</Title>
-            <Spoiler maxHeight={150} showLabel="Show more" hideLabel="Hide">
+          <Stack spacing={6}>
+            <Title order={5}>Course description</Title>
+            <Spoiler
+              classNames={{ control: classes.spoilerControl }}
+              maxHeight={150}
+              showLabel="Show more"
+              hideLabel="Hide"
+            >
               <TextViewer
+                size="sm"
                 preserveWhiteSpace
                 overflowWrap
                 withLinkify
@@ -99,10 +114,10 @@ function CourseDetailsPage() {
             </Spoiler>
           </Stack>
 
-          <RoleRestrictedWrapper allowedRoles={[Role.CoOwner, Role.Instructor]}>
-            <Stack spacing="xs">
+          <ConditionalRenderer allow={canAccessFullDetails}>
+            <Stack spacing={6}>
               <Group spacing={4}>
-                <Title order={4}>Milestone alias</Title>
+                <Title order={5}>Milestone alias</Title>
                 <Tooltip
                   label={
                     <Text size="xs">
@@ -122,14 +137,14 @@ function CourseDetailsPage() {
                   </ThemeIcon>
                 </Tooltip>
               </Group>
-              <Text color={!milestoneAlias ? "dimmed" : undefined}>
+              <Text size="sm" color={!milestoneAlias ? "dimmed" : undefined}>
                 {milestoneAlias || "No alias"}
               </Text>
             </Stack>
 
-            <Stack spacing="xs">
+            <Stack spacing={6}>
               <Group spacing={4}>
-                <Title order={4}>Publish course</Title>
+                <Title order={5}>Publish course</Title>
                 <Tooltip
                   label={
                     <Text size="xs">
@@ -149,14 +164,18 @@ function CourseDetailsPage() {
                   </ThemeIcon>
                 </Tooltip>
               </Group>
-              <Text weight={500} color={isPublished ? "green" : "red"}>
+              <Text
+                size="sm"
+                weight={500}
+                color={isPublished ? "green" : "red"}
+              >
                 {isPublished ? "Yes" : "No"}
               </Text>
             </Stack>
 
-            <Stack spacing="xs">
+            <Stack spacing={6}>
               <Group spacing={4}>
-                <Title order={4}>Make group members public</Title>
+                <Title order={5}>Make group members public</Title>
                 <Tooltip
                   label={
                     <Text size="xs">
@@ -176,6 +195,7 @@ function CourseDetailsPage() {
                 </Tooltip>
               </Group>
               <Text
+                size="sm"
                 weight={500}
                 color={showGroupMembersNames ? "green" : "red"}
               >
@@ -183,9 +203,9 @@ function CourseDetailsPage() {
               </Text>
             </Stack>
 
-            <Stack spacing="xs">
+            <Stack spacing={6}>
               <Group spacing={4}>
-                <Title order={4}>Students can modify group names</Title>
+                <Title order={5}>Students can modify group names</Title>
                 <Tooltip
                   label={
                     <Text size="xs">
@@ -205,6 +225,7 @@ function CourseDetailsPage() {
                 </Tooltip>
               </Group>
               <Text
+                size="sm"
                 weight={500}
                 color={allowStudentsToModifyGroupName ? "green" : "red"}
               >
@@ -212,9 +233,10 @@ function CourseDetailsPage() {
               </Text>
             </Stack>
 
-            <Stack spacing="xs">
-              <Title order={4}>Students can create groups</Title>
+            <Stack spacing={6}>
+              <Title order={5}>Students can create groups</Title>
               <Text
+                size="sm"
                 weight={500}
                 color={allowStudentsToCreateGroups ? "green" : "red"}
               >
@@ -222,9 +244,9 @@ function CourseDetailsPage() {
               </Text>
             </Stack>
 
-            <Stack spacing="xs">
+            <Stack spacing={6}>
               <Group spacing={4}>
-                <Title order={4}>Students can delete groups</Title>
+                <Title order={5}>Students can delete groups</Title>
                 <Tooltip
                   label={
                     <Text size="xs">
@@ -244,6 +266,7 @@ function CourseDetailsPage() {
                 </Tooltip>
               </Group>
               <Text
+                size="sm"
                 weight={500}
                 color={allowStudentsToDeleteGroups ? "green" : "red"}
               >
@@ -251,9 +274,10 @@ function CourseDetailsPage() {
               </Text>
             </Stack>
 
-            <Stack spacing="xs">
-              <Title order={4}>Students can join groups</Title>
+            <Stack spacing={6}>
+              <Title order={5}>Students can join groups</Title>
               <Text
+                size="sm"
                 weight={500}
                 color={allowStudentsToJoinGroups ? "green" : "red"}
               >
@@ -261,9 +285,10 @@ function CourseDetailsPage() {
               </Text>
             </Stack>
 
-            <Stack spacing="xs">
-              <Title order={4}>Students can leave groups</Title>
+            <Stack spacing={6}>
+              <Title order={5}>Students can leave groups</Title>
               <Text
+                size="sm"
                 weight={500}
                 color={allowStudentsToLeaveGroups ? "green" : "red"}
               >
@@ -271,9 +296,9 @@ function CourseDetailsPage() {
               </Text>
             </Stack>
 
-            <Stack spacing="xs">
+            <Stack spacing={6}>
               <Group spacing={4}>
-                <Title order={4}>Students can add/remove group members</Title>
+                <Title order={5}>Students can add/remove group members</Title>
                 <Tooltip
                   label={
                     <Text size="xs">
@@ -294,17 +319,18 @@ function CourseDetailsPage() {
                 </Tooltip>
               </Group>
               <Text
+                size="sm"
                 weight={500}
                 color={allowStudentsToAddOrRemoveGroupMembers ? "green" : "red"}
               >
                 {allowStudentsToAddOrRemoveGroupMembers ? "Yes" : "No"}
               </Text>
             </Stack>
-          </RoleRestrictedWrapper>
+          </ConditionalRenderer>
         </Stack>
       </Paper>
 
-      <RoleRestrictedWrapper allowedRoles={[Role.CoOwner]}>
+      <ConditionalRenderer allow={canModify || canDelete}>
         <Paper
           className={classes.actionsSection}
           withBorder
@@ -314,7 +340,7 @@ function CourseDetailsPage() {
         >
           <CourseActionsSection />
         </Paper>
-      </RoleRestrictedWrapper>
+      </ConditionalRenderer>
     </Group>
   );
 }

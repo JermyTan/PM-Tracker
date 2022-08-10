@@ -109,7 +109,6 @@ JAZZMIN_SETTINGS = {
         "authentication.passwordauthentication": "fas fa-key",
         "content_delivery_service.image": "fas fa-image",
         "users.user": "fas fa-users",
-        "users.userinvite": "fas fa-user-plus",
     },
 }
 

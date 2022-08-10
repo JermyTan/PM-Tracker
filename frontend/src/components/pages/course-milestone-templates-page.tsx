@@ -14,26 +14,39 @@ import { generatePath, Link } from "react-router-dom";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import useGetMilestoneAlias from "../../custom-hooks/use-get-milestone-alias";
 import useGetTemplateId from "../../custom-hooks/use-get-template-id";
+import useGetTemplatePermissions from "../../custom-hooks/use-get-template-permissions";
 import { useGetTemplatesQuery } from "../../redux/services/templates-api";
 import { COURSE_MILESTONE_TEMPLATES_CREATION_PATH } from "../../routes/paths";
 import { useResolveError } from "../../utils/error-utils";
-import CourseMilestoneTemplatesTable from "../milestone-templates-table";
+import CourseTemplatesTable from "../course-templates-table";
 import PlaceholderWrapper from "../placeholder-wrapper";
+import ConditionalRenderer from "../conditional-renderer";
+import { MAX_FORM_WIDTH } from "../../custom-hooks/use-get-form-container-style";
 
-const useStyles = createStyles({
-  templateContainer: {
-    flex: "1 3 auto",
-  },
-  templateTableContainer: {
-    flex: "1 1 auto",
-  },
-});
+const useStyles = createStyles(
+  (_, { noWrap }: { hasSelectedTemplate?: boolean; noWrap?: boolean }) => ({
+    pageContainer: {
+      flexDirection: !noWrap ? "column-reverse" : undefined,
+    },
+    templateContainer: {
+      flex: "1 1 auto",
+      width: "100%",
+      maxWidth: noWrap ? MAX_FORM_WIDTH : undefined,
+    },
+    templateTableContainer: {
+      minWidth: "650px",
+      width: !noWrap ? "100%" : undefined,
+      flex: "1 1 auto",
+    },
+  }),
+);
 
 type Props = {
   children: ReactNode;
+  studentView?: boolean;
 };
 
-function CourseMilestoneTemplatesPage({ children }: Props) {
+function CourseMilestoneTemplatesPage({ children, studentView }: Props) {
   const courseId = useGetCourseId();
   const { capitalizedMilestoneAlias } = useGetMilestoneAlias();
   const { milestoneTemplates, isLoading, error } = useGetTemplatesQuery(
@@ -54,8 +67,8 @@ function CourseMilestoneTemplatesPage({ children }: Props) {
   });
   const templateId = useGetTemplateId();
   const hasSelectedTemplate = Boolean(templateId);
-  const { cx, classes } = useStyles();
-  const noWrap = useMediaQuery("(min-width: 1400px)");
+  const noWrap = useMediaQuery("(min-width: 1500px)");
+  const { classes } = useStyles({ noWrap });
 
   return (
     <PlaceholderWrapper
@@ -66,29 +79,44 @@ function CourseMilestoneTemplatesPage({ children }: Props) {
       showDefaultMessage={Boolean(errorMessage)}
     >
       {milestoneTemplates && (
-        <Group noWrap={noWrap} align="flex-start">
+        <Group
+          className={classes.pageContainer}
+          noWrap={noWrap}
+          align="flex-start"
+        >
           {hasSelectedTemplate && (
             <div className={classes.templateContainer}>{children}</div>
           )}
 
-          <Stack className={cx(classes.templateTableContainer)}>
+          <Stack className={classes.templateTableContainer}>
             <Group position="apart">
               <Title order={3}>{capitalizedMilestoneAlias} Templates</Title>
-              <Button<typeof Link>
-                component={Link}
-                to={generatePath(COURSE_MILESTONE_TEMPLATES_CREATION_PATH, {
-                  courseId,
-                })}
-                color="teal"
-                leftIcon={<RiFileAddLine />}
-              >
-                Create new template
-              </Button>
+
+              {!studentView && (
+                <ConditionalRenderer
+                  permissionGetter={{
+                    fn: useGetTemplatePermissions,
+                    key: "canCreate",
+                  }}
+                >
+                  <Button<typeof Link>
+                    component={Link}
+                    to={generatePath(COURSE_MILESTONE_TEMPLATES_CREATION_PATH, {
+                      courseId,
+                    })}
+                    color="teal"
+                    leftIcon={<RiFileAddLine />}
+                  >
+                    Create new template
+                  </Button>
+                </ConditionalRenderer>
+              )}
             </Group>
 
             <Paper withBorder shadow="sm" p="md" radius="md">
-              <CourseMilestoneTemplatesTable
-                milestoneTemplates={milestoneTemplates}
+              <CourseTemplatesTable
+                templates={milestoneTemplates}
+                studentView={studentView}
               />
             </Paper>
           </Stack>

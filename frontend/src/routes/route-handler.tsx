@@ -11,13 +11,18 @@ import CourseMilestonesPage from "../components/pages/course-milestones-page";
 import CourseGroupPage from "../components/pages/course-groups-page";
 import CourseDetailsPage from "../components/pages/course-details-page";
 import CourseMilestoneTemplatesPage from "../components/pages/course-milestone-templates-page";
-import RoleRestrictedWrapper from "../components/role-restricted-wrapper";
-import { Role } from "../types/courses";
+import ConditionalRenderer from "../components/conditional-renderer";
 import MilestoneTemplatesLayout from "../components/milestone-templates-layout";
 import CourseMilestoneTemplatesCreationPage from "../components/pages/course-milestone-templates-creation-page";
 import CourseMilestoneTemplatesEditPage from "../components/pages/course-milestone-templates-edit-page";
 import CourseMilestoneTemplatesViewPage from "../components/pages/course-milestone-templates-view-page";
 import MilestoneTemplatesNestedLayout from "../components/milestone-templates-nested-layout";
+import CourseMilestoneSubmissionsPage from "../components/pages/course-milestone-submissions-page";
+import MilestoneLayout from "../components/milestone-layout";
+import MilestoneDetailsLayout from "../components/milestone-details-layout";
+import useGetTemplatePermissions from "../custom-hooks/use-get-template-permissions";
+import CourseMilestoneSubmissionsTemplatesViewPage from "../components/pages/course-milestone-submissions-templates-view-page";
+import CourseMilestoneSubmissionsViewPage from "../components/pages/course-milestone-submissions-view-page";
 
 function RouteHandler() {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
@@ -50,16 +55,61 @@ function RouteHandler() {
               <Route index element={<Navigate to="milestones" replace />} />
               <Route path="milestones" element={<CourseMilestonesPage />} />
               <Route
+                element={
+                  <MilestoneLayout>
+                    <Outlet />
+                  </MilestoneLayout>
+                }
+                path="milestones/:milestoneId"
+              >
+                <Route
+                  element={
+                    <MilestoneDetailsLayout>
+                      <Outlet />
+                    </MilestoneDetailsLayout>
+                  }
+                >
+                  <Route
+                    index
+                    element={<Navigate to="submissions" replace />}
+                  />
+                  <Route
+                    path="submissions"
+                    element={<CourseMilestoneSubmissionsPage />}
+                  />
+                </Route>
+                <Route
+                  path="submissions/templates"
+                  element={
+                    <CourseMilestoneTemplatesPage studentView>
+                      <Outlet />
+                    </CourseMilestoneTemplatesPage>
+                  }
+                >
+                  <Route
+                    path=":templateId"
+                    element={<CourseMilestoneSubmissionsTemplatesViewPage />}
+                  />
+                </Route>
+                <Route
+                  path="submissions/:submissionId"
+                  element={<CourseMilestoneSubmissionsViewPage />}
+                />
+              </Route>
+              <Route
                 path="templates"
                 element={
-                  <RoleRestrictedWrapper
-                    allowedRoles={[Role.CoOwner, Role.Instructor]}
+                  <ConditionalRenderer
+                    permissionGetter={{
+                      fn: useGetTemplatePermissions,
+                      key: "canManage",
+                    }}
                     fallback={<Navigate to="/dashboard" replace />}
                   >
                     <MilestoneTemplatesLayout>
                       <Outlet />
                     </MilestoneTemplatesLayout>
-                  </RoleRestrictedWrapper>
+                  </ConditionalRenderer>
                 }
               >
                 <Route

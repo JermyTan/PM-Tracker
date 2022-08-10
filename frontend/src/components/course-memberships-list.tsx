@@ -2,7 +2,7 @@ import { skipToken } from "@reduxjs/toolkit/query/react";
 import { Text, Stack, ScrollArea } from "@mantine/core";
 import { useMemo } from "react";
 import PlaceholderWrapper from "./placeholder-wrapper";
-import { Role, CourseMemberData, roles } from "../types/courses";
+import { Role, CourseMemberData, ALL_ROLES } from "../types/courses";
 import { useGetCourseMembershipsQuery } from "../redux/services/members-api";
 import CourseRoleGroupList from "./course-role-group-list";
 import { sort } from "../utils/transform-utils";
@@ -15,7 +15,7 @@ type Props = {
   hasAdminPermission: boolean;
 };
 
-const orderedRoles = sort(roles);
+const orderedRoles = sort(ALL_ROLES);
 
 function CourseMembershipsList({ courseId, hasAdminPermission }: Props) {
   const { data: coursePersonnel, isLoading } = useGetCourseMembershipsQuery(

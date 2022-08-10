@@ -13,8 +13,7 @@ import pluralize from "pluralize";
 import { MdOutlineLibraryAdd } from "react-icons/md";
 import { ImFilesEmpty } from "react-icons/im";
 import { Link } from "react-router-dom";
-import { Role } from "../../types/courses";
-import RoleRestrictedWrapper from "../role-restricted-wrapper";
+import ConditionalRenderer from "../conditional-renderer";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import { useGetMilestonesQuery } from "../../redux/services/milestones-api";
 import { useResolveError } from "../../utils/error-utils";
@@ -22,7 +21,9 @@ import useGetMilestoneAlias from "../../custom-hooks/use-get-milestone-alias";
 import MilestoneCard from "../milestone-card";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import MilestoneCreationForm from "../milestone-creation-form";
-import SubmissionCommentsSection from "../submission-comments-section";
+import CourseSubmissionCommentsSection from "../course-submission-comments-section";
+import useGetMilestonePermissions from "../../custom-hooks/use-get-milestone-permissions";
+import useGetTemplatePermissions from "../../custom-hooks/use-get-template-permissions";
 
 function CourseMilestonesPage() {
   const courseId = useGetCourseId();
@@ -41,6 +42,8 @@ function CourseMilestonesPage() {
   useResolveError({ error, name: "course-milestones-page" });
   const { milestoneAlias, capitalizedMilestoneAlias } = useGetMilestoneAlias();
   const [isDrawerOpened, { open, close }] = useDisclosure(false);
+  const { canCreate: canCreateMilestone } = useGetMilestonePermissions();
+  const { canManage: canManageTemplates } = useGetTemplatePermissions();
   const pluralizedMilestoneAlias = pluralize(milestoneAlias);
 
   return (
@@ -52,7 +55,7 @@ function CourseMilestonesPage() {
         size="xl"
         padding="lg"
         closeButtonLabel={`Cancel ${milestoneAlias} creation`}
-        title={<Title order={2}>{capitalizedMilestoneAlias} Creation</Title>}
+        title={<Title order={3}>{capitalizedMilestoneAlias} Creation</Title>}
       >
         <ScrollArea offsetScrollbars pr="xs" scrollbarSize={8}>
           <MilestoneCreationForm onSuccess={close} />
@@ -60,24 +63,29 @@ function CourseMilestonesPage() {
       </Drawer>
 
       <Stack>
-        <RoleRestrictedWrapper allowedRoles={[Role.CoOwner, Role.Instructor]}>
+        <ConditionalRenderer allow={canCreateMilestone || canManageTemplates}>
           <Group position="right">
-            <Button<typeof Link>
-              component={Link}
-              to="../templates"
-              leftIcon={<ImFilesEmpty />}
-            >
-              {capitalizedMilestoneAlias} templates
-            </Button>
-            <Button
-              color="teal"
-              leftIcon={<MdOutlineLibraryAdd />}
-              onClick={open}
-            >
-              Create new {milestoneAlias}
-            </Button>
+            <ConditionalRenderer allow={canManageTemplates}>
+              <Button<typeof Link>
+                component={Link}
+                to="../templates"
+                leftIcon={<ImFilesEmpty />}
+              >
+                {capitalizedMilestoneAlias} templates
+              </Button>
+            </ConditionalRenderer>
+
+            <ConditionalRenderer allow={canCreateMilestone}>
+              <Button
+                color="teal"
+                leftIcon={<MdOutlineLibraryAdd />}
+                onClick={open}
+              >
+                Create new {milestoneAlias}
+              </Button>
+            </ConditionalRenderer>
           </Group>
-        </RoleRestrictedWrapper>
+        </ConditionalRenderer>
 
         <PlaceholderWrapper
           isLoading={isLoading}
@@ -102,7 +110,7 @@ function CourseMilestonesPage() {
         </PlaceholderWrapper>
 
         {/* Replace here */}
-        <SubmissionCommentsSection
+        <CourseSubmissionCommentsSection
           courseId={1}
           submissionId={1}
           fieldIndex={0}

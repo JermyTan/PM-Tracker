@@ -1,4 +1,4 @@
-import { ScrollArea } from "@mantine/core";
+import { createStyles, ScrollArea } from "@mantine/core";
 import { FormField, FormFieldType } from "../types/templates";
 import CheckboxGroupField from "./checkbox-group-field";
 import NumericField from "./numeric-field";
@@ -7,12 +7,29 @@ import TextField from "./text-field";
 import TextViewer from "./text-viewer";
 import TextareaField from "./textarea-field";
 
+const useStyles = createStyles({
+  // NOTE: currently there is no way to access the container for checkbox and radio options
+  // use this hack for now
+  optionsContainer: {
+    "> .mantine-Group-root": {
+      columnGap: "40px",
+    },
+  },
+  // TODO: change to autosize when migrated to mantine ui v5
+  textDisplay: {
+    height: "150px",
+  },
+});
+
 type Props = {
   name: string;
   formField: FormField;
+  readOnly?: boolean;
 };
 
-function FormFieldRenderer({ name, formField }: Props) {
+function FormFieldRenderer({ name, formField, readOnly }: Props) {
+  const { classes } = useStyles();
+
   switch (formField.type) {
     case FormFieldType.Text: {
       const { label, description, placeholder, required } = formField;
@@ -43,6 +60,7 @@ function FormFieldRenderer({ name, formField }: Props) {
           }
           placeholder={placeholder}
           required={required}
+          readOnly={readOnly}
         />
       );
     }
@@ -78,6 +96,7 @@ function FormFieldRenderer({ name, formField }: Props) {
           required={required}
           minRows={5}
           maxRows={20}
+          readOnly={readOnly}
         />
       );
     }
@@ -111,6 +130,7 @@ function FormFieldRenderer({ name, formField }: Props) {
           placeholder={placeholder}
           required={required}
           hideControls
+          readOnly={readOnly}
         />
       );
     }
@@ -144,7 +164,8 @@ function FormFieldRenderer({ name, formField }: Props) {
           }
           required={required}
           choices={choices}
-          spacing={40}
+          className={classes.optionsContainer}
+          readOnly={readOnly}
         />
       );
     }
@@ -178,7 +199,8 @@ function FormFieldRenderer({ name, formField }: Props) {
           }
           required={required}
           choices={choices}
-          spacing={40}
+          className={classes.optionsContainer}
+          readOnly={readOnly}
         />
       );
     }
@@ -186,7 +208,11 @@ function FormFieldRenderer({ name, formField }: Props) {
       const { content } = formField;
 
       return (
-        <ScrollArea offsetScrollbars style={{ height: "150px" }}>
+        <ScrollArea
+          offsetScrollbars
+          className={classes.textDisplay}
+          type="auto"
+        >
           <TextViewer preserveWhiteSpace overflowWrap>
             {content}
           </TextViewer>

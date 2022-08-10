@@ -21,7 +21,7 @@ from authentication.models import (
 )
 from content_delivery_service.models import Image
 from pigeonhole.common.parsers import to_base_json
-from .models import User, UserInvite, PatchUserAction
+from .models import User, PatchUserAction
 
 
 def user_to_json(user: User) -> dict:
@@ -64,17 +64,5 @@ def requester_to_json(requester: User) -> dict:
     return data
 
 
-def user_invite_to_json(user_invite: UserInvite) -> dict:
-    data = to_base_json(user_invite)
-
-    data |= {EMAIL: user_invite.email}
-
-    return data
-
-
 def get_users(*args, **kwargs) -> QuerySet[User]:
     return User.objects.filter(*args, **kwargs)
-
-
-def get_user_invites(*args, **kwargs) -> QuerySet[UserInvite]:
-    return UserInvite.objects.filter(*args, **kwargs)

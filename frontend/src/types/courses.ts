@@ -24,7 +24,11 @@ export enum Role {
   Student = "STUDENT",
 }
 
-export const roles = Object.values(Role);
+export const ALL_ROLES = Object.values(Role);
+
+export const CO_OWNER_PERMISSION_ROLES = [Role.CoOwner];
+
+export const INSTRUCTOR_PERMISSION_ROLES = [Role.Instructor, Role.CoOwner];
 
 // Matches a user's role in a course to the set of roles which the
 // user can add/remove to a course group

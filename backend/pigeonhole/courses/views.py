@@ -22,7 +22,7 @@ from .models import (
     CourseMilestone,
     CourseMilestoneTemplate,
     CourseSubmission,
-    CourseSubmissionFieldComment,
+    CourseSubmissionComment,
     PatchCourseGroupAction,
     Role,
 )
@@ -31,10 +31,10 @@ from .logic import (
     can_create_course_group,
     can_delete_course_group,
     can_delete_course_submission,
-    can_delete_course_submission_field_comment,
+    can_delete_course_submission_comment,
     can_update_course_group,
     can_update_course_submission,
-    can_update_course_submission_field_comment,
+    can_update_course_submission_comment,
     can_view_course_group_members,
     can_view_course_milestone_template,
     can_view_course_submission,
@@ -42,7 +42,7 @@ from .logic import (
     course_group_with_members_to_json,
     course_membership_to_json,
     course_milestone_template_to_json,
-    course_submission_field_comment_to_json,
+    course_submission_comment_to_json,
     course_submission_summary_to_json,
     course_submission_to_json,
     course_summary_to_json,
@@ -53,8 +53,8 @@ from .logic import (
     create_course_membership,
     create_course_milestone_template,
     create_course_submission,
-    create_course_submission_field_comment,
-    delete_course_submission_field_comment,
+    create_course_submission_comment,
+    delete_course_submission_comment,
     get_requested_course_submissions,
     submission_field_comment_is_deleted,
     update_course,
@@ -65,7 +65,7 @@ from .logic import (
     update_course_membership,
     update_course_milestone_template,
     update_course_submission,
-    update_course_submission_field_comment,
+    update_course_submission_comment,
 )
 from .serializers import (
     GetCourseSubmissionSerializer,
@@ -73,7 +73,7 @@ from .serializers import (
     PostCourseGroupSerializer,
     PostCourseMilestoneTemplateSerializer,
     PostCourseSerializer,
-    PostCourseSubmissionFieldCommentSerializer,
+    PostCourseSubmissionCommentSerializer,
     PostCourseSubmissionSerializer,
     PutCourseMilestoneTemplateSerializer,
     PutCourseSerializer,
@@ -81,7 +81,7 @@ from .serializers import (
     PutCourseMilestoneSerializer,
     PostCourseMembershipSerializer,
     PatchCourseMembershipSerializer,
-    PutCourseSubmissionFieldCommentSerializer,
+    PutCourseSubmissionCommentSerializer,
     PutCourseSubmissionSerializer,
 )
 from .middlewares import (
@@ -603,9 +603,7 @@ class SingleCourseGroupView(APIView):
                 try:
 
                     updated_course = batch_update_course_group_members(
-                        course=course,
-                        group=group,
-                        user_ids=payload["user_ids"]
+                        course=course, group=group, user_ids=payload["user_ids"]
                     )
 
                 except ValueError as e:
@@ -794,7 +792,11 @@ class CourseSubmissionsView(APIView):
         )
 
         data = [
-            course_submission_summary_to_json(submission) for submission in submissions
+            course_submission_summary_to_json(submission)
+            for submission in submissions
+            if can_view_course_submission(
+                requester_membership=requester_membership, submission=submission
+            )
         ]
 
         return Response(data, status=status.HTTP_200_OK)
@@ -921,7 +923,8 @@ class SingleCourseSubmissionView(APIView):
 
         return Response(data=data, status=status.HTTP_200_OK)
 
-class CourseSubmissionFieldCommentsView(APIView):
+
+class CourseSubmissionCommentsView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
     @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
@@ -933,7 +936,7 @@ class CourseSubmissionFieldCommentsView(APIView):
         course: Course,
         requester_membership: CourseMembership,
         submission: CourseSubmission,
-        field_index: int
+        field_index: int,
     ):
         if not can_view_course_submission(
             requester_membership=requester_membership, submission=submission
@@ -941,16 +944,19 @@ class CourseSubmissionFieldCommentsView(APIView):
             raise PermissionDenied()
 
         if field_index < 0 or field_index >= len(submission.form_response_data):
-            raise BadRequest(detail="Invalid field index provided.")
+            raise BadRequest(detail="No such field.")
 
-        field_comments = submission.coursesubmissionfieldcomment_set.filter(
-            field_index=field_index
+        comments: QuerySet[CourseSubmissionComment] = (
+            submission.coursesubmissioncomment_set.select_related(
+                "comment__commenter__profile_image", "member"
+            )
+            .filter(field_index=field_index)
+            .order_by("created_at")
         )
 
-        data = [course_submission_field_comment_to_json(comment) for comment in field_comments]
+        data = [course_submission_comment_to_json(comment) for comment in comments]
 
         return Response(data=data, status=status.HTTP_200_OK)
-
 
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
@@ -963,7 +969,7 @@ class CourseSubmissionFieldCommentsView(APIView):
         course: Course,
         requester_membership: CourseMembership,
         submission: CourseSubmission,
-        field_index: int
+        field_index: int,
     ):
         if not can_view_course_submission(
             requester_membership=requester_membership, submission=submission
@@ -971,30 +977,27 @@ class CourseSubmissionFieldCommentsView(APIView):
             raise PermissionDenied()
 
         if field_index < 0 or field_index >= len(submission.form_response_data):
-            raise BadRequest(detail="Invalid field index provided.")
-        
-        serializer = PostCourseSubmissionFieldCommentSerializer(data=request.data)
+            raise BadRequest(detail="No such field.")
+
+        serializer = PostCourseSubmissionCommentSerializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
 
-        try:
-            new_comment = create_course_submission_field_comment(
-                submission=submission,
-                commenter = requester,
-                content=validated_data["content"],
-                field_index=field_index,
-                course_membership=requester_membership
-            )
-        except ValueError as e:
-            raise BadRequest(detail=e)
+        new_comment = create_course_submission_comment(
+            submission=submission,
+            commenter=requester,
+            content=validated_data["content"],
+            field_index=field_index,
+            member=requester_membership,
+        )
 
-        data = course_submission_field_comment_to_json(new_comment)
+        data = course_submission_comment_to_json(new_comment)
 
         return Response(data=data, status=status.HTTP_201_CREATED)
 
 
-class SingleCourseSubmissionFieldCommentsView(APIView):
+class SingleCourseSubmissionCommentView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
     @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
@@ -1007,32 +1010,29 @@ class SingleCourseSubmissionFieldCommentsView(APIView):
         course: Course,
         requester_membership: CourseMembership,
         submission: CourseSubmission,
-        submission_comment: CourseSubmissionFieldComment
+        submission_comment: CourseSubmissionComment,
     ):
-        
-        if not can_update_course_submission_field_comment(
+
+        if not can_update_course_submission_comment(
             requester_membership=requester_membership,
-            submission_comment=submission_comment
+            submission_comment=submission_comment,
         ):
             raise PermissionDenied()
 
-        if submission_field_comment_is_deleted(submission_comment=submission_comment):
-            raise BadRequest(detail="The comment is already deleted.")
+        if submission_comment.comment.is_deleted:
+            raise BadRequest(detail="Cannot update deleted comment.")
 
-        serializer = PutCourseSubmissionFieldCommentSerializer(data=request.data)
+        serializer = PutCourseSubmissionCommentSerializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
 
-        try:
-            updated_comment = update_course_submission_field_comment(
-                course_submission_field_comment=submission_comment,
-                content = validated_data['content']
-            )
-        except ValueError as e:
-            raise BadRequest(detail=e)
+        updated_comment = update_course_submission_comment(
+            submission_comment=submission_comment,
+            content=validated_data["content"],
+        )
 
-        data = course_submission_field_comment_to_json(updated_comment)
+        data = course_submission_comment_to_json(updated_comment)
 
         return Response(data=data, status=status.HTTP_200_OK)
 
@@ -1048,25 +1048,20 @@ class SingleCourseSubmissionFieldCommentsView(APIView):
         course: Course,
         requester_membership: CourseMembership,
         submission: CourseSubmission,
-        submission_comment: CourseSubmissionFieldComment
+        submission_comment: CourseSubmissionComment,
     ):
-        
-        if not can_delete_course_submission_field_comment(
+
+        if not can_delete_course_submission_comment(
             requester_membership=requester_membership,
-            submission_comment=submission_comment
+            submission_comment=submission_comment,
         ):
             raise PermissionDenied()
 
-        if submission_field_comment_is_deleted(submission_comment=submission_comment):
-            raise BadRequest(detail="The comment is already deleted.")
-        
-        try:
-            deleted_comment = delete_course_submission_field_comment(
-                course_submission_field_comment=submission_comment,
-            )
-        except ValueError as e:
-            raise BadRequest(detail=e)
+        if submission_comment.comment.is_deleted:
+            raise BadRequest(detail="Comment has already been deleted.")
 
-        data = course_submission_field_comment_to_json(deleted_comment)
+        deleted_comment = delete_course_submission_comment(submission_comment)
+
+        data = course_submission_comment_to_json(deleted_comment)
 
         return Response(data=data, status=status.HTTP_200_OK)

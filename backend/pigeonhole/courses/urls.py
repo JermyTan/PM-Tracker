@@ -15,6 +15,8 @@ from .views import (
     SingleCourseMilestoneTemplateView,
     CourseSubmissionsView,
     SingleCourseSubmissionView,
+    CourseSubmissionCommentsView,
+    SingleCourseSubmissionCommentView,
 )
 
 urlpatterns = [
@@ -72,12 +74,12 @@ urlpatterns = [
     ),
     path(
         "<int:course_id>/submissions/<int:submission_id>/fields/<int:field_index>/comments/",
-        CourseSubmissionFieldCommentsView.as_view(),
-        name="course_submission_field_comments",
+        CourseSubmissionCommentsView.as_view(),
+        name="course_submission_comments",
     ),
     path(
         "<int:course_id>/submissions/<int:submission_id>/comments/<int:comment_id>",
-        SingleCourseSubmissionFieldCommentsView.as_view(),
-        name="course_submission_field_comments",
+        SingleCourseSubmissionCommentView.as_view(),
+        name="single_course_submission_comment",
     ),
 ]

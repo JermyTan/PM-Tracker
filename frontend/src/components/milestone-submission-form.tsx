@@ -1,11 +1,20 @@
+import { forwardRef, Ref, useImperativeHandle } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Stack, Title, Text } from "@mantine/core";
-import { FormProvider, useFieldArray, useForm } from "react-hook-form";
+import { Stack, Title, Text, Button, Group, Alert } from "@mantine/core";
+import { GoDashboard } from "react-icons/go";
+import {
+  FormProvider,
+  useFieldArray,
+  useForm,
+  UseFormReset,
+} from "react-hook-form";
 import {
   FORM_RESPONSE_DATA,
   GROUP,
+  ID,
   IS_DRAFT,
+  NAME,
   RESPONSE,
   SUBMISSION_TYPE,
 } from "../constants";
@@ -18,27 +27,47 @@ import { useResolveError } from "../utils/error-utils";
 import { handleSubmitForm } from "../utils/form-utils";
 import SubmissionTypeIconLabel from "./submission-type-icon-label";
 import FormFieldRenderer from "./form-field-renderer";
+import TextViewer from "./text-viewer";
+import toastUtils from "../utils/toast-utils";
 
 const schema = z.object({
   [IS_DRAFT]: z.boolean(),
   [SUBMISSION_TYPE]: z.nativeEnum(SubmissionType),
-  [GROUP]: z.null(), // TODO: update to GroupData
+  [GROUP]: z.object({ [ID]: z.number(), [NAME]: z.string() }).nullable(), // TODO: update to GroupData
   [FORM_RESPONSE_DATA]: z.array(formResponseFieldSchema),
 });
 
 type SubmissionFormProps = z.infer<typeof schema>;
 
+export type SubmissionFormData = SubmissionFormProps;
+
+type MilestoneSubmissionFormHandler = {
+  reset: UseFormReset<SubmissionFormProps>;
+};
+
 type Props = {
   defaultValues: SubmissionViewData;
   readOnly?: boolean;
+  testMode?: boolean;
+  onSubmit?: (formData: SubmissionFormData) => Promise<unknown>;
 };
 
-function MilestoneSubmissionForm({ defaultValues, readOnly }: Props) {
+function MilestoneSubmissionForm(
+  { defaultValues, readOnly, testMode, onSubmit: handleOnSubmit }: Props,
+  ref: Ref<MilestoneSubmissionFormHandler>,
+) {
   const methods = useForm<SubmissionFormProps>({
     resolver: zodResolver(schema),
     defaultValues,
   });
-  const { control, handleSubmit } = methods;
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting, errors },
+  } = methods;
+  useImperativeHandle(ref, () => ({ reset }), [reset]);
+
   const { fields } = useFieldArray({
     control,
     name: FORM_RESPONSE_DATA,
@@ -48,18 +77,25 @@ function MilestoneSubmissionForm({ defaultValues, readOnly }: Props) {
     name: "milestone-submission-form",
   });
 
-  const {
-    createdAt,
-    updatedAt,
-    name,
-    description,
-    submissionType,
-    creator,
-    editor,
-    milestone,
-  } = defaultValues;
+  const { name, description, submissionType } = defaultValues;
 
-  const onSubmit = () => {};
+  const onSubmit = async (formData: SubmissionFormProps) => {
+    if (testMode) {
+      toastUtils.info({
+        title: "Test Mode",
+        message: "Form inputs are successfully validated and can be submitted.",
+      });
+      return;
+    }
+
+    if (isSubmitting || readOnly) {
+      return;
+    }
+
+    await handleOnSubmit?.(formData);
+  };
+
+  console.log(errors);
 
   return (
     <FormProvider {...methods}>
@@ -68,12 +104,41 @@ function MilestoneSubmissionForm({ defaultValues, readOnly }: Props) {
         autoComplete="off"
       >
         <Stack spacing={32}>
-          <Stack spacing={2}>
-            <Title order={4}>{name}</Title>
-            <Text size="sm" color="dimmed">
-              <SubmissionTypeIconLabel submissionType={submissionType} />
-            </Text>
-            <Text size="sm">{description}</Text>
+          <Stack>
+            {testMode && (
+              <Alert
+                p="xs"
+                color="orange"
+                icon={<GoDashboard />}
+                title="Test Mode"
+              >
+                This form is in test mode. You can test this form by filling in
+                the fields. Validations, such as checking non-empty inputs for
+                required fields, will be run. No actual submission will be made
+                in test mode.
+              </Alert>
+            )}
+
+            <Stack spacing={2}>
+              <Title order={4}>
+                <TextViewer inherit overflowWrap>
+                  {name}
+                </TextViewer>
+              </Title>
+              <Text size="sm" color="dimmed">
+                <SubmissionTypeIconLabel submissionType={submissionType} />
+              </Text>
+              {description && (
+                <TextViewer
+                  size="sm"
+                  preserveWhiteSpace
+                  overflowWrap
+                  withLinkify
+                >
+                  {description}
+                </TextViewer>
+              )}
+            </Stack>
           </Stack>
 
           {fields.map(({ id, ...field }, index) => (
@@ -81,12 +146,25 @@ function MilestoneSubmissionForm({ defaultValues, readOnly }: Props) {
               key={id}
               name={`${FORM_RESPONSE_DATA}.${index}.${RESPONSE}`}
               formField={field as FormField}
+              readOnly={readOnly}
             />
           ))}
+
+          {!readOnly && (
+            <Group position="right">
+              <Button
+                disabled={isSubmitting}
+                loading={isSubmitting}
+                type="submit"
+              >
+                Save
+              </Button>
+            </Group>
+          )}
         </Stack>
       </form>
     </FormProvider>
   );
 }
 
-export default MilestoneSubmissionForm;
+export default forwardRef(MilestoneSubmissionForm);

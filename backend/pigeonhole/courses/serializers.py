@@ -7,7 +7,7 @@ from pigeonhole.common.serializers import (
     UserIdSerializer,
     IdField,
     ObjectListField,
-    BatchUserIdSerializer
+    BatchUserIdSerializer,
 )
 from forms.serializers import FormSerializer
 
@@ -22,6 +22,7 @@ from .models import (
     CourseSubmissionFieldComment,
     PatchCourseGroupAction,
     Role,
+    Comment,
 )
 
 
@@ -201,8 +202,19 @@ class PostCourseSubmissionSerializer(PutCourseSubmissionSerializer):
             "template_id",
         )
 
+<<<<<<< HEAD
 class PutCourseSubmissionFieldCommentSerializer(serializers.Serializer):
     content = serializers.CharField(required=True)
     
 class PostCourseSubmissionFieldCommentSerializer(PutCourseSubmissionFieldCommentSerializer):
     pass
+=======
+
+class PostCourseSubmissionCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ("content",)
+
+
+PutCourseSubmissionCommentSerializer = PostCourseSubmissionCommentSerializer
+>>>>>>> 3333829dbd0a44a17d7494cd92602f635aff3d5c

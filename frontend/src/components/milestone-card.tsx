@@ -1,51 +1,56 @@
-import { Alert, Badge, Group, Paper, Stack, Text } from "@mantine/core";
+import { Alert, Badge, createStyles, Group, Paper, Stack } from "@mantine/core";
 import { HiEyeOff } from "react-icons/hi";
-import { DATE_TIME_MONTH_NAME_FORMAT } from "../constants";
+import { useNavigate } from "react-router-dom";
 import useGetMilestoneAlias from "../custom-hooks/use-get-milestone-alias";
-import { Role } from "../types/courses";
+import useGetMilestonePermissions from "../custom-hooks/use-get-milestone-permissions";
 import { MilestoneData } from "../types/milestones";
-import { displayDateTime } from "../utils/transform-utils";
 import MilestoneActionsMenu from "./milestone-actions-menu";
-import RoleRestrictedWrapper from "./role-restricted-wrapper";
+import MilestoneActivePeriodDisplay from "./milestone-active-period-display";
+import ConditionalRenderer from "./conditional-renderer";
 import TextViewer from "./text-viewer";
+import { checkIsMilestoneOpen } from "../utils/misc-utils";
+
+const useStyles = createStyles((_, { canAccess }: { canAccess?: boolean }) => ({
+  card: {
+    cursor: canAccess ? "pointer" : "not-allowed",
+  },
+}));
 
 type Props = MilestoneData;
 
 function MilestoneCard(props: Props) {
   const { milestoneAlias } = useGetMilestoneAlias();
+  const navigate = useNavigate();
+  const { canAccess, canModify, canDelete } = useGetMilestonePermissions(props);
+  const { classes } = useStyles({ canAccess });
 
-  const { name, startDateTime, endDateTime, isPublished } = props;
-  const now = Date.now();
-  const isOpen =
-    startDateTime <= now && (endDateTime === null || now <= endDateTime);
+  const { name, startDateTime, endDateTime, isPublished, id } = props;
+  const isOpen = checkIsMilestoneOpen(props);
 
   return (
-    <Paper withBorder shadow="sm" p="md" radius="md">
+    <Paper
+      onClick={canAccess ? () => navigate(`${id}`) : undefined}
+      withBorder
+      shadow="sm"
+      p="md"
+      radius="md"
+      className={classes.card}
+    >
       <Stack spacing="xs">
         <Group noWrap spacing={4} position="apart" align="flex-start">
           <TextViewer overflowWrap weight={600} size="lg">
             {name}
           </TextViewer>
-          <RoleRestrictedWrapper allowedRoles={[Role.CoOwner, Role.Instructor]}>
+          <ConditionalRenderer allow={canModify || canDelete}>
             <MilestoneActionsMenu {...props} />
-          </RoleRestrictedWrapper>
+          </ConditionalRenderer>
         </Group>
-        <div>
-          <Text size="sm">
-            Start:{" "}
-            <Text<"span"> weight={500} size="sm" component="span">
-              {displayDateTime(startDateTime, DATE_TIME_MONTH_NAME_FORMAT)}
-            </Text>
-          </Text>
-          {endDateTime !== null && (
-            <Text size="sm">
-              End:{" "}
-              <Text<"span"> weight={500} size="sm" component="span">
-                {displayDateTime(endDateTime, DATE_TIME_MONTH_NAME_FORMAT)}
-              </Text>
-            </Text>
-          )}
-        </div>
+        <MilestoneActivePeriodDisplay
+          startDateTime={startDateTime}
+          endDateTime={endDateTime}
+          size="sm"
+          weight={500}
+        />
         <div>
           <Badge variant="outline" color={isOpen ? "green" : "red"}>
             {isOpen ? "Open" : "Closed"}

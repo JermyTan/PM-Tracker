@@ -10,7 +10,7 @@ import {
   CourseMemberData,
   editableRoleMap,
   Role,
-  roles,
+  ALL_ROLES,
 } from "../types/courses";
 import { useResolveError } from "../utils/error-utils";
 import toastUtils from "../utils/toast-utils";
@@ -75,7 +75,7 @@ function CourseMemberEditRoleMenu({ member, onSuccess }: Props) {
           }
         }}
       >
-        {roles.map((role) => (
+        {ALL_ROLES.map((role) => (
           <Radio
             value={role}
             label={capitalCase(role)}

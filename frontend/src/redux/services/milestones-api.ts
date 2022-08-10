@@ -79,6 +79,9 @@ const milestonesApi = baseApi
     }),
   });
 
+export const useGetSingleMilestoneQueryState =
+  milestonesApi.endpoints.getSingleMilestone.useQueryState;
+
 export const {
   useGetMilestonesQuery,
   useCreateMilestoneMutation,

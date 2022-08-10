@@ -206,7 +206,7 @@ def comment_to_json(comment: Comment) -> dict:
 
     return data
 
-def course_submission_field_comment_to_json(field_comment: CourseSubmissionFieldComment) -> dict:
+def course_submission_field_comment_to_json(field_comment: CourseSubmissionComment) -> dict:
     data = comment_to_json(field_comment.comment)
 
     data |= {

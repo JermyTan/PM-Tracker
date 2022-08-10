@@ -109,10 +109,10 @@ function CourseMilestonesPage() {
           </SimpleGrid>
         </PlaceholderWrapper>
 
-        {/* Replace here */}
+        {/* TODO: Replace here */}
         <CourseSubmissionCommentsSection
-          courseId={1}
-          submissionId={1}
+          courseId={courseId ?? 1}
+          submissionId={4}
           fieldIndex={0}
         />
       </Stack>

@@ -1,5 +1,5 @@
 import logging
-from re import sub
+from collections import Counter
 
 from django.db.models import Q, QuerySet, Prefetch
 
@@ -56,7 +56,6 @@ from .logic import (
     create_course_submission_comment,
     delete_course_submission_comment,
     get_requested_course_submissions,
-    submission_field_comment_is_deleted,
     update_course,
     create_course_milestone,
     update_course_group,
@@ -925,6 +924,36 @@ class SingleCourseSubmissionView(APIView):
 
 
 class CourseSubmissionCommentsView(APIView):
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_submission
+    def get(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership,
+        submission: CourseSubmission,
+    ):
+        if not can_view_course_submission(
+            requester_membership=requester_membership, submission=submission
+        ):
+            raise PermissionDenied()
+
+        field_to_comment_count_map = Counter(
+            submission.coursesubmissioncomment_set.values_list("field_index", flat=True)
+        )
+
+        data = [
+            field_to_comment_count_map[i]
+            for i in range(len(submission.form_response_data))
+        ]
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+
+class CourseSubmissionSingleFieldCommentsView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
     @check_requester_membership(Role.STUDENT, Role.INSTRUCTOR, Role.CO_OWNER)

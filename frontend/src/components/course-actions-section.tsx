@@ -108,7 +108,6 @@ function CourseActionsSection(props: Props) {
               onClick={openDeleteModal}
               color="red"
               leftIcon={<MdDeleteForever />}
-              disabled={isLoading}
               loading={isLoading}
             >
               Delete course

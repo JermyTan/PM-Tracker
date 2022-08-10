@@ -88,11 +88,7 @@ function CourseMemberEditRoleMenu({ member, onSuccess }: Props) {
         <Button color="gray" onClick={onSuccess}>
           Cancel
         </Button>
-        <Button
-          disabled={isLoading}
-          loading={isLoading}
-          onClick={onUpdateCourseMemberRole}
-        >
+        <Button loading={isLoading} onClick={onUpdateCourseMemberRole}>
           Save changes
         </Button>
       </Group>

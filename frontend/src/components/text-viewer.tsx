@@ -35,7 +35,7 @@ const LINKIFY_OPTIONS = {
   target: (_: string, linkType: LinkType) =>
     linkType === "url" ? "_blank" : null,
   rel: (_: string, linkType: LinkType) =>
-    linkType === "url" ? "noreferrer" : null,
+    linkType === "url" ? "noopener noreferrer" : null,
 };
 
 type Props<T> = TextProps<T> & {

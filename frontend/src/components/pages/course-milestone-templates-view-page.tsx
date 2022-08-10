@@ -40,9 +40,11 @@ function CourseMilestoneTemplatesViewPage() {
       }),
     [templateId, milestoneTemplates],
   );
-  const [deleteTemplate, { isLoading }] = useDeleteTemplateMutation({
-    selectFromResult: ({ isLoading }) => ({ isLoading }),
-  });
+  const [deleteTemplate, { isLoading: isDeleting }] = useDeleteTemplateMutation(
+    {
+      selectFromResult: ({ isLoading }) => ({ isLoading }),
+    },
+  );
   const { resolveError } = useResolveError({
     name: "course-milestone-templates-view-page",
   });
@@ -54,7 +56,7 @@ function CourseMilestoneTemplatesViewPage() {
   );
 
   const onDeleteTemplate = async () => {
-    if (isLoading || courseId === undefined || templateId === undefined) {
+    if (isDeleting || courseId === undefined || templateId === undefined) {
       return;
     }
 
@@ -89,7 +91,7 @@ function CourseMilestoneTemplatesViewPage() {
         </Text>
       ),
       labels: { confirm: "Delete template", cancel: "No don't delete" },
-      confirmProps: { color: "red", loading: isLoading },
+      confirmProps: { color: "red" },
       onConfirm: onDeleteTemplate,
     });
 
@@ -123,8 +125,7 @@ function CourseMilestoneTemplatesViewPage() {
                   color="red"
                   leftIcon={<RiFileEditLine />}
                   onClick={openDeleteModal}
-                  loading={isLoading}
-                  disabled={isLoading}
+                  loading={isDeleting}
                 >
                   Delete template
                 </Button>

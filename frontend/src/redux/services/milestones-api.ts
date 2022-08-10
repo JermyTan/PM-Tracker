@@ -15,7 +15,8 @@ const milestonesApi = baseApi
           url: `/courses/${courseId}/milestones/`,
           method: "GET",
         }),
-        providesTags: (result) => cacher.providesList(result, "Milestone"),
+        providesTags: (result, _, courseId) =>
+          cacher.providesList(result, "Milestone", [`${courseId}`]),
       }),
 
       createMilestone: build.mutation<
@@ -29,8 +30,8 @@ const milestonesApi = baseApi
           method: "POST",
           body: milestonePostData,
         }),
-        invalidatesTags: (_, error) =>
-          error ? [] : cacher.invalidatesList("Milestone"),
+        invalidatesTags: (_, error, { courseId }) =>
+          error ? [] : cacher.invalidatesList("Milestone", [`${courseId}`]),
       }),
 
       getSingleMilestone: build.query<
@@ -41,8 +42,8 @@ const milestonesApi = baseApi
           url: `/courses/${courseId}/milestones/${milestoneId}/`,
           method: "GET",
         }),
-        providesTags: (_, __, { milestoneId: id }) => [
-          { type: "Milestone", id },
+        providesTags: (_, __, { milestoneId: id, courseId }) => [
+          cacher.getIdTag(id, "Milestone", [`${courseId}`]),
         ],
       }),
 
@@ -58,8 +59,8 @@ const milestonesApi = baseApi
           method: "PUT",
           body: milestonePutData,
         }),
-        invalidatesTags: (_, error, { milestoneId: id }) =>
-          error ? [] : [{ type: "Milestone", id }],
+        invalidatesTags: (_, error, { milestoneId: id, courseId }) =>
+          error ? [] : [cacher.getIdTag(id, "Milestone", [`${courseId}`])],
       }),
 
       deleteMilestone: build.mutation<
@@ -73,8 +74,8 @@ const milestonesApi = baseApi
           url: `/courses/${courseId}/milestones/${milestoneId}/`,
           method: "DELETE",
         }),
-        invalidatesTags: (_, error, { milestoneId: id }) =>
-          error ? [] : [{ type: "Milestone", id }],
+        invalidatesTags: (_, error, { milestoneId: id, courseId }) =>
+          error ? [] : [cacher.getIdTag(id, "Milestone", [`${courseId}`])],
       }),
     }),
   });

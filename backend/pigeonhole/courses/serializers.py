@@ -19,7 +19,6 @@ from .models import (
     CourseMilestoneTemplate,
     CourseSettings,
     CourseSubmission,
-    CourseSubmissionFieldComment,
     PatchCourseGroupAction,
     Role,
     Comment,
@@ -202,13 +201,6 @@ class PostCourseSubmissionSerializer(PutCourseSubmissionSerializer):
             "template_id",
         )
 
-<<<<<<< HEAD
-class PutCourseSubmissionFieldCommentSerializer(serializers.Serializer):
-    content = serializers.CharField(required=True)
-    
-class PostCourseSubmissionFieldCommentSerializer(PutCourseSubmissionFieldCommentSerializer):
-    pass
-=======
 
 class PostCourseSubmissionCommentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -217,4 +209,3 @@ class PostCourseSubmissionCommentSerializer(serializers.ModelSerializer):
 
 
 PutCourseSubmissionCommentSerializer = PostCourseSubmissionCommentSerializer
->>>>>>> 3333829dbd0a44a17d7494cd92602f635aff3d5c

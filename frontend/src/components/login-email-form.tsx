@@ -62,7 +62,7 @@ function LoginEmailForm() {
             autoFocus={Boolean(inputEmail)}
           />
 
-          <Button disabled={isSubmitting} loading={isSubmitting} type="submit">
+          <Button loading={isSubmitting} type="submit">
             Next
           </Button>
         </Stack>

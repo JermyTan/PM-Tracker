@@ -78,11 +78,7 @@ function GroupJoinOrLeaveConfirmation({
         <Button color="gray" onClick={onSuccess}>
           Cancel
         </Button>
-        <Button
-          onClick={onJoinOrLeaveGroup}
-          loading={isLoading}
-          disabled={isLoading}
-        >
+        <Button onClick={onJoinOrLeaveGroup} loading={isLoading}>
           {actionCapitalized} group
         </Button>
       </Group>

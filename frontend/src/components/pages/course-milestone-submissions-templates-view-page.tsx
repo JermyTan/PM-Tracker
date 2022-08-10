@@ -108,7 +108,6 @@ function CourseMilestoneSubmissionsTemplatesViewPage() {
           <Group position="right">
             <Button
               loading={isLoading}
-              disabled={isLoading}
               leftIcon={<FiFileText />}
               onClick={onUseTemplate}
             >

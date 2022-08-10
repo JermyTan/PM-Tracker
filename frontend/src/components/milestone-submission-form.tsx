@@ -1,4 +1,5 @@
 import { forwardRef, Ref, useImperativeHandle } from "react";
+import { skipToken } from "@reduxjs/toolkit/query/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Stack, Title, Text, Button, Group, Alert } from "@mantine/core";
@@ -29,6 +30,9 @@ import SubmissionTypeIconLabel from "./submission-type-icon-label";
 import FormFieldRenderer from "./form-field-renderer";
 import TextViewer from "./text-viewer";
 import toastUtils from "../utils/toast-utils";
+import { useGetSubmissionCommentCountQuery } from "../redux/services/comments-api";
+import useGetCourseId from "../custom-hooks/use-get-course-id";
+import useGetSubmissionId from "../custom-hooks/use-get-submission-id";
 
 const schema = z.object({
   [IS_DRAFT]: z.boolean(),
@@ -49,11 +53,18 @@ type Props = {
   defaultValues: SubmissionViewData;
   readOnly?: boolean;
   testMode?: boolean;
+  withComments?: boolean;
   onSubmit?: (formData: SubmissionFormData) => Promise<unknown>;
 };
 
 function MilestoneSubmissionForm(
-  { defaultValues, readOnly, testMode, onSubmit: handleOnSubmit }: Props,
+  {
+    defaultValues,
+    readOnly,
+    testMode,
+    withComments,
+    onSubmit: handleOnSubmit,
+  }: Props,
   ref: Ref<MilestoneSubmissionFormHandler>,
 ) {
   const methods = useForm<SubmissionFormProps>({
@@ -64,9 +75,22 @@ function MilestoneSubmissionForm(
     control,
     handleSubmit,
     reset,
-    formState: { isSubmitting, errors },
+    formState: { isSubmitting },
   } = methods;
   useImperativeHandle(ref, () => ({ reset }), [reset]);
+  const courseId = useGetCourseId();
+  const submissionId = useGetSubmissionId();
+  const { error } = useGetSubmissionCommentCountQuery(
+    !withComments || courseId === undefined || submissionId === undefined
+      ? skipToken
+      : { courseId, submissionId },
+    {
+      selectFromResult: ({ error }) => ({
+        error,
+      }),
+    },
+  );
+  useResolveError({ error, name: "milestone-submission-form" });
 
   const { fields } = useFieldArray({
     control,
@@ -94,8 +118,6 @@ function MilestoneSubmissionForm(
 
     await handleOnSubmit?.(formData);
   };
-
-  console.log(errors);
 
   return (
     <FormProvider {...methods}>
@@ -145,18 +167,16 @@ function MilestoneSubmissionForm(
             <FormFieldRenderer
               key={id}
               name={`${FORM_RESPONSE_DATA}.${index}.${RESPONSE}`}
+              index={index}
               formField={field as FormField}
               readOnly={readOnly}
+              withComments={withComments}
             />
           ))}
 
           {!readOnly && (
             <Group position="right">
-              <Button
-                disabled={isSubmitting}
-                loading={isSubmitting}
-                type="submit"
-              >
+              <Button loading={isSubmitting} type="submit">
                 Save
               </Button>
             </Group>

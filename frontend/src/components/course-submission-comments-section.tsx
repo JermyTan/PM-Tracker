@@ -13,7 +13,7 @@ import PlaceholderWrapper from "./placeholder-wrapper";
 
 type Props = {
   fieldIndex: number;
-  courseId: number;
+  courseId: string | number;
   submissionId: number;
 };
 

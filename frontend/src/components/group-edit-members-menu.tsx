@@ -193,11 +193,7 @@ function GroupEditMembersMenu({
       <Space h="md" />
       <Group position="apart">
         <Button color="gray">Cancel</Button>
-        <Button
-          onClick={onUpdateGroupMembers}
-          disabled={isUpdatingGroupMembers}
-          loading={isUpdatingGroupMembers}
-        >
+        <Button onClick={onUpdateGroupMembers} loading={isUpdatingGroupMembers}>
           Save changes
         </Button>
       </Group>

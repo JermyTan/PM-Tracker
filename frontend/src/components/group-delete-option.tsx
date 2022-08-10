@@ -54,12 +54,7 @@ function GroupDeleteOption({ course, group, onSuccess }: Props) {
         <Button color="gray" onClick={onSuccess}>
           Cancel
         </Button>
-        <Button
-          color="red"
-          onClick={onDeleteCourseGroup}
-          loading={isLoading}
-          disabled={isLoading}
-        >
+        <Button color="red" onClick={onDeleteCourseGroup} loading={isLoading}>
           Delete group
         </Button>
       </Group>

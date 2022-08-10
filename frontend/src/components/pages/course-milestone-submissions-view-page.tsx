@@ -1,6 +1,6 @@
 import { createStyles, LoadingOverlay } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/query/react";
-import { useRef, ElementRef } from "react";
+import { useRef, ElementRef, useEffect } from "react";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import useGetMilestoneId from "../../custom-hooks/use-get-milestone-id";
 import useGetSubmissionId from "../../custom-hooks/use-get-submission-id";
@@ -89,7 +89,7 @@ function CourseMilestoneSubmissionsViewPage() {
       groupId: group?.id ?? null,
     };
 
-    const updatedSubmission = await updateSubmission({
+    await updateSubmission({
       ...submissionPutData,
       courseId,
       submissionId,
@@ -98,8 +98,13 @@ function CourseMilestoneSubmissionsViewPage() {
     toastUtils.success({
       message: "This submission has been updated successfully.",
     });
-    formRef.current?.reset(updatedSubmission);
   };
+
+  useEffect(() => {
+    if (submission) {
+      formRef.current?.reset(submission);
+    }
+  }, [submission]);
 
   return (
     <PlaceholderWrapper
@@ -117,6 +122,7 @@ function CourseMilestoneSubmissionsViewPage() {
             defaultValues={submission}
             readOnly={!isMilestoneOpen}
             onSubmit={onUpdateSubmission}
+            withComments
           />
         )}
       </div>

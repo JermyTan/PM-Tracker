@@ -24,8 +24,7 @@ const useStyles = createStyles((theme) => ({
     flex: "1 1 auto",
   },
   actionsSection: {
-    width: "250px",
-    flex: "1 0 auto",
+    flex: "0 0 250px",
   },
   spoilerControl: {
     fontSize: theme.fontSizes.sm,

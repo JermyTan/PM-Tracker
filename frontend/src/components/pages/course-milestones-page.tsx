@@ -23,9 +23,15 @@ import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import MilestoneCreationForm from "../milestone-creation-form";
 import useGetMilestonePermissions from "../../custom-hooks/use-get-milestone-permissions";
 import useGetTemplatePermissions from "../../custom-hooks/use-get-template-permissions";
+import useGetScrollAreaContainerPaddingStyle from "../../custom-hooks/use-get-scroll-area-container-padding-style";
 
 function CourseMilestonesPage() {
   const courseId = useGetCourseId();
+  const { scrollAreaContainerClassName, scrollbarSize, adjustedPadding } =
+    useGetScrollAreaContainerPaddingStyle({
+      scrollbarSize: 8,
+      referencePadding: 20,
+    });
   const { milestones, isLoading, error } = useGetMilestonesQuery(
     courseId ?? skipToken,
     {
@@ -48,15 +54,19 @@ function CourseMilestonesPage() {
   return (
     <>
       <Drawer
+        classNames={{ drawer: scrollAreaContainerClassName }}
         opened={isDrawerOpened}
         onClose={close}
         position="right"
         size="xl"
-        padding="lg"
         closeButtonLabel={`Cancel ${milestoneAlias} creation`}
         title={<Title order={3}>{capitalizedMilestoneAlias} Creation</Title>}
       >
-        <ScrollArea offsetScrollbars pr="xs" scrollbarSize={8}>
+        <ScrollArea
+          offsetScrollbars
+          pr={adjustedPadding}
+          scrollbarSize={scrollbarSize}
+        >
           <MilestoneCreationForm onSuccess={close} />
         </ScrollArea>
       </Drawer>

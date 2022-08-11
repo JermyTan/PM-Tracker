@@ -22,11 +22,17 @@ import { useResolveError } from "../utils/error-utils";
 import toastUtils from "../utils/toast-utils";
 import MilestoneEditForm from "./milestone-edit-form";
 import ConditionalRenderer from "./conditional-renderer";
+import useGetScrollAreaContainerPaddingStyle from "../custom-hooks/use-get-scroll-area-container-padding-style";
 
 type Props = MilestoneData;
 
 function MilestoneActionsMenu(props: Props) {
   const { id: milestoneId, name } = props;
+  const { scrollAreaContainerClassName, scrollbarSize, adjustedPadding } =
+    useGetScrollAreaContainerPaddingStyle({
+      scrollbarSize: 8,
+      referencePadding: 20,
+    });
   const { canModify, canDelete } = useGetMilestonePermissions(props);
   const courseId = useGetCourseId();
   const { milestoneAlias, capitalizedMilestoneAlias } = useGetMilestoneAlias();
@@ -68,18 +74,22 @@ function MilestoneActionsMenu(props: Props) {
     >
       <ConditionalRenderer allow={canModify}>
         <Drawer
+          classNames={{ drawer: scrollAreaContainerClassName }}
           opened={isEditDrawerOpened}
           onClose={closeEditDrawer}
           position="right"
           size="xl"
-          padding="lg"
           closeButtonLabel={`Cancel ${milestoneAlias} update`}
           title={<Title order={3}>{capitalizedMilestoneAlias} Update</Title>}
         >
           {/* special case: this conditional render is required as milestone edit form is mounted and api call will be made
         even though the drawer is not yet opened */}
           {isEditDrawerOpened && (
-            <ScrollArea offsetScrollbars pr="xs" scrollbarSize={8}>
+            <ScrollArea
+              offsetScrollbars
+              pr={adjustedPadding}
+              scrollbarSize={scrollbarSize}
+            >
               <MilestoneEditForm
                 milestoneId={milestoneId}
                 onSuccess={closeEditDrawer}

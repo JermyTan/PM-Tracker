@@ -20,12 +20,12 @@ import MilestoneSubmissionForm from "../milestone-submission-form";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import useGetTemplatePermissions from "../../custom-hooks/use-get-template-permissions";
 import ConditionalRenderer from "../conditional-renderer";
-import useGetFormContainerStyles from "../../custom-hooks/use-get-form-container-style";
+import useGetFormContainerStyle from "../../custom-hooks/use-get-form-container-style";
 
 function CourseMilestoneTemplatesViewPage() {
   const courseId = useGetCourseId();
   const templateId = useGetTemplateId();
-  const formContainerClassName = useGetFormContainerStyles();
+  const formContainerClassName = useGetFormContainerStyle();
   const { milestoneTemplates } = useGetTemplatesQueryState(
     courseId ?? skipToken,
     {

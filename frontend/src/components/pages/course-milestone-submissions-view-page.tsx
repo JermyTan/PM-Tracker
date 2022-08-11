@@ -16,7 +16,7 @@ import { useModals } from "@mantine/modals";
 import { FaTrashAlt } from "react-icons/fa";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
-import useGetFormContainerStyles from "../../custom-hooks/use-get-form-container-style";
+import useGetFormContainerStyle from "../../custom-hooks/use-get-form-container-style";
 import useGetMilestoneId from "../../custom-hooks/use-get-milestone-id";
 import useGetSubmissionId from "../../custom-hooks/use-get-submission-id";
 import { useGetSingleMilestoneQueryState } from "../../redux/services/milestones-api";
@@ -36,6 +36,7 @@ import PlaceholderWrapper from "../placeholder-wrapper";
 import { DATE_TIME_MONTH_NAME_FORMAT, UNKNOWN_USER } from "../../constants";
 import { displayDateTime } from "../../utils/transform-utils";
 import CourseSubmissionCommentsSection from "../course-submission-comments-section";
+import useGetScrollAreaContainerPaddingStyle from "../../custom-hooks/use-get-scroll-area-container-padding-style";
 
 const useStyles = createStyles({
   commentsContainer: {
@@ -48,8 +49,8 @@ function CourseMilestoneSubmissionsViewPage() {
   const courseId = useGetCourseId();
   const milestoneId = useGetMilestoneId();
   const submissionId = useGetSubmissionId();
-  const formContainerClassName = useGetFormContainerStyles();
-  const { classes } = useStyles();
+  const formContainerClassName = useGetFormContainerStyle();
+  const { classes, cx } = useStyles();
   const { milestone } = useGetSingleMilestoneQueryState(
     courseId === undefined || milestoneId === undefined
       ? skipToken
@@ -94,6 +95,11 @@ function CourseMilestoneSubmissionsViewPage() {
   const { pathname } = useLocation();
   const modals = useModals();
   const noWrap = useMediaQuery("(min-width: 1300px)");
+  const { scrollAreaContainerClassName, scrollbarSize, adjustedPadding } =
+    useGetScrollAreaContainerPaddingStyle({
+      scrollbarSize: 8,
+      referencePadding: 16,
+    });
 
   const isMilestoneOpen = checkIsMilestoneOpen(milestone);
 
@@ -234,16 +240,15 @@ function CourseMilestoneSubmissionsViewPage() {
 
       <Group align="flex-start" position="center" noWrap={noWrap}>
         <Paper
-          className={formContainerClassName}
+          className={cx(formContainerClassName, scrollAreaContainerClassName)}
           withBorder
           shadow="sm"
-          p="md"
           radius="md"
         >
-          <ScrollArea
-            sx={{ height: "1000px" }}
-            pr="xs"
-            scrollbarSize={8}
+          <ScrollArea.Autosize
+            maxHeight="1000px"
+            styles={{ root: { paddingRight: adjustedPadding } }}
+            scrollbarSize={scrollbarSize}
             offsetScrollbars
           >
             <LoadingOverlay visible={isFetching} />
@@ -255,7 +260,7 @@ function CourseMilestoneSubmissionsViewPage() {
               withComments
               submitButtonProps={{ disabled: isDeleting }}
             />
-          </ScrollArea>
+          </ScrollArea.Autosize>
         </Paper>
 
         <CourseSubmissionCommentsSection

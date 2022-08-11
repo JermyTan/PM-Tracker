@@ -34,7 +34,7 @@ function LoginSection() {
           </Title>
 
           <Group spacing={4} position="center">
-            <Text<"span"> component="span" className={classes.meta}>
+            <Text span className={classes.meta}>
               Don&apos;t have an account?
             </Text>
 

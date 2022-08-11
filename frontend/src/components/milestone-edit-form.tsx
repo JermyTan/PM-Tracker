@@ -280,10 +280,10 @@ function MilestoneEditForm({ milestoneId, onSuccess }: Props) {
                     </Text>
                   }
                   withArrow
-                  placement="start"
+                  position="top-start"
                   transition="pop-top-left"
                   transitionDuration={300}
-                  wrapLines
+                  multiline
                   width={200}
                 >
                   <ThemeIcon color="gray" size="xs" radius="xl">
@@ -291,13 +291,7 @@ function MilestoneEditForm({ milestoneId, onSuccess }: Props) {
                   </ThemeIcon>
                 </Tooltip>
               </Group>
-              <SwitchField
-                name={IS_PUBLISHED}
-                id={IS_PUBLISHED}
-                onLabel="Yes"
-                offLabel="No"
-                size="md"
-              />
+              <SwitchField name={IS_PUBLISHED} id={IS_PUBLISHED} />
             </Group>
           </Stack>
 

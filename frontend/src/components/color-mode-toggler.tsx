@@ -7,7 +7,7 @@ import { IconBaseProps } from "react-icons";
 import { FaSun, FaMoon } from "react-icons/fa";
 import { colorModeValue } from "../utils/theme-utils";
 
-type Props = Omit<ActionIconProps<"button">, "onClick" | "aria-label"> & {
+type Props = Omit<ActionIconProps, "onClick" | "aria-label"> & {
   iconProps?: IconBaseProps;
 };
 
@@ -21,7 +21,6 @@ function ColorModeToggler({ iconProps, ...props }: Props) {
         darkModeValue: "Switch to light mode",
       })}
       onClick={() => toggleColorScheme()}
-      variant="hover"
       size="lg"
       {...props}
     >

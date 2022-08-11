@@ -73,7 +73,15 @@ function MyCoursesPage() {
         defaultMessage="No courses found."
         showDefaultMessage={!courses || courses.length === 0}
       >
-        <SimpleGrid cols={3} spacing="xs">
+        <SimpleGrid
+          cols={4}
+          breakpoints={[
+            { maxWidth: "sm", cols: 1 },
+            { maxWidth: "md", cols: 2 },
+            { maxWidth: "xl", cols: 3 },
+          ]}
+          spacing="xs"
+        >
           {courses?.map((course) => (
             <CourseCard key={course.id} {...course} />
           ))}

@@ -39,7 +39,7 @@ function LoginPage() {
 
       <Box<"main"> component="main" className={classes.main} pt="xs" pb="md">
         <Group position="right" px="md">
-          <ColorModeToggler variant="hover" />
+          <ColorModeToggler />
         </Group>
 
         <Container className={classes.container} size={450} p={32}>

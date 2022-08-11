@@ -76,7 +76,7 @@ function CourseMembershipsList({ courseId, hasAdminPermission }: Props) {
             {courseOwner && (
               <>
                 <Text weight={700}>Owner</Text>
-                <UserProfileDisplay {...courseOwner} />
+                <UserProfileDisplay user={course.owner} />
               </>
             )}
             {orderedRoles.map((role) => {

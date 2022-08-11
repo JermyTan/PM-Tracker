@@ -23,12 +23,12 @@ function MilestoneTemplatesNestedLayout({ children }: Props) {
           to={path.resolve(pathname, "../")}
           color={colorModeValue(colorScheme, {
             lightModeValue: "dark",
-            darkModeValue: "gray",
+            darkModeValue: "gray.5",
           })}
         >
           <Group spacing={4}>
             <HiOutlineChevronLeft />
-            <Text<"span"> component="span" inherit>
+            <Text span inherit>
               Back
             </Text>
           </Group>

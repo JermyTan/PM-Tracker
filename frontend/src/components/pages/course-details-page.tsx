@@ -1,6 +1,4 @@
 import {
-  Anchor,
-  Avatar,
   createStyles,
   Group,
   Paper,
@@ -19,6 +17,7 @@ import ConditionalRenderer from "../conditional-renderer";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import TextViewer from "../text-viewer";
 import useGetCoursePermissions from "../../custom-hooks/use-get-course-permissions";
+import UserProfileDisplay from "../user-profile-display";
 
 const useStyles = createStyles((theme) => ({
   detailsSection: {
@@ -69,24 +68,15 @@ function CourseDetailsPage() {
         <Stack spacing={32}>
           <Stack spacing="xs">
             <Title order={5}>Course owner</Title>
-            <Group spacing="xl">
-              <Avatar
-                size={60}
-                radius={60}
-                alt=""
-                src={owner?.profileImage || undefined}
+            {owner && (
+              <UserProfileDisplay
+                user={owner}
+                avatarProps={{ size: 60, radius: 60 }}
+                spacing="xl"
+                nameProps={{ size: "md" }}
+                emailProps={{ size: "sm", color: undefined }}
               />
-              <div>
-                <Text size="sm" weight={500}>
-                  {owner?.name}
-                </Text>
-                {owner?.email && (
-                  <Anchor size="sm" href={`mailto:${owner.email}`}>
-                    {owner.email}
-                  </Anchor>
-                )}
-              </div>
-            </Group>
+            )}
           </Stack>
 
           <Stack spacing={6}>
@@ -126,10 +116,10 @@ function CourseDetailsPage() {
                     </Text>
                   }
                   withArrow
-                  placement="start"
+                  position="top-start"
                   transition="pop-top-left"
                   transitionDuration={300}
-                  wrapLines
+                  multiline
                   width={300}
                 >
                   <ThemeIcon color="gray" size="sm" radius="xl">
@@ -153,10 +143,10 @@ function CourseDetailsPage() {
                     </Text>
                   }
                   withArrow
-                  placement="start"
+                  position="top-start"
                   transition="pop-top-left"
                   transitionDuration={300}
-                  wrapLines
+                  multiline
                   width={300}
                 >
                   <ThemeIcon color="gray" size="sm" radius="xl">
@@ -183,10 +173,10 @@ function CourseDetailsPage() {
                     </Text>
                   }
                   withArrow
-                  placement="start"
+                  position="top-start"
                   transition="pop-top-left"
                   transitionDuration={300}
-                  wrapLines
+                  multiline
                   width={300}
                 >
                   <ThemeIcon color="gray" size="sm" radius="xl">
@@ -213,10 +203,10 @@ function CourseDetailsPage() {
                     </Text>
                   }
                   withArrow
-                  placement="start"
+                  position="top-start"
                   transition="pop-top-left"
                   transitionDuration={300}
-                  wrapLines
+                  multiline
                   width={300}
                 >
                   <ThemeIcon color="gray" size="sm" radius="xl">
@@ -254,10 +244,10 @@ function CourseDetailsPage() {
                     </Text>
                   }
                   withArrow
-                  placement="start"
+                  position="top-start"
                   transition="pop-top-left"
                   transitionDuration={300}
-                  wrapLines
+                  multiline
                   width={300}
                 >
                   <ThemeIcon color="gray" size="sm" radius="xl">
@@ -307,10 +297,10 @@ function CourseDetailsPage() {
                     </Text>
                   }
                   withArrow
-                  placement="start"
+                  position="top-start"
                   transition="pop-top-left"
                   transitionDuration={300}
-                  wrapLines
+                  multiline
                   width={300}
                 >
                   <ThemeIcon color="gray" size="sm" radius="xl">

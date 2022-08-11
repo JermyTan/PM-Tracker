@@ -110,9 +110,6 @@ function FormFieldBuilderRenderer({ formFieldType, builderName }: Props) {
           <SwitchField
             key={requiredFieldName}
             name={requiredFieldName}
-            onLabel="Yes"
-            offLabel="No"
-            size="md"
             label={<Text size="sm">Required</Text>}
           />
         );
@@ -125,9 +122,6 @@ function FormFieldBuilderRenderer({ formFieldType, builderName }: Props) {
           <SwitchField
             key={hasFeedbackFieldName}
             name={hasFeedbackFieldName}
-            onLabel="Yes"
-            offLabel="No"
-            size="md"
             label={<Text size="sm">Enable feedback</Text>}
           />
         );

@@ -58,7 +58,7 @@ function CourseMemberRemoveConfirmation({ member, onSuccess }: Props) {
         <strong>This action is irreversible.</strong>
       </Text>
       <Space h="md" />
-      <UserProfileDisplay {...member.user} />
+      <UserProfileDisplay user={member.user} />
       <Space h="md" />
       <Group position="right">
         <Button color="gray" onClick={onSuccess}>

@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from "react";
+import { useMemo } from "react";
 import { Card, Text, Group, createStyles, Stack } from "@mantine/core";
 import { MdGroup } from "react-icons/md";
 import { createSelector } from "@reduxjs/toolkit";
@@ -111,7 +111,7 @@ function GroupCard({ groupId, course }: Props) {
             showDefaultMessage={!group?.members || group.members?.length === 0}
           >
             {group?.members?.map((member) => (
-              <UserProfileDisplay key={member.id} {...member} />
+              <UserProfileDisplay key={member.id} user={member} />
             ))}
           </PlaceholderWrapper>
         )}
@@ -120,4 +120,4 @@ function GroupCard({ groupId, course }: Props) {
   );
 }
 
-export default memo(GroupCard);
+export default GroupCard;

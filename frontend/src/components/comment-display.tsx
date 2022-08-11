@@ -63,30 +63,33 @@ function CommentDisplay({ comment, courseId, submissionId }: Props) {
           </Group>
           {canModifyComment && (
             <Menu
-              control={
+              position="bottom-end"
+              transition="pop-bottom-right"
+              // hidden={isEditingComment}
+            >
+              <Menu.Target>
                 <ActionIcon>
                   <FaChevronDown />
                 </ActionIcon>
-              }
-              placement="end"
-              hidden={isEditingComment}
-              closeOnScroll
-            >
-              <Menu.Item
-                icon={<FaEdit size={14} />}
-                onClick={() => {
-                  setIsEditingComment(true);
-                }}
-              >
-                Edit comment
-              </Menu.Item>
+              </Menu.Target>
 
-              <Menu.Item
-                icon={<FaTrashAlt size={14} color="red" />}
-                onClick={openDeleteCommentModal}
-              >
-                Delete comment
-              </Menu.Item>
+              <Menu.Dropdown>
+                <Menu.Item
+                  icon={<FaEdit size={14} />}
+                  onClick={() => {
+                    setIsEditingComment(true);
+                  }}
+                >
+                  Edit comment
+                </Menu.Item>
+
+                <Menu.Item
+                  icon={<FaTrashAlt size={14} color="red" />}
+                  onClick={openDeleteCommentModal}
+                >
+                  Delete comment
+                </Menu.Item>
+              </Menu.Dropdown>
             </Menu>
           )}
           {isEditingComment && (

@@ -1,6 +1,11 @@
+import {
+  ComponentPropsWithoutRef,
+  ElementType,
+  MouseEvent,
+  ReactNode,
+} from "react";
 import { TextProps, Text, createStyles } from "@mantine/core";
 import Linkify from "linkify-react";
-import { MouseEvent, ReactNode } from "react";
 
 const useStyles = createStyles((theme) => ({
   preserveWhiteSpace: {
@@ -27,7 +32,7 @@ type LinkType = "email" | "url"; // manual typing, can add more as more types ar
 
 const LINKIFY_OPTIONS = {
   attributes: {
-    onClick: (event: MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    onClick: (event: MouseEvent<HTMLAnchorElement>) => {
       // prevents click from propagating to parent element
       event.stopPropagation();
     },
@@ -38,14 +43,17 @@ const LINKIFY_OPTIONS = {
     linkType === "url" ? "noopener noreferrer" : null,
 };
 
-type Props<T> = TextProps<T> & {
+type Props<T extends ElementType> = Omit<
+  TextProps & ComponentPropsWithoutRef<T>,
+  "children"
+> & {
   withLinkify?: boolean;
   preserveWhiteSpace?: boolean;
   overflowWrap?: boolean;
   children: ReactNode;
 };
 
-function TextViewer<T = "div">({
+function TextViewer<T extends ElementType = "div">({
   withLinkify,
   preserveWhiteSpace,
   overflowWrap,

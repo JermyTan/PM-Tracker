@@ -1,4 +1,4 @@
-import { Radio, RadioGroup, RadioGroupProps } from "@mantine/core";
+import { Radio, RadioGroupProps } from "@mantine/core";
 import { useController } from "react-hook-form";
 
 type Props = Omit<RadioGroupProps, "children"> & {
@@ -14,7 +14,7 @@ function RadioGroupField({ name, choices, readOnly, ...props }: Props) {
   } = useController<{ [name: string]: string }>({ name });
 
   return (
-    <RadioGroup
+    <Radio.Group
       error={error?.message}
       {...props}
       {...other}
@@ -25,7 +25,7 @@ function RadioGroupField({ name, choices, readOnly, ...props }: Props) {
       {choices.map((choice, index) => (
         <Radio key={`${index}.${choice}`} value={choice} label={choice} />
       ))}
-    </RadioGroup>
+    </Radio.Group>
   );
 }
 

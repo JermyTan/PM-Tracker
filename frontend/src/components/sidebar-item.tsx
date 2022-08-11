@@ -1,3 +1,4 @@
+import { ComponentPropsWithoutRef, ElementType } from "react";
 import { IconType } from "react-icons";
 import {
   createStyles,
@@ -11,15 +12,16 @@ import {
 import { HiCollection } from "react-icons/hi";
 import { colorModeValue } from "../utils/theme-utils";
 
-export type SidebarItemProps<C> = Omit<
-  UnstyledButtonProps<C> & {
-    icon?: IconType;
-    label: string;
-    showIconOnly?: boolean;
-    isActive?: boolean;
-  },
+export type SidebarItemProps<T extends ElementType> = Omit<
+  UnstyledButtonProps & ComponentPropsWithoutRef<T>,
   "children"
->;
+> & {
+  component?: ElementType;
+  icon?: IconType;
+  label: string;
+  showIconOnly?: boolean;
+  isActive?: boolean;
+};
 
 const useStyles = createStyles(
   (
@@ -60,13 +62,13 @@ const useStyles = createStyles(
   },
 );
 
-function SidebarItem<C = "button">({
+function SidebarItem<T extends ElementType = "button">({
   icon = HiCollection,
   showIconOnly,
   label,
   isActive,
   ...props
-}: SidebarItemProps<C>) {
+}: SidebarItemProps<T>) {
   const { classes } = useStyles({ showIconOnly, isActive });
   const Icon = icon;
 
@@ -75,6 +77,7 @@ function SidebarItem<C = "button">({
       label={label}
       disabled={!showIconOnly}
       position="right"
+      withinPortal
       transition="scale-x"
       transitionDuration={300}
     >
@@ -87,7 +90,7 @@ function SidebarItem<C = "button">({
         <Group className={classes.content} spacing="xs" noWrap>
           <Icon size={showIconOnly ? 24 : 20} aria-label={label} />
 
-          {!showIconOnly && label && <Text<"span">>{label}</Text>}
+          {!showIconOnly && label && <Text>{label}</Text>}
         </Group>
       </UnstyledButton>
     </Tooltip>

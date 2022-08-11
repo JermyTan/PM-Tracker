@@ -149,10 +149,10 @@ function CourseEditForm({ onSuccess }: Props) {
                     </Text>
                   }
                   withArrow
-                  placement="start"
+                  position="top-start"
                   transition="pop-top-left"
                   transitionDuration={300}
-                  wrapLines
+                  multiline
                   width={200}
                 >
                   <ThemeIcon color="gray" size="xs" radius="xl">
@@ -160,13 +160,7 @@ function CourseEditForm({ onSuccess }: Props) {
                   </ThemeIcon>
                 </Tooltip>
               </Group>
-              <SwitchField
-                name={IS_PUBLISHED}
-                id={IS_PUBLISHED}
-                onLabel="Yes"
-                offLabel="No"
-                size="md"
-              />
+              <SwitchField name={IS_PUBLISHED} id={IS_PUBLISHED} />
             </Group>
 
             <Title order={4}>Group Settings</Title>
@@ -187,10 +181,10 @@ function CourseEditForm({ onSuccess }: Props) {
                     </Text>
                   }
                   withArrow
-                  placement="start"
+                  position="top-start"
                   transition="pop-top-left"
                   transitionDuration={300}
-                  wrapLines
+                  multiline
                   width={200}
                 >
                   <ThemeIcon color="gray" size="xs" radius="xl">
@@ -201,9 +195,6 @@ function CourseEditForm({ onSuccess }: Props) {
               <SwitchField
                 name={SHOW_GROUP_MEMBERS_NAMES}
                 id={SHOW_GROUP_MEMBERS_NAMES}
-                onLabel="Yes"
-                offLabel="No"
-                size="md"
               />
             </Group>
 
@@ -223,10 +214,10 @@ function CourseEditForm({ onSuccess }: Props) {
                     </Text>
                   }
                   withArrow
-                  placement="start"
+                  position="top-start"
                   transition="pop-top-left"
                   transitionDuration={300}
-                  wrapLines
+                  multiline
                   width={200}
                 >
                   <ThemeIcon color="gray" size="xs" radius="xl">
@@ -237,9 +228,6 @@ function CourseEditForm({ onSuccess }: Props) {
               <SwitchField
                 name={ALLOW_STUDENTS_TO_MODIFY_GROUP_NAME}
                 id={ALLOW_STUDENTS_TO_MODIFY_GROUP_NAME}
-                onLabel="Yes"
-                offLabel="No"
-                size="md"
               />
             </Group>
 
@@ -254,9 +242,6 @@ function CourseEditForm({ onSuccess }: Props) {
               <SwitchField
                 name={ALLOW_STUDENTS_TO_CREATE_GROUPS}
                 id={ALLOW_STUDENTS_TO_CREATE_GROUPS}
-                onLabel="Yes"
-                offLabel="No"
-                size="md"
               />
             </Group>
 
@@ -276,10 +261,10 @@ function CourseEditForm({ onSuccess }: Props) {
                     </Text>
                   }
                   withArrow
-                  placement="start"
+                  position="top-start"
                   transition="pop-top-left"
                   transitionDuration={300}
-                  wrapLines
+                  multiline
                   width={200}
                 >
                   <ThemeIcon color="gray" size="xs" radius="xl">
@@ -290,9 +275,6 @@ function CourseEditForm({ onSuccess }: Props) {
               <SwitchField
                 name={ALLOW_STUDENTS_TO_DELETE_GROUPS}
                 id={ALLOW_STUDENTS_TO_DELETE_GROUPS}
-                onLabel="Yes"
-                offLabel="No"
-                size="md"
               />
             </Group>
 
@@ -307,9 +289,6 @@ function CourseEditForm({ onSuccess }: Props) {
               <SwitchField
                 name={ALLOW_STUDENTS_TO_JOIN_GROUPS}
                 id={ALLOW_STUDENTS_TO_JOIN_GROUPS}
-                onLabel="Yes"
-                offLabel="No"
-                size="md"
               />
             </Group>
 
@@ -324,9 +303,6 @@ function CourseEditForm({ onSuccess }: Props) {
               <SwitchField
                 name={ALLOW_STUDENTS_TO_LEAVE_GROUPS}
                 id={ALLOW_STUDENTS_TO_LEAVE_GROUPS}
-                onLabel="Yes"
-                offLabel="No"
-                size="md"
               />
             </Group>
 
@@ -347,10 +323,10 @@ function CourseEditForm({ onSuccess }: Props) {
                     </Text>
                   }
                   withArrow
-                  placement="start"
+                  position="top-start"
                   transition="pop-top-left"
                   transitionDuration={300}
-                  wrapLines
+                  multiline
                   width={200}
                 >
                   <ThemeIcon color="gray" size="xs" radius="xl">
@@ -361,9 +337,6 @@ function CourseEditForm({ onSuccess }: Props) {
               <SwitchField
                 name={ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS}
                 id={ALLOW_STUDENTS_TO_ADD_OR_REMOVE_GROUP_MEMBERS}
-                onLabel="Yes"
-                offLabel="No"
-                size="md"
               />
             </Group>
           </Stack>

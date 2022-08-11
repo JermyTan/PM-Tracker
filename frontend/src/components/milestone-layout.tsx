@@ -72,7 +72,7 @@ function MilestoneLayout({ children }: Props) {
       {
         label: (
           <Group spacing={4}>
-            <Text<"span"> component="span" inherit>
+            <Text span inherit>
               {milestone.name}
             </Text>
             <Badge variant="outline" color={isOpen ? "green" : "red"}>

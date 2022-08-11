@@ -1,4 +1,4 @@
-import { CheckboxGroup, CheckboxGroupProps, Checkbox } from "@mantine/core";
+import { CheckboxGroupProps, Checkbox } from "@mantine/core";
 import { useController } from "react-hook-form";
 
 type Props = Omit<CheckboxGroupProps, "children"> & {
@@ -14,7 +14,7 @@ function CheckboxGroupField({ name, choices, readOnly, ...props }: Props) {
   } = useController<{ [name: string]: string[] }>({ name });
 
   return (
-    <CheckboxGroup
+    <Checkbox.Group
       error={error?.message}
       {...props}
       {...other}
@@ -25,7 +25,7 @@ function CheckboxGroupField({ name, choices, readOnly, ...props }: Props) {
       {choices.map((choice, index) => (
         <Checkbox key={`${index}.${choice}`} value={choice} label={choice} />
       ))}
-    </CheckboxGroup>
+    </Checkbox.Group>
   );
 }
 

@@ -210,64 +210,67 @@ function GroupCardActionsMenu({
 
   return (
     <Menu
-      control={
+      position="bottom-start"
+      // hidden={!hasAvailableActions}
+      withinPortal
+    >
+      <Menu.Target>
         <ActionIcon>
           <FaChevronDown />
         </ActionIcon>
-      }
-      placement="end"
-      hidden={!hasAvailableActions}
-      closeOnScroll
-    >
-      <Menu.Item
-        icon={<FaEdit size={14} />}
-        onClick={openRenameGroupModal}
-        hidden={!canModifyGroupName}
-      >
-        Rename group
-      </Menu.Item>
-      <Menu.Item
-        icon={
-          isJoiningOrLeavingGroup ? (
-            <Loader size={14} />
-          ) : (
-            <MdPersonAdd size={14} />
-          )
-        }
-        onClick={onJoinGroup}
-        hidden={!canJoinGroup}
-        disabled={isJoiningOrLeavingGroup}
-      >
-        Join group
-      </Menu.Item>
-      <Menu.Item
-        icon={<MdPeopleAlt size={14} />}
-        onClick={openEditMembersMenu}
-        hidden={!canEditMembers}
-      >
-        Edit members
-      </Menu.Item>
-      <Menu.Item
-        icon={
-          isJoiningOrLeavingGroup ? (
-            <Loader size={14} />
-          ) : (
-            <MdLogout size={14} />
-          )
-        }
-        onClick={onLeaveGroup}
-        hidden={!canLeaveGroup}
-        disabled={isJoiningOrLeavingGroup}
-      >
-        Leave group
-      </Menu.Item>
-      <Menu.Item
-        icon={<FaTrashAlt size={14} color="red" />}
-        onClick={openDeleteGroupModal}
-        hidden={!canDeleteGroup}
-      >
-        Delete group
-      </Menu.Item>
+      </Menu.Target>
+
+      <Menu.Dropdown>
+        <Menu.Item
+          icon={<FaEdit size={14} />}
+          onClick={openRenameGroupModal}
+          hidden={!canModifyGroupName}
+        >
+          Rename group
+        </Menu.Item>
+        <Menu.Item
+          icon={
+            isJoiningOrLeavingGroup ? (
+              <Loader size={14} />
+            ) : (
+              <MdPersonAdd size={14} />
+            )
+          }
+          onClick={onJoinGroup}
+          hidden={!canJoinGroup}
+          disabled={isJoiningOrLeavingGroup}
+        >
+          Join group
+        </Menu.Item>
+        <Menu.Item
+          icon={<MdPeopleAlt size={14} />}
+          onClick={openEditMembersMenu}
+          hidden={!canEditMembers}
+        >
+          Edit members
+        </Menu.Item>
+        <Menu.Item
+          icon={
+            isJoiningOrLeavingGroup ? (
+              <Loader size={14} />
+            ) : (
+              <MdLogout size={14} />
+            )
+          }
+          onClick={onLeaveGroup}
+          hidden={!canLeaveGroup}
+          disabled={isJoiningOrLeavingGroup}
+        >
+          Leave group
+        </Menu.Item>
+        <Menu.Item
+          icon={<FaTrashAlt size={14} color="red" />}
+          onClick={openDeleteGroupModal}
+          hidden={!canDeleteGroup}
+        >
+          Delete group
+        </Menu.Item>
+      </Menu.Dropdown>
     </Menu>
   );
 }

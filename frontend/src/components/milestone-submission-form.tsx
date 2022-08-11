@@ -63,7 +63,7 @@ type Props = {
   testMode?: boolean;
   withComments?: boolean;
   onSubmit?: (formData: SubmissionFormData) => Promise<unknown>;
-  submitButtonProps?: ButtonProps<"button">;
+  submitButtonProps?: ButtonProps;
 };
 
 function MilestoneSubmissionForm(

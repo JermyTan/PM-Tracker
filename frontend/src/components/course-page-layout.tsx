@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Head from "next/head";
-import { Text, Title, Tabs, Space } from "@mantine/core";
+import { Text, Title, Tabs, Space, createStyles } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import pluralize from "pluralize";
 import { useGetSingleCourseQuery } from "../redux/services/courses-api";
@@ -11,24 +11,32 @@ import { useResolveError } from "../utils/error-utils";
 import useGetMilestoneAlias from "../custom-hooks/use-get-milestone-alias";
 import useGetCourseId from "../custom-hooks/use-get-course-id";
 
-type Props = {
-  children: ReactNode;
-};
+const useStyles = createStyles({
+  tab: {
+    "&:hover": {
+      backgroundColor: "initial",
+    },
+  },
+});
 
-const tabDetails = [
+const tabDetails: { value: string; label?: string }[] = [
   {
-    key: "milestones",
+    value: "milestones",
     label: undefined,
   },
   {
-    key: "groups",
+    value: "groups",
     label: "Course Members and Groups",
   },
   {
-    key: "details",
+    value: "details",
     label: "Course Details",
   },
 ];
+
+type Props = {
+  children: ReactNode;
+};
 
 function CoursePageLayout({ children }: Props) {
   const courseId = useGetCourseId();
@@ -47,7 +55,7 @@ function CoursePageLayout({ children }: Props) {
   useResolveError({ error, name: "course-page-layout" });
   const { pathname } = useLocation();
   const { capitalizedMilestoneAlias } = useGetMilestoneAlias();
-  const navigate = useNavigate();
+  const { classes } = useStyles();
 
   // update label during runtime
   tabDetails[0].label = pluralize(capitalizedMilestoneAlias);
@@ -56,7 +64,7 @@ function CoursePageLayout({ children }: Props) {
     // get the course tab component name from pathname
     // e.g. ["", "courses", ":courseId", <component name>]
     const componentName = pathname.split("/")[3];
-    const index = tabDetails.findIndex(({ key }) => key === componentName);
+    const index = tabDetails.findIndex(({ value }) => value === componentName);
     return index >= 0 ? index : 0;
   })();
 
@@ -76,32 +84,25 @@ function CoursePageLayout({ children }: Props) {
 
       <Title order={2}>{course?.name}</Title>
 
-      <Space h="md" />
+      <Space h={8} />
 
-      <Tabs
-        tabPadding="md"
-        active={activeIndex}
-        onTabChange={(_, key) => key !== undefined && navigate(key)}
-      >
-        {tabDetails.map(({ key, label }) => (
-          <Tabs.Tab
-            key={key}
-            tabKey={key}
-            label={
-              <Text<typeof Link>
-                component={Link}
-                to={key}
-                weight={500}
-                onClick={(event) => {
-                  event.stopPropagation();
-                }}
-              >
-                {label}
-              </Text>
-            }
-          >
+      <Tabs value={tabDetails[activeIndex].value} loop>
+        <Tabs.List>
+          {tabDetails.map(({ value, label }) => (
+            <Text<typeof Link> key={value} component={Link} to={value}>
+              <Tabs.Tab className={classes.tab} value={value}>
+                <Text span weight={500} size="md">
+                  {label}
+                </Text>
+              </Tabs.Tab>
+            </Text>
+          ))}
+        </Tabs.List>
+
+        {tabDetails.map(({ value }) => (
+          <Tabs.Panel pt="md" key={value} value={value}>
             {children}
-          </Tabs.Tab>
+          </Tabs.Panel>
         ))}
       </Tabs>
     </PlaceholderWrapper>

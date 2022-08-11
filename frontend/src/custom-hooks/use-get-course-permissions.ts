@@ -23,6 +23,7 @@ export default function useGetCoursePermissions() {
 
   if (!course) {
     return {
+      canAccess: false,
       canAccessFullDetails: false,
       canModify: false,
       canDelete: false,
@@ -33,11 +34,13 @@ export default function useGetCoursePermissions() {
   const canAccessFullDetails = INSTRUCTOR_PERMISSION_ROLES.includes(
     course.role,
   );
+  const canAccess = canAccessFullDetails || course.isPublished;
   const canModify = CO_OWNER_PERMISSION_ROLES.includes(course.role);
   const canDelete = course.owner.id === id;
 
   return {
     canAccessFullDetails,
+    canAccess,
     canModify,
     canDelete,
     canCreate,

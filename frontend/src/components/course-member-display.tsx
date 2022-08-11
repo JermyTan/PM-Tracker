@@ -43,28 +43,32 @@ function CourseMemberDisplay({ member, makeAdminOptionsAvailable }: Props) {
       </Modal>
 
       <Group position="apart">
-        <UserProfileDisplay {...member.user} />
+        <UserProfileDisplay user={member.user} />
         <Menu
-          control={
+          position="bottom-end"
+          transition="pop-bottom-right"
+          // hidden={!makeAdminOptionsAvailable}
+        >
+          <Menu.Target>
             <ActionIcon>
               <FaEdit />
             </ActionIcon>
-          }
-          placement="end"
-          hidden={!makeAdminOptionsAvailable}
-        >
-          <Menu.Item
-            icon={<FaUserEdit />}
-            onClick={() => setEditMemberRoleModalOpen(true)}
-          >
-            Edit role
-          </Menu.Item>
-          <Menu.Item
-            icon={<FaTrashAlt color="red" />}
-            onClick={() => setRemoveMemberModalOpen(true)}
-          >
-            Remove from course
-          </Menu.Item>
+          </Menu.Target>
+
+          <Menu.Dropdown>
+            <Menu.Item
+              icon={<FaUserEdit />}
+              onClick={() => setEditMemberRoleModalOpen(true)}
+            >
+              Edit role
+            </Menu.Item>
+            <Menu.Item
+              icon={<FaTrashAlt color="red" />}
+              onClick={() => setRemoveMemberModalOpen(true)}
+            >
+              Remove from course
+            </Menu.Item>
+          </Menu.Dropdown>
         </Menu>
       </Group>
     </>

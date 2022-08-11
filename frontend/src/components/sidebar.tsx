@@ -1,3 +1,4 @@
+import { ComponentPropsWithoutRef } from "react";
 import {
   Box,
   BoxProps,
@@ -22,7 +23,7 @@ import resetAppState from "../redux/thunks/reset-app-state";
 import toastUtils from "../utils/toast-utils";
 import { APP_NAME } from "../constants";
 
-type Props = Omit<BoxProps<"nav">, "children"> & {
+type Props = Omit<BoxProps & ComponentPropsWithoutRef<"nav">, "children"> & {
   isSidebarExpanded: boolean;
 };
 

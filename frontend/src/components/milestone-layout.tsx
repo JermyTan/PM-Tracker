@@ -130,12 +130,7 @@ function MilestoneLayout({ children }: Props) {
     }
 
     return components.map(({ label, path }, index) => (
-      <Anchor<typeof Link>
-        size="lg"
-        key={`${index}.${path}`}
-        component={Link}
-        to={path}
-      >
+      <Anchor<typeof Link> key={`${index}.${path}`} component={Link} to={path}>
         {label}
       </Anchor>
     ));

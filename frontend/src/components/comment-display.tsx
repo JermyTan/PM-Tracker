@@ -13,13 +13,13 @@ import { FaEdit, FaChevronDown, FaTrashAlt } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { DATE_TIME_MONTH_NAME_FORMAT } from "../constants";
 import { useAppSelector } from "../redux/hooks";
-import { SubmissionFieldComment } from "../types/comments";
+import { SubmissionComment } from "../types/comments";
 import { displayDateTime } from "../utils/transform-utils";
 import CommentContentDisplayAndEditor from "./comment-content-display-and-editor";
 import CommentDeleteConfirmation from "./comment-delete-confirmation";
 
 type Props = {
-  comment: SubmissionFieldComment;
+  comment: SubmissionComment;
   courseId: number | string;
   submissionId: number;
 };

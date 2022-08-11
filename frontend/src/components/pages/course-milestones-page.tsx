@@ -21,7 +21,6 @@ import useGetMilestoneAlias from "../../custom-hooks/use-get-milestone-alias";
 import MilestoneCard from "../milestone-card";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import MilestoneCreationForm from "../milestone-creation-form";
-import CourseSubmissionCommentsSection from "../course-submission-comments-section";
 import useGetMilestonePermissions from "../../custom-hooks/use-get-milestone-permissions";
 import useGetTemplatePermissions from "../../custom-hooks/use-get-template-permissions";
 
@@ -108,13 +107,6 @@ function CourseMilestonesPage() {
             ))}
           </SimpleGrid>
         </PlaceholderWrapper>
-
-        {/* TODO: Replace here */}
-        <CourseSubmissionCommentsSection
-          courseId={courseId ?? 1}
-          submissionId={4}
-          fieldIndex={0}
-        />
       </Stack>
     </>
   );

@@ -222,6 +222,7 @@ function FormFieldRenderer({
             offsetScrollbars
             className={classes.textDisplay}
             type="auto"
+            scrollbarSize={8}
           >
             <TextViewer preserveWhiteSpace overflowWrap>
               {content}

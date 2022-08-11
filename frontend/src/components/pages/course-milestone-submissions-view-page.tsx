@@ -5,9 +5,11 @@ import {
   Group,
   LoadingOverlay,
   Paper,
+  ScrollArea,
   Stack,
   Text,
 } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import { useLocation, useNavigate } from "react-router-dom";
 import path from "path";
 import { useModals } from "@mantine/modals";
@@ -33,10 +35,12 @@ import MilestoneSubmissionForm, {
 import PlaceholderWrapper from "../placeholder-wrapper";
 import { DATE_TIME_MONTH_NAME_FORMAT, UNKNOWN_USER } from "../../constants";
 import { displayDateTime } from "../../utils/transform-utils";
+import CourseSubmissionCommentsSection from "../course-submission-comments-section";
 
 const useStyles = createStyles({
-  overlayContainer: {
-    position: "relative",
+  commentsContainer: {
+    flex: "1 1 auto",
+    minWidth: "450px",
   },
 });
 
@@ -45,7 +49,7 @@ function CourseMilestoneSubmissionsViewPage() {
   const milestoneId = useGetMilestoneId();
   const submissionId = useGetSubmissionId();
   const formContainerClassName = useGetFormContainerStyles();
-  const { classes, cx } = useStyles();
+  const { classes } = useStyles();
   const { milestone } = useGetSingleMilestoneQueryState(
     courseId === undefined || milestoneId === undefined
       ? skipToken
@@ -89,6 +93,7 @@ function CourseMilestoneSubmissionsViewPage() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const modals = useModals();
+  const noWrap = useMediaQuery("(min-width: 1300px)");
 
   const isMilestoneOpen = checkIsMilestoneOpen(milestone);
 
@@ -227,24 +232,39 @@ function CourseMilestoneSubmissionsViewPage() {
         </Button>
       </Group>
 
-      <Group position="center">
+      <Group align="flex-start" position="center" noWrap={noWrap}>
         <Paper
-          className={cx(classes.overlayContainer, formContainerClassName)}
+          className={formContainerClassName}
           withBorder
           shadow="sm"
           p="md"
           radius="md"
         >
-          <LoadingOverlay visible={isFetching} />
-          <MilestoneSubmissionForm
-            ref={formRef}
-            defaultValues={submission}
-            readOnly={!isMilestoneOpen}
-            onSubmit={onUpdateSubmission}
-            withComments
-            submitButtonProps={{ disabled: isDeleting }}
-          />
+          <ScrollArea
+            sx={{ height: "1000px" }}
+            pr="xs"
+            scrollbarSize={8}
+            offsetScrollbars
+          >
+            <LoadingOverlay visible={isFetching} />
+            <MilestoneSubmissionForm
+              ref={formRef}
+              defaultValues={submission}
+              readOnly={!isMilestoneOpen}
+              onSubmit={onUpdateSubmission}
+              withComments
+              submitButtonProps={{ disabled: isDeleting }}
+            />
+          </ScrollArea>
         </Paper>
+
+        <CourseSubmissionCommentsSection
+          className={classes.commentsContainer}
+          withBorder
+          shadow="sm"
+          p="md"
+          radius="md"
+        />
       </Group>
     </Stack>
   );

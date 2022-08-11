@@ -75,8 +75,7 @@ function Sidebar({ isSidebarExpanded, className, ...props }: Props) {
 
       <ScrollArea
         className={classes.navContainer}
-        scrollbarSize={isSidebarExpanded ? 10 : 6}
-        scrollHideDelay={500}
+        scrollbarSize={isSidebarExpanded ? 8 : 6}
       >
         <SidebarLinkItem
           icon={MdSpaceDashboard}

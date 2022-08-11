@@ -4,7 +4,7 @@ import { useDidUpdate } from "@mantine/hooks";
 import { useModals } from "@mantine/modals";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { RiFileEditLine } from "react-icons/ri";
-import { FaTrash, FaTrashAlt } from "react-icons/fa";
+import { FaTrashAlt } from "react-icons/fa";
 import { generatePath, Link, useNavigate } from "react-router-dom";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import useGetTemplateId from "../../custom-hooks/use-get-template-id";

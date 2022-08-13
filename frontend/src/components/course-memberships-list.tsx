@@ -11,7 +11,7 @@ import { sort } from "../utils/transform-utils";
 import { EMAIL, NAME, USER } from "../constants";
 import { useGetSingleCourseQuery } from "../redux/services/courses-api";
 import UserProfileDisplay from "./user-profile-display";
-import CourseAddMembersEditor from "./course-add-members-editor";
+import CourseMemberCreationEditor from "./course-member-creation-editor";
 
 type Props = {
   courseId: number | string | undefined;
@@ -65,7 +65,7 @@ function CourseMembershipsList({ courseId, hasAdminPermission }: Props) {
     const id = modals.openModal({
       title: <Text weight="bold">Add Members to Course</Text>,
       children: (
-        <CourseAddMembersEditor
+        <CourseMemberCreationEditor
           courseId={courseId}
           onSuccess={() => modals.closeModal(id)}
         />

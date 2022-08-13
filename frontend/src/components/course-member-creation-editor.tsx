@@ -25,7 +25,7 @@ type Props = {
 
 type UserCreationCsvRowData = [string];
 
-function CourseAddMembersEditor({ courseId, onSuccess }: Props) {
+function CourseMemberCreationEditor({ courseId, onSuccess }: Props) {
   const [isParsingCSV, setIsParsingCSV] = useState(false);
   const [userCreationDataList, setUserCreationDataList] = useState<string[]>(
     [],
@@ -186,4 +186,4 @@ function CourseAddMembersEditor({ courseId, onSuccess }: Props) {
   );
 }
 
-export default CourseAddMembersEditor;
+export default CourseMemberCreationEditor;

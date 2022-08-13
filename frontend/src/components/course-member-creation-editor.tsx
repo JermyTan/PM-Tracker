@@ -1,4 +1,12 @@
-import { Button, Group, Stack, Loader, Table, Badge } from "@mantine/core";
+import {
+  Button,
+  Group,
+  Stack,
+  Loader,
+  Table,
+  Badge,
+  ScrollArea,
+} from "@mantine/core";
 import papaparse from "papaparse";
 import { z } from "zod";
 import { MdPersonAdd } from "react-icons/md";
@@ -208,24 +216,29 @@ function CourseMemberCreationEditor({ courseId, onSuccess }: Props) {
       </Group>
       {hasEmailData ? (
         <Table striped>
-          <thead>
-            <tr>
-              <th>Email</th>
-              <th>Name (Optional)</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tableRows.map((row, index) => (
-              <tr key={index}>
-                <td>{row.data.email}</td>
-                <td>{row.data.name}</td>
-                <td>
-                  <Badge color={getStatusColor(row.status)}>{row.status}</Badge>
-                </td>
+          <ScrollArea style={{ height: 300 }}>
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Name (Optional)</th>
+                <th>Status</th>
               </tr>
-            ))}
-          </tbody>
+            </thead>
+
+            <tbody>
+              {tableRows.map((row, index) => (
+                <tr key={index}>
+                  <td>{row.data.email}</td>
+                  <td>{row.data.name}</td>
+                  <td>
+                    <Badge color={getStatusColor(row.status)}>
+                      {row.status}
+                    </Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </ScrollArea>
         </Table>
       ) : (
         <CourseMemberCsvFileUploader

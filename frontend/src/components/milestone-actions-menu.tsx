@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
-import { RiMoreLine } from "react-icons/ri";
+import { IoIosMore } from "react-icons/io";
 import useGetCourseId from "../custom-hooks/use-get-course-id";
 import useGetMilestoneAlias from "../custom-hooks/use-get-milestone-alias";
 import useGetMilestonePermissions from "../custom-hooks/use-get-milestone-permissions";
@@ -130,10 +130,10 @@ function MilestoneActionsMenu(props: Props) {
         </Modal>
       </ConditionalRenderer>
 
-      <Menu position="bottom-start">
+      <Menu position="bottom-start" withinPortal>
         <Menu.Target>
-          <ActionIcon>
-            <RiMoreLine />
+          <ActionIcon aria-label="More actions">
+            <IoIosMore />
           </ActionIcon>
         </Menu.Target>
 

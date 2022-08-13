@@ -4,6 +4,7 @@ import { useDisclosure } from "@mantine/hooks";
 import Header from "./header";
 import Sidebar from "./sidebar";
 import { colorModeValue } from "../utils/theme-utils";
+import CourseSubmissionCommentsSection from "./course-submission-comments-section";
 
 type Props = {
   children: ReactNode;
@@ -21,14 +22,21 @@ const useStyles = createStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     flex: "1 1 auto",
-    overflow: "hidden",
   },
-  scrollArea: {
+  contentContainer: {
+    display: "flex",
     flex: "1 1 auto",
     backgroundColor: colorModeValue(theme.colorScheme, {
       lightModeValue: theme.colors.gray[0],
       darkModeValue: theme.colors.dark[8],
     }),
+    overflow: "hidden",
+  },
+  scrollArea: {
+    flex: "1 1 auto",
+  },
+  commentsSection: {
+    flex: "0 0 auto",
   },
 }));
 
@@ -57,11 +65,17 @@ function AppLayout({ children }: Props) {
         <Divider />
 
         {/* Main content */}
-        <ScrollArea className={classes.scrollArea}>
-          <Box<"main"> component="main" pt="md" pb="xl" px="xl">
-            {children}
-          </Box>
-        </ScrollArea>
+        <div className={classes.contentContainer}>
+          <ScrollArea className={classes.scrollArea} offsetScrollbars>
+            <Box<"main"> component="main" pt="md" pb="xl" px="xl">
+              {children}
+            </Box>
+          </ScrollArea>
+
+          <CourseSubmissionCommentsSection
+            className={classes.commentsSection}
+          />
+        </div>
       </div>
     </div>
   );

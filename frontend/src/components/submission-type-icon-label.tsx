@@ -9,7 +9,8 @@ type Props = {
 };
 
 function SubmissionTypeIconLabel({ submissionType }: Props) {
-  const { label, Icon } = submissionTypeToPropertiesMap[submissionType];
+  const { label, icon } = submissionTypeToPropertiesMap[submissionType];
+  const Icon = icon;
 
   return (
     <Group noWrap spacing={4}>

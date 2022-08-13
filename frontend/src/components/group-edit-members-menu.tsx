@@ -11,14 +11,13 @@ import {
   Space,
 } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/dist/query";
-import { capitalCase } from "change-case";
 import pluralize from "pluralize";
 import { useEffect, useState } from "react";
 import { USER, NAME, EMAIL } from "../constants";
 import { useAppSelector } from "../redux/hooks";
 import { usePatchCourseGroupMutation } from "../redux/services/groups-api";
 import { useGetCourseMembershipsQuery } from "../redux/services/members-api";
-import { CourseMemberData, editableRoleMap, Role } from "../types/courses";
+import { CourseMemberData, Role, roleToPropertiesMap } from "../types/courses";
 import { GroupPatchAction, GroupPatchData } from "../types/groups";
 import { UserData } from "../types/users";
 import { useResolveError } from "../utils/error-utils";
@@ -37,7 +36,9 @@ type Props = {
 const convertMemberDataToTransferListData = (
   courseMemberData: CourseMemberData,
 ) => {
-  const roleString = capitalCase(pluralize(courseMemberData.role));
+  const roleString = pluralize(
+    roleToPropertiesMap[courseMemberData.role].label,
+  );
 
   return {
     value: `${courseMemberData.user.id}`,
@@ -102,7 +103,7 @@ function GroupEditMembersMenu({
     });
 
     const editableUserRoles =
-      editableRoleMap.get(userCourseRole) || new Set<Role>();
+      roleToPropertiesMap[userCourseRole ?? Role.Student].modifiableRoles;
 
     allCourseMembers?.forEach((member) => {
       // Prevent user from adding/removing self from group via edit members menu
@@ -111,7 +112,7 @@ function GroupEditMembersMenu({
       }
 
       // Prevent user from editing members for which they have no permission
-      if (!editableUserRoles.has(member.role)) {
+      if (!editableUserRoles.includes(member.role)) {
         return;
       }
 

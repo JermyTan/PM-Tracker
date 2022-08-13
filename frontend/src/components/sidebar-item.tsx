@@ -12,11 +12,11 @@ import {
 import { HiCollection } from "react-icons/hi";
 import { colorModeValue } from "../utils/theme-utils";
 
-export type SidebarItemProps<T extends ElementType> = Omit<
-  UnstyledButtonProps & ComponentPropsWithoutRef<T>,
+export type SidebarItemProps<C extends ElementType> = Omit<
+  UnstyledButtonProps & ComponentPropsWithoutRef<C>,
   "children"
 > & {
-  component?: ElementType;
+  component?: C;
   icon?: IconType;
   label: string;
   showIconOnly?: boolean;
@@ -62,13 +62,13 @@ const useStyles = createStyles(
   },
 );
 
-function SidebarItem<T extends ElementType = "button">({
+function SidebarItem<C extends ElementType = "button">({
   icon = HiCollection,
   showIconOnly,
   label,
   isActive,
   ...props
-}: SidebarItemProps<T>) {
+}: SidebarItemProps<C>) {
   const { classes } = useStyles({ showIconOnly, isActive });
   const Icon = icon;
 

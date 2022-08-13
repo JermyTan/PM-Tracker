@@ -21,16 +21,23 @@ import { useResolveError } from "../../utils/error-utils";
 import CourseTemplatesTable from "../course-templates-table";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import ConditionalRenderer from "../conditional-renderer";
-import { MAX_FORM_WIDTH } from "../../custom-hooks/use-get-form-container-style";
+import {
+  MAX_FORM_WIDTH,
+  MIN_FORM_WIDTH,
+} from "../../custom-hooks/use-get-form-container-style";
 
 const useStyles = createStyles(
   (_, { noWrap }: { hasSelectedTemplate?: boolean; noWrap?: boolean }) => ({
     pageContainer: {
       flexDirection: !noWrap ? "column-reverse" : undefined,
     },
+    title: {
+      lineHeight: 36 / 22, // neighbour's height / font-size
+    },
     templateContainer: {
       width: "100%",
       maxWidth: noWrap ? MAX_FORM_WIDTH : undefined,
+      minWidth: noWrap ? MIN_FORM_WIDTH : undefined,
     },
     templateTableContainer: {
       minWidth: "650px",
@@ -66,7 +73,7 @@ function CourseMilestoneTemplatesPage({ children, studentView }: Props) {
   });
   const templateId = useGetTemplateId();
   const hasSelectedTemplate = Boolean(templateId);
-  const noWrap = useMediaQuery("(min-width: 1500px)");
+  const noWrap = useMediaQuery("(min-width: 1400px)");
   const { classes } = useStyles({ noWrap });
 
   return (
@@ -89,7 +96,9 @@ function CourseMilestoneTemplatesPage({ children, studentView }: Props) {
 
           <Stack className={classes.templateTableContainer}>
             <Group position="apart">
-              <Title order={3}>{capitalizedMilestoneAlias} Templates</Title>
+              <Title className={classes.title} order={3}>
+                {capitalizedMilestoneAlias} Templates
+              </Title>
 
               {!studentView && (
                 <ConditionalRenderer

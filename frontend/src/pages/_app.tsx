@@ -129,6 +129,13 @@ function App({ Component, pageProps }: AppProps) {
                     transition: "pop-bottom-left",
                   },
                 },
+                Textarea: {
+                  defaultProps: {
+                    autosize: true,
+                    minRows: 3,
+                    maxRows: 10,
+                  },
+                },
               },
             }}
           >

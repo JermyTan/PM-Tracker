@@ -25,7 +25,7 @@ type Props = StackProps;
 
 function CourseActionsSection(props: Props) {
   const courseId = useGetCourseId();
-  const { scrollAreaContainerClassName, scrollbarSize, adjustedPadding } =
+  const { scrollAreaContainerClassName, scrollbarSize, referencePadding } =
     useGetScrollAreaContainerPaddingStyle({
       scrollbarSize: 8,
       referencePadding: 20,
@@ -95,11 +95,7 @@ function CourseActionsSection(props: Props) {
           {/* special case: this conditional render is required as course edit form is mounted and api call will be made
         even though the drawer is not yet opened */}
           {isDrawerOpened && (
-            <ScrollArea
-              offsetScrollbars
-              pr={adjustedPadding}
-              scrollbarSize={scrollbarSize}
-            >
+            <ScrollArea pr={referencePadding} scrollbarSize={scrollbarSize}>
               <CourseEditForm onSuccess={close} />
             </ScrollArea>
           )}

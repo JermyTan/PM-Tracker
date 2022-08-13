@@ -28,7 +28,7 @@ type Props = MilestoneData;
 
 function MilestoneActionsMenu(props: Props) {
   const { id: milestoneId, name } = props;
-  const { scrollAreaContainerClassName, scrollbarSize, adjustedPadding } =
+  const { scrollAreaContainerClassName, scrollbarSize, referencePadding } =
     useGetScrollAreaContainerPaddingStyle({
       scrollbarSize: 8,
       referencePadding: 20,
@@ -85,11 +85,7 @@ function MilestoneActionsMenu(props: Props) {
           {/* special case: this conditional render is required as milestone edit form is mounted and api call will be made
         even though the drawer is not yet opened */}
           {isEditDrawerOpened && (
-            <ScrollArea
-              offsetScrollbars
-              pr={adjustedPadding}
-              scrollbarSize={scrollbarSize}
-            >
+            <ScrollArea pr={referencePadding} scrollbarSize={scrollbarSize}>
               <MilestoneEditForm
                 milestoneId={milestoneId}
                 onSuccess={closeEditDrawer}
@@ -130,7 +126,7 @@ function MilestoneActionsMenu(props: Props) {
         </Modal>
       </ConditionalRenderer>
 
-      <Menu position="bottom-start" withinPortal>
+      <Menu position="bottom-start">
         <Menu.Target>
           <ActionIcon aria-label="More actions">
             <IoIosMore />

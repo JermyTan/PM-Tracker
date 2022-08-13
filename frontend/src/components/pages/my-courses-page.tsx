@@ -32,7 +32,7 @@ function MyCoursesPage() {
   // subsequent api calls to the same endpoint do not need to resolve error since it is already handled here
   useResolveError({ error, name: "my-courses-page" });
   const [isDrawerOpened, { open, close }] = useDisclosure(false);
-  const { scrollAreaContainerClassName, scrollbarSize, adjustedPadding } =
+  const { scrollAreaContainerClassName, scrollbarSize, referencePadding } =
     useGetScrollAreaContainerPaddingStyle({
       scrollbarSize: 8,
       referencePadding: 20,
@@ -53,11 +53,7 @@ function MyCoursesPage() {
         closeButtonLabel="Cancel course creation"
         title={<Title order={3}>Course Creation</Title>}
       >
-        <ScrollArea
-          offsetScrollbars
-          pr={adjustedPadding}
-          scrollbarSize={scrollbarSize}
-        >
+        <ScrollArea pr={referencePadding} scrollbarSize={scrollbarSize}>
           <CourseCreationForm onSuccess={close} />
         </ScrollArea>
       </Drawer>

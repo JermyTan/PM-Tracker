@@ -58,8 +58,8 @@ const membersApi = baseApi
           method: "POST",
           body: courseMembershipBatchCreateData,
         }),
-        invalidatesTags: (_, error) =>
-          error ? [] : cacher.invalidatesList("Member"),
+        invalidatesTags: (_, error, { courseId }) =>
+          error ? [] : cacher.invalidatesList("Member", [`${courseId}`]),
       }),
     }),
   });

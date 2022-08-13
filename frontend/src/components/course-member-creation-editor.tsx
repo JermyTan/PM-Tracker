@@ -17,19 +17,25 @@ import toastUtils from "../utils/toast-utils";
 import { useResolveError } from "../utils/error-utils";
 import { useBatchCreateCourseMembershipsMutation } from "../redux/services/members-api";
 import { CourseMembershipBatchCreateData } from "../types/courses";
+import { MEMBER_CREATION_DATA } from "../constants";
 
 type Props = {
   courseId?: number | string;
   onSuccess?: () => void;
 };
 
-type UserCreationCsvRowData = [string];
+type MemberCreationCsvRowData = [string, string];
+
+type MemberCreationData = {
+  email: string;
+  name: string;
+};
 
 function CourseMemberCreationEditor({ courseId, onSuccess }: Props) {
   const [isParsingCSV, setIsParsingCSV] = useState(false);
-  const [userCreationDataList, setUserCreationDataList] = useState<string[]>(
-    [],
-  );
+  const [memberCreationDataList, setMemberCreationDataList] = useState<
+    MemberCreationData[]
+  >([]);
 
   const { resolveError } = useResolveError();
   const [batchCreateCourseMemberships, { isLoading }] =
@@ -43,7 +49,10 @@ function CourseMemberCreationEditor({ courseId, onSuccess }: Props) {
     }
 
     const membershipsData: CourseMembershipBatchCreateData = {
-      user_emails: userCreationDataList,
+      memberCreationData: memberCreationDataList.map((memberData) => ({
+        email: memberData.email,
+        name: memberData.name,
+      })),
     };
 
     try {
@@ -60,7 +69,7 @@ function CourseMemberCreationEditor({ courseId, onSuccess }: Props) {
 
   const theme = useMantineTheme();
 
-  const hasEmailData = userCreationDataList.length !== 0;
+  const hasEmailData = memberCreationDataList.length !== 0;
 
   const downloadCSVTemplate = () => {};
 
@@ -74,7 +83,7 @@ function CourseMemberCreationEditor({ courseId, onSuccess }: Props) {
     setIsParsingCSV(true);
 
     /* eslint-disable @typescript-eslint/no-unsafe-call */
-    papaparse.parse<UserCreationCsvRowData, papaparse.LocalFile>(csvFile, {
+    papaparse.parse<MemberCreationCsvRowData, papaparse.LocalFile>(csvFile, {
       worker: true,
       error: (error: { message: string }) => {
         console.log("Parse CSV file error:", error, error.message);
@@ -84,10 +93,14 @@ function CourseMemberCreationEditor({ courseId, onSuccess }: Props) {
         // removes column headers
         data.shift();
 
-        const userCreationData = data
-          .filter((row) => row.length)
-          .map((row) => row[0]);
-        setUserCreationDataList(userCreationData);
+        const userCreationData: MemberCreationData[] = data
+          .filter((row) => row.length >= 1)
+          .map((row) => ({
+            email: row[0],
+            name: row[1],
+          }));
+
+        setMemberCreationDataList(userCreationData);
 
         toastUtils.info({
           message: "The CSV file content has been successfully parsed.",
@@ -100,7 +113,7 @@ function CourseMemberCreationEditor({ courseId, onSuccess }: Props) {
   };
 
   const clearData = () => {
-    setUserCreationDataList([]);
+    setMemberCreationDataList([]);
   };
 
   return (
@@ -126,8 +139,11 @@ function CourseMemberCreationEditor({ courseId, onSuccess }: Props) {
       </Group>
       {hasEmailData ? (
         <>
-          {userCreationDataList.map((email) => (
-            <Text>{email}</Text>
+          {memberCreationDataList.map((data) => (
+            <Text>
+              {data.email}
+              {data.name}
+            </Text>
           ))}
         </>
       ) : (

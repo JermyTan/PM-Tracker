@@ -209,5 +209,9 @@ class PostCourseSubmissionCommentSerializer(serializers.ModelSerializer):
 
 PutCourseSubmissionCommentSerializer = PostCourseSubmissionCommentSerializer
 
-class PostCourseMembershipsWithNewUserCreationSerializer(serializers.Serializer):
-    user_emails = serializers.ListField(child=serializers.EmailField())
+class CourseMemberCreationDataSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    name = serializers.CharField(max_length=255, allow_blank=True, required=False)
+
+class BatchMembershipCreationSerializer(serializers.Serializer):
+    member_creation_data = serializers.JSONField()

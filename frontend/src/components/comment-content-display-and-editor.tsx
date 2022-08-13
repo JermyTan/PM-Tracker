@@ -3,14 +3,14 @@ import { CONTENT } from "../constants";
 import useGetCourseId from "../custom-hooks/use-get-course-id";
 import useGetSubmissionId from "../custom-hooks/use-get-submission-id";
 import { useUpdateSubmissionCommentMutation } from "../redux/services/comments-api";
-import { SubmissionFieldComment } from "../types/comments";
+import { SubmissionComment } from "../types/comments";
 import toastUtils from "../utils/toast-utils";
 import CommentEditForm, { CommentFormData } from "./comment-edit-form";
 import TextViewer from "./text-viewer";
 
 type Props = {
   isEditingComment: boolean;
-  comment: SubmissionFieldComment;
+  comment: SubmissionComment;
   onEditSuccess: () => void;
 };
 

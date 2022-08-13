@@ -1,97 +1,78 @@
-import React, { memo } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  Text,
-  Group,
-  createStyles,
-  Stack,
-  Avatar,
-  ScrollArea,
-  Paper,
-} from "@mantine/core";
-import { CourseSummaryData, Role } from "../types/courses";
-import CourseStatusBadge from "./course-status-badge";
+import { Stack, ScrollArea, Paper, Alert, createStyles } from "@mantine/core";
+import { HiEyeOff } from "react-icons/hi";
+import { generatePath, Link } from "react-router-dom";
+import { SINGLE_COURSE_PATH } from "../routes/paths";
+import { CourseSummaryData } from "../types/courses";
 import TextViewer from "./text-viewer";
+import UserProfileDisplay from "./user-profile-display";
 
-const useStyles = createStyles(
-  (theme, { userCanAccessCourse }: { userCanAccessCourse?: boolean }) => ({
-    card: {
-      backgroundColor:
-        theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
-      height: 300,
-      cursor: userCanAccessCourse ? "pointer" : "not-allowed",
-    },
-
-    scrollArea: {
-      height: 75,
-    },
-  }),
-);
+const useStyles = createStyles({
+  contentContainer: {
+    height: "100%",
+  },
+});
 
 type Props = CourseSummaryData;
 
-function CourseCard({
-  name,
-  description,
-  owner,
-  isPublished,
-  id,
-  role,
-}: Props) {
-  const navigate = useNavigate();
-
-  const userCanAccessCourse = isPublished || role !== Role.Student;
-
-  const { classes } = useStyles({ userCanAccessCourse });
-
-  const hasDescription = description.length > 0;
-
-  const redirectToCoursePage = () => {
-    if (!userCanAccessCourse) {
-      return;
-    }
-
-    navigate(`../${id}`);
-  };
+function CourseCard(props: Props) {
+  const { name, description, owner, isPublished, id } = props;
+  const { classes } = useStyles();
 
   return (
-    <Paper
-      onClick={redirectToCoursePage}
+    <Paper<typeof Link>
+      component={Link}
+      to={generatePath(SINGLE_COURSE_PATH, { courseId: `${id}` })}
       withBorder
       radius="md"
       p="md"
-      className={classes.card}
     >
-      <Stack spacing="xs">
-        <Group position="apart">
-          <Text size="lg" weight={500} lineClamp={2}>
+      <Stack
+        spacing="xs"
+        justify="space-between"
+        className={classes.contentContainer}
+      >
+        <Stack spacing="xs">
+          <TextViewer overflowWrap weight={600} size="lg">
             {name}
-          </Text>
-        </Group>
-
-        <Group spacing="sm">
-          <Avatar radius={20} size={20} src={owner.profileImage} />
-          <Text size="sm" weight={500} lineClamp={1}>
-            {owner.name}
-          </Text>
-        </Group>
-        <ScrollArea offsetScrollbars className={classes.scrollArea}>
-          <TextViewer
-            preserveWhiteSpace
-            overflowWrap
-            withLinkify
-            size="sm"
-            color={hasDescription ? undefined : "dimmed"}
-          >
-            {description || "No description"}
           </TextViewer>
-        </ScrollArea>
-        <Group>
-          <CourseStatusBadge isPublished={isPublished} />
-        </Group>
+
+          <UserProfileDisplay
+            user={owner}
+            avatarProps={{ size: 32, radius: 32 }}
+            spacing="xs"
+          />
+
+          <ScrollArea.Autosize
+            scrollbarSize={8}
+            type="auto"
+            offsetScrollbars
+            maxHeight="150px"
+          >
+            <TextViewer
+              preserveWhiteSpace
+              overflowWrap
+              withLinkify
+              size="sm"
+              color={!description ? "dimmed" : undefined}
+            >
+              {description || "No description"}
+            </TextViewer>
+          </ScrollArea.Autosize>
+        </Stack>
+
+        {!isPublished && (
+          <Alert
+            p="xs"
+            color="orange"
+            icon={<HiEyeOff />}
+            title="Not published"
+          >
+            Students cannot view this course.
+          </Alert>
+        )}
       </Stack>
     </Paper>
   );
 }
 
-export default memo(CourseCard);
+export default CourseCard;

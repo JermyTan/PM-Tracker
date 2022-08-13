@@ -2,7 +2,15 @@ import { forwardRef, Ref, useImperativeHandle } from "react";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Stack, Title, Text, Button, Group, Alert } from "@mantine/core";
+import {
+  Stack,
+  Title,
+  Text,
+  Button,
+  Group,
+  Alert,
+  ButtonProps,
+} from "@mantine/core";
 import { GoDashboard } from "react-icons/go";
 import {
   FormProvider,
@@ -55,6 +63,7 @@ type Props = {
   testMode?: boolean;
   withComments?: boolean;
   onSubmit?: (formData: SubmissionFormData) => Promise<unknown>;
+  submitButtonProps?: ButtonProps;
 };
 
 function MilestoneSubmissionForm(
@@ -64,6 +73,7 @@ function MilestoneSubmissionForm(
     testMode,
     withComments,
     onSubmit: handleOnSubmit,
+    submitButtonProps,
   }: Props,
   ref: Ref<MilestoneSubmissionFormHandler>,
 ) {
@@ -176,9 +186,12 @@ function MilestoneSubmissionForm(
 
           {!readOnly && (
             <Group position="right">
-              <Button loading={isSubmitting} type="submit">
-                Save
-              </Button>
+              <Button
+                {...{ children: testMode ? "Test" : "Save" }}
+                {...submitButtonProps}
+                loading={isSubmitting}
+                type="submit"
+              />
             </Group>
           )}
         </Stack>

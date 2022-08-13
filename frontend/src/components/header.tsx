@@ -1,3 +1,4 @@
+import { ComponentPropsWithoutRef } from "react";
 import {
   Box,
   BoxProps,
@@ -11,7 +12,7 @@ import { HiMenu } from "react-icons/hi";
 import ColorModeToggler from "./color-mode-toggler";
 import { useShallowEqualAppSelector } from "../redux/hooks";
 
-type Props = Omit<BoxProps<"header">, "children"> & {
+type Props = Omit<BoxProps & ComponentPropsWithoutRef<"header">, "children"> & {
   isSiderbarExpanded: boolean;
   onSidebarToggle: () => void;
 };
@@ -48,7 +49,6 @@ function Header({
     >
       <ActionIcon
         aria-label={isSiderbarExpanded ? "Collapse sidebar" : "Expand sidebar"}
-        variant="hover"
         onClick={onSidebarToggle}
         size="lg"
       >
@@ -56,7 +56,7 @@ function Header({
       </ActionIcon>
 
       <Group>
-        <Text<"span"> component="span">{name}</Text>
+        <Text span>{name}</Text>
         <Avatar size={36} radius={36} alt="" src={profileImage || undefined} />
         <ColorModeToggler />
       </Group>

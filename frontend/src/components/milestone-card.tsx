@@ -14,6 +14,9 @@ const useStyles = createStyles((_, { canAccess }: { canAccess?: boolean }) => ({
   card: {
     cursor: canAccess ? "pointer" : "not-allowed",
   },
+  contentContainer: {
+    height: "100%",
+  },
 }));
 
 type Props = MilestoneData;
@@ -36,26 +39,34 @@ function MilestoneCard(props: Props) {
       radius="md"
       className={classes.card}
     >
-      <Stack spacing="xs">
-        <Group noWrap spacing={4} position="apart" align="flex-start">
-          <TextViewer overflowWrap weight={600} size="lg">
-            {name}
-          </TextViewer>
-          <ConditionalRenderer allow={canModify || canDelete}>
-            <MilestoneActionsMenu {...props} />
-          </ConditionalRenderer>
-        </Group>
-        <MilestoneActivePeriodDisplay
-          startDateTime={startDateTime}
-          endDateTime={endDateTime}
-          size="sm"
-          weight={500}
-        />
-        <div>
-          <Badge variant="outline" color={isOpen ? "green" : "red"}>
-            {isOpen ? "Open" : "Closed"}
-          </Badge>
-        </div>
+      <Stack
+        className={classes.contentContainer}
+        spacing="xs"
+        justify="space-between"
+      >
+        <Stack spacing="xs">
+          <Group noWrap spacing={4} position="apart" align="flex-start">
+            <TextViewer overflowWrap weight={600} size="lg">
+              {name}
+            </TextViewer>
+            <ConditionalRenderer allow={canModify || canDelete}>
+              <MilestoneActionsMenu {...props} />
+            </ConditionalRenderer>
+          </Group>
+          <MilestoneActivePeriodDisplay
+            startDateTime={startDateTime}
+            endDateTime={endDateTime}
+            size="sm"
+            weight={500}
+          />
+          <div>
+            <Badge variant="outline" color={isOpen ? "green" : "red"}>
+              {isOpen ? "Open" : "Closed"}
+            </Badge>
+          </div>
+        </Stack>
+        {/* <FlexSpacer /> */}
+
         {!isPublished && (
           <Alert
             p="xs"

@@ -4,6 +4,7 @@ import { useDidUpdate } from "@mantine/hooks";
 import { useModals } from "@mantine/modals";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { RiFileEditLine } from "react-icons/ri";
+import { FaTrashAlt } from "react-icons/fa";
 import { generatePath, Link, useNavigate } from "react-router-dom";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import useGetTemplateId from "../../custom-hooks/use-get-template-id";
@@ -19,12 +20,12 @@ import MilestoneSubmissionForm from "../milestone-submission-form";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import useGetTemplatePermissions from "../../custom-hooks/use-get-template-permissions";
 import ConditionalRenderer from "../conditional-renderer";
-import useGetFormContainerStyles from "../../custom-hooks/use-get-form-container-style";
+import useGetFormContainerStyle from "../../custom-hooks/use-get-form-container-style";
 
 function CourseMilestoneTemplatesViewPage() {
   const courseId = useGetCourseId();
   const templateId = useGetTemplateId();
-  const formContainerClassName = useGetFormContainerStyles();
+  const formContainerClassName = useGetFormContainerStyle();
   const { milestoneTemplates } = useGetTemplatesQueryState(
     courseId ?? skipToken,
     {
@@ -40,11 +41,9 @@ function CourseMilestoneTemplatesViewPage() {
       }),
     [templateId, milestoneTemplates],
   );
-  const [deleteTemplate, { isLoading: isDeleting }] = useDeleteTemplateMutation(
-    {
-      selectFromResult: ({ isLoading }) => ({ isLoading }),
-    },
-  );
+  const [deleteTemplate, { isDeleting }] = useDeleteTemplateMutation({
+    selectFromResult: ({ isLoading: isDeleting }) => ({ isDeleting }),
+  });
   const { resolveError } = useResolveError({
     name: "course-milestone-templates-view-page",
   });
@@ -123,7 +122,7 @@ function CourseMilestoneTemplatesViewPage() {
               <ConditionalRenderer allow={canDelete}>
                 <Button
                   color="red"
-                  leftIcon={<RiFileEditLine />}
+                  leftIcon={<FaTrashAlt size={12} />}
                   onClick={openDeleteModal}
                   loading={isDeleting}
                 >

@@ -1,4 +1,4 @@
-import { Button, Group, Radio, RadioGroup, Space } from "@mantine/core";
+import { Button, Group, Radio, Space } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/dist/query";
 import { capitalCase } from "change-case";
 import { useState } from "react";
@@ -64,7 +64,7 @@ function CourseMemberEditRoleMenu({ member, onSuccess }: Props) {
 
   return (
     <>
-      <RadioGroup
+      <Radio.Group
         value={memberRole}
         onChange={(value: string) => {
           try {
@@ -82,7 +82,7 @@ function CourseMemberEditRoleMenu({ member, onSuccess }: Props) {
             disabled={!editableRoles.has(role)}
           />
         ))}
-      </RadioGroup>
+      </Radio.Group>
       <Space h="md" />
       <Group position="right">
         <Button color="gray" onClick={onSuccess}>

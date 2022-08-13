@@ -9,7 +9,7 @@ import { BaseData } from "./base";
 import { Role } from "./courses";
 import { UserData } from "./users";
 
-export type SubmissionFieldComment = BaseData & {
+export type SubmissionComment = BaseData & {
   [CONTENT]: string;
   [COMMENTER]: UserData;
   [ROLE]: Role;
@@ -17,8 +17,8 @@ export type SubmissionFieldComment = BaseData & {
   [FIELD_INDEX]: number;
 };
 
-export type SubmissionCommentsData = SubmissionFieldComment[];
-
-export type SubmissionFieldCommentPostPatchData = {
+export type SubmissionCommentPostData = {
   [CONTENT]: string;
 };
+
+export type SubmissionCommentPatchData = SubmissionCommentPostData;

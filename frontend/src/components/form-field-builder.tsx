@@ -15,18 +15,11 @@ import { FaTrashAlt } from "react-icons/fa";
 import { MdDragIndicator } from "react-icons/md";
 import { TYPE } from "../constants";
 import { FormFieldType } from "../types/templates";
-import { colorModeValue } from "../utils/theme-utils";
 import FlexSpacer from "./flex-spacer";
 import FormFieldBuilderRenderer from "./form-field-builder-renderer";
 import SelectField from "./select-field";
 
-const useStyles = createStyles((theme) => ({
-  card: {
-    borderColor: colorModeValue(theme.colorScheme, {
-      lightModeValue: theme.colors.gray[4],
-      darkModeValue: theme.colors.dark[4],
-    }),
-  },
+const useStyles = createStyles({
   topSection: {
     height: "48px",
   },
@@ -41,13 +34,9 @@ const useStyles = createStyles((theme) => ({
     paddingLeft: "12px",
     paddingRight: "30px",
   },
-  deleteTooltip: {
-    height: "100%",
-    width: "48px",
-  },
   deleteIconContainer: {
     height: "100%",
-    width: "100%",
+    width: "48px",
   },
   dragContainer: {
     height: "100%",
@@ -55,7 +44,7 @@ const useStyles = createStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
   },
-}));
+});
 
 const FORM_FIELD_TYPE_OPTIONS: SelectItem[] = [
   {
@@ -114,7 +103,7 @@ function FormFieldBuilder({
 
   return (
     <Box py="xs">
-      <Paper className={classes.card} withBorder shadow="sm">
+      <Paper withBorder shadow="sm">
         <Group noWrap spacing={0} className={classes.topSection}>
           <Box px="sm" className={classes.fieldNumberContainer}>
             {index + 1}
@@ -136,7 +125,6 @@ function FormFieldBuilder({
           <Divider orientation="vertical" />
 
           <Tooltip
-            className={classes.deleteTooltip}
             label={<Text size="xs">Delete field.</Text>}
             withArrow
             transitionDuration={300}
@@ -152,27 +140,23 @@ function FormFieldBuilder({
               <FaTrashAlt />
             </ActionIcon>
           </Tooltip>
-
           <Divider orientation="vertical" />
-
           <Tooltip
-            {...dragHandleProps}
-            className={classes.dragContainer}
-            px="sm"
             label={
               <Text size="xs">
                 Drag and move up/down to rearrange the fields.
               </Text>
             }
             withArrow
-            placement="end"
-            position="top"
+            position="top-end"
             transition="pop-bottom-right"
             transitionDuration={300}
-            wrapLines
+            multiline
             width={180}
           >
-            <MdDragIndicator size={24} />
+            <Box {...dragHandleProps} px="sm" className={classes.dragContainer}>
+              <MdDragIndicator size={24} />
+            </Box>
           </Tooltip>
         </Group>
 

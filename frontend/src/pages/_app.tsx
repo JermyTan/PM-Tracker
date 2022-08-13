@@ -86,42 +86,50 @@ function App({ Component, pageProps }: AppProps) {
                   "#101113",
                 ],
               },
-              headings: {
-                sizes: {
-                  h1: { fontSize: 32 },
+              components: {
+                Button: {
+                  styles: {
+                    root: {
+                      minWidth: "150px",
+                    },
+                    rightIcon: {
+                      marginLeft: "6px",
+                    },
+                    leftIcon: {
+                      marginRight: "6px",
+                    },
+                  },
+                },
+                Tooltip: {
+                  defaultProps: {
+                    color: colorModeValue(colorScheme, {
+                      darkModeValue: "gray",
+                    }),
+                  },
+                },
+                Drawer: {
+                  styles: {
+                    drawer: {
+                      display: "flex",
+                      flexDirection: "column",
+                    },
+                  },
+                },
+                Switch: {
+                  defaultProps: {
+                    size: "md",
+                    onLabel: "Yes",
+                    offLabel: "No",
+                  },
+                },
+                Menu: {
+                  defaultProps: {
+                    shadow: "md",
+                    width: 200,
+                    transition: "pop-bottom-left",
+                  },
                 },
               },
-            }}
-            styles={{
-              Tooltip: {
-                root: {
-                  display: "flex",
-                },
-              },
-              Button: {
-                root: {
-                  minWidth: "150px",
-                },
-                rightIcon: {
-                  marginLeft: "6px",
-                },
-                leftIcon: {
-                  marginRight: "6px",
-                },
-              },
-              Drawer: {
-                drawer: {
-                  display: "flex",
-                  flexDirection: "column",
-                },
-              },
-              Divider: (theme) => ({
-                horizontal: {
-                  borderTopColor: colorModeValue(colorScheme, {
-                    darkModeValue: theme.colors.dark[4],
-                  }),
-                },
-              }),
             }}
           >
             <NotificationsProvider position="bottom-center" limit={3}>

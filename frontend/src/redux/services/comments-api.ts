@@ -1,7 +1,7 @@
 import {
-  SubmissionCommentsData,
-  SubmissionFieldComment,
-  SubmissionFieldCommentPostPatchData,
+  SubmissionComment,
+  SubmissionCommentPostData,
+  SubmissionCommentPatchData,
 } from "../../types/comments";
 import { cacher } from "./api-cache-utils";
 import baseApi from "./base-api";
@@ -27,11 +27,11 @@ const commentsApi = baseApi
       }),
 
       getSubmissionComments: build.query<
-        SubmissionCommentsData,
+        SubmissionComment[],
         {
           courseId: string | number;
           submissionId: string | number;
-          fieldIndex: number;
+          fieldIndex: string | number;
         }
       >({
         query: ({ courseId, submissionId, fieldIndex }) => ({
@@ -47,11 +47,11 @@ const commentsApi = baseApi
       }),
 
       createSubmissionComment: build.mutation<
-        SubmissionFieldComment,
-        SubmissionFieldCommentPostPatchData & {
+        SubmissionComment,
+        SubmissionCommentPostData & {
           courseId: string | number;
           submissionId: string | number;
-          fieldIndex: number;
+          fieldIndex: string | number;
         }
       >({
         query: ({
@@ -81,8 +81,8 @@ const commentsApi = baseApi
       }),
 
       updateSubmissionComment: build.mutation<
-        SubmissionFieldComment,
-        SubmissionFieldCommentPostPatchData & {
+        SubmissionComment,
+        SubmissionCommentPatchData & {
           courseId: string | number;
           submissionId: string | number;
           commentId: string | number;
@@ -119,7 +119,7 @@ const commentsApi = baseApi
       }),
 
       deleteSubmissionComment: build.mutation<
-        SubmissionFieldComment,
+        SubmissionComment,
         {
           courseId: string | number;
           submissionId: string | number;

@@ -1,6 +1,6 @@
 import { Stack, Title, Text, SimpleGrid, Anchor } from "@mantine/core";
 import { Link } from "react-router-dom";
-import { DATE_TIME_MONTH_NAME_FORMAT } from "../constants";
+import { DATE_TIME_MONTH_NAME_FORMAT, UNKNOWN_USER } from "../constants";
 import { SubmissionSummaryData } from "../types/submissions";
 import { displayDateTime } from "../utils/transform-utils";
 import SubmissionTypeIconLabel from "./submission-type-icon-label";
@@ -95,12 +95,10 @@ function CourseSubmissionSummarySection({
             Created by
           </Text>
           <Text color={!creator?.name ? "red" : undefined} size="sm">
-            {creator?.name
-              ? `${creator.name} @ ${displayDateTime(
-                  createdAt,
-                  DATE_TIME_MONTH_NAME_FORMAT,
-                )}`
-              : "Unknown"}
+            {`${creator?.name ?? UNKNOWN_USER} @ ${displayDateTime(
+              createdAt,
+              DATE_TIME_MONTH_NAME_FORMAT,
+            )}`}
           </Text>
         </div>
 
@@ -109,12 +107,10 @@ function CourseSubmissionSummarySection({
             Last updated by
           </Text>
           <Text color={!editor?.name ? "red" : undefined} size="sm">
-            {editor?.name
-              ? `${editor.name} @ ${displayDateTime(
-                  updatedAt,
-                  DATE_TIME_MONTH_NAME_FORMAT,
-                )}`
-              : "Unknown"}
+            {`${editor?.name ?? UNKNOWN_USER} @ ${displayDateTime(
+              updatedAt,
+              DATE_TIME_MONTH_NAME_FORMAT,
+            )}`}
           </Text>
         </div>
 

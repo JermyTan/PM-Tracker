@@ -10,7 +10,7 @@ const useStyles = createStyles({
   },
 });
 
-export default function useGetFormContainerStyles() {
+export default function useGetFormContainerStyle() {
   const { classes } = useStyles();
 
   return classes.formContainer;

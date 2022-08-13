@@ -72,7 +72,7 @@ function MilestoneLayout({ children }: Props) {
       {
         label: (
           <Group spacing={4}>
-            <Text<"span"> component="span" inherit>
+            <Text span inherit>
               {milestone.name}
             </Text>
             <Badge variant="outline" color={isOpen ? "green" : "red"}>
@@ -130,12 +130,7 @@ function MilestoneLayout({ children }: Props) {
     }
 
     return components.map(({ label, path }, index) => (
-      <Anchor<typeof Link>
-        size="lg"
-        key={`${index}.${path}`}
-        component={Link}
-        to={path}
-      >
+      <Anchor<typeof Link> key={`${index}.${path}`} component={Link} to={path}>
         {label}
       </Anchor>
     ));

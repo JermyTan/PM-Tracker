@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
 import useGetMilestoneAlias from "../../custom-hooks/use-get-milestone-alias";
 import { useCreateTemplateMutation } from "../../redux/services/templates-api";
-import { emptySelector } from "../../redux/utils";
 import { TemplatePostData } from "../../types/templates";
 import toastUtils from "../../utils/toast-utils";
 import MilestoneTemplateFormBuilder, {
@@ -13,15 +12,15 @@ import MilestoneTemplateFormBuilder, {
 function CourseMilestoneTemplatesCreationPage() {
   const { capitalizedMilestoneAlias } = useGetMilestoneAlias();
   const courseId = useGetCourseId();
-  const [createTemplate] = useCreateTemplateMutation({
-    selectFromResult: emptySelector,
+  const [createTemplate, { isCreating }] = useCreateTemplateMutation({
+    selectFromResult: ({ isLoading: isCreating }) => ({ isCreating }),
   });
   const navigate = useNavigate();
 
   const onCreateTemplate = async (
     formData: MilestoneTemplateFormBuilderData,
   ) => {
-    if (courseId === undefined) {
+    if (isCreating || courseId === undefined) {
       return;
     }
 

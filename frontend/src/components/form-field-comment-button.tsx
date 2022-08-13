@@ -55,7 +55,7 @@ function FormFieldCommentButton({ fieldIndex }: Props) {
       className={classes.button}
       loading={isFetching}
     >
-      {isError ? "Error" : count}
+      {!isFetching && (isError ? "Error" : count)}
     </Button>
   );
 }

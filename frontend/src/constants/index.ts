@@ -73,3 +73,4 @@ export const EDITOR = "editor";
 export const GROUP = "group";
 export const TEMPLATE = "template";
 export const USER_EMAILS = "user_emails";
+export const UNKNOWN_USER = "unknown user";

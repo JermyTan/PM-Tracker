@@ -10,6 +10,7 @@ import {
   Tooltip,
   createStyles,
   Button,
+  Input,
 } from "@mantine/core";
 import { FormProvider, useForm } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
@@ -98,7 +99,7 @@ const SelectItemComponent = forwardRef<HTMLDivElement, SelectItem>(
 type Props = {
   defaultValues?: MilestoneTemplateFormBuilderProps;
   onSubmit: (formData: MilestoneTemplateFormBuilderData) => Promise<unknown>;
-  submitButtonProps?: ButtonProps<"button">;
+  submitButtonProps?: ButtonProps;
 };
 
 function MilestoneTemplateFormBuilder({
@@ -190,10 +191,10 @@ function MilestoneTemplateFormBuilder({
                     </Text>
                   }
                   withArrow
-                  placement="start"
+                  position="top-start"
                   transition="pop-top-left"
                   transitionDuration={300}
-                  wrapLines
+                  multiline
                   width={200}
                 >
                   <ThemeIcon color="gray" size="xs" radius="xl">
@@ -201,13 +202,7 @@ function MilestoneTemplateFormBuilder({
                   </ThemeIcon>
                 </Tooltip>
               </Group>
-              <SwitchField
-                name={IS_PUBLISHED}
-                id={IS_PUBLISHED}
-                onLabel="Yes"
-                offLabel="No"
-                size="md"
-              />
+              <SwitchField name={IS_PUBLISHED} id={IS_PUBLISHED} />
             </Group>
           </Stack>
 
@@ -220,9 +215,7 @@ function MilestoneTemplateFormBuilder({
               <ErrorMessage
                 name={FORM_FIELD_DATA}
                 render={({ message }) => (
-                  <Text color="red" size="sm">
-                    {message}
-                  </Text>
+                  <Input.Error size="md">{message}</Input.Error>
                 )}
               />
             </div>

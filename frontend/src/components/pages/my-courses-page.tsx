@@ -18,6 +18,7 @@ import { useResolveError } from "../../utils/error-utils";
 import CourseCard from "../course-card";
 import CourseCreationForm from "../course-creation-form";
 import useGetCoursePermissions from "../../custom-hooks/use-get-course-permissions";
+import useGetScrollAreaContainerPaddingStyle from "../../custom-hooks/use-get-scroll-area-container-padding-style";
 
 function MyCoursesPage() {
   const { courses, isLoading, error } = useGetCoursesQuery(undefined, {
@@ -31,6 +32,11 @@ function MyCoursesPage() {
   // subsequent api calls to the same endpoint do not need to resolve error since it is already handled here
   useResolveError({ error, name: "my-courses-page" });
   const [isDrawerOpened, { open, close }] = useDisclosure(false);
+  const { scrollAreaContainerClassName, scrollbarSize, adjustedPadding } =
+    useGetScrollAreaContainerPaddingStyle({
+      scrollbarSize: 8,
+      referencePadding: 20,
+    });
 
   return (
     <>
@@ -39,21 +45,25 @@ function MyCoursesPage() {
       </Head>
 
       <Drawer
+        classNames={{ drawer: scrollAreaContainerClassName }}
         opened={isDrawerOpened}
         onClose={close}
         position="right"
         size="xl"
-        padding="lg"
         closeButtonLabel="Cancel course creation"
         title={<Title order={3}>Course Creation</Title>}
       >
-        <ScrollArea offsetScrollbars pr="xs" scrollbarSize={8}>
+        <ScrollArea
+          offsetScrollbars
+          pr={adjustedPadding}
+          scrollbarSize={scrollbarSize}
+        >
           <CourseCreationForm onSuccess={close} />
         </ScrollArea>
       </Drawer>
 
       <Group position="apart">
-        <Title>My Courses</Title>
+        <Title order={2}>My Courses</Title>
 
         <ConditionalRenderer
           permissionGetter={{ fn: useGetCoursePermissions, key: "canCreate" }}
@@ -73,7 +83,15 @@ function MyCoursesPage() {
         defaultMessage="No courses found."
         showDefaultMessage={!courses || courses.length === 0}
       >
-        <SimpleGrid cols={3} spacing="xs">
+        <SimpleGrid
+          cols={4}
+          breakpoints={[
+            { maxWidth: "sm", cols: 1 },
+            { maxWidth: "md", cols: 2 },
+            { maxWidth: "xl", cols: 3 },
+          ]}
+          spacing="xs"
+        >
           {courses?.map((course) => (
             <CourseCard key={course.id} {...course} />
           ))}

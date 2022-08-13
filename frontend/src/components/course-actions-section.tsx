@@ -13,6 +13,7 @@ import { MdDeleteForever, MdEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import useGetCourseId from "../custom-hooks/use-get-course-id";
 import useGetCoursePermissions from "../custom-hooks/use-get-course-permissions";
+import useGetScrollAreaContainerPaddingStyle from "../custom-hooks/use-get-scroll-area-container-padding-style";
 import { useDeleteCourseMutation } from "../redux/services/courses-api";
 import { MY_COURSES_PATH } from "../routes/paths";
 import { useResolveError } from "../utils/error-utils";
@@ -24,6 +25,11 @@ type Props = StackProps;
 
 function CourseActionsSection(props: Props) {
   const courseId = useGetCourseId();
+  const { scrollAreaContainerClassName, scrollbarSize, adjustedPadding } =
+    useGetScrollAreaContainerPaddingStyle({
+      scrollbarSize: 8,
+      referencePadding: 20,
+    });
   const [deleteCourse, { isLoading }] = useDeleteCourseMutation({
     selectFromResult: ({ isLoading }) => ({ isLoading }),
   });
@@ -78,18 +84,22 @@ function CourseActionsSection(props: Props) {
     <>
       <ConditionalRenderer allow={canModify}>
         <Drawer
+          classNames={{ drawer: scrollAreaContainerClassName }}
           opened={isDrawerOpened}
           onClose={close}
           position="right"
           size="xl"
-          padding="lg"
           closeButtonLabel="Cancel course update"
           title={<Title order={3}>Course Update</Title>}
         >
           {/* special case: this conditional render is required as course edit form is mounted and api call will be made
         even though the drawer is not yet opened */}
           {isDrawerOpened && (
-            <ScrollArea offsetScrollbars pr="xs" scrollbarSize={8}>
+            <ScrollArea
+              offsetScrollbars
+              pr={adjustedPadding}
+              scrollbarSize={scrollbarSize}
+            >
               <CourseEditForm onSuccess={close} />
             </ScrollArea>
           )}
@@ -99,7 +109,7 @@ function CourseActionsSection(props: Props) {
       <ConditionalRenderer allow={canModify || canDelete}>
         <Stack {...props}>
           <ConditionalRenderer allow={canModify}>
-            <Button onClick={open} leftIcon={<MdEdit />}>
+            <Button onClick={open} leftIcon={<MdEdit size={16} />}>
               Edit course
             </Button>
           </ConditionalRenderer>
@@ -107,7 +117,7 @@ function CourseActionsSection(props: Props) {
             <Button
               onClick={openDeleteModal}
               color="red"
-              leftIcon={<MdDeleteForever />}
+              leftIcon={<MdDeleteForever size={16} />}
               loading={isLoading}
             >
               Delete course

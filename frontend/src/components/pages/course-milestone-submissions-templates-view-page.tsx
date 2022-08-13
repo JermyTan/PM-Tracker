@@ -5,7 +5,7 @@ import { ElementRef, useMemo, useRef } from "react";
 import { FiFileText } from "react-icons/fi";
 import { generatePath, useNavigate } from "react-router-dom";
 import useGetCourseId from "../../custom-hooks/use-get-course-id";
-import useGetFormContainerStyles from "../../custom-hooks/use-get-form-container-style";
+import useGetFormContainerStyle from "../../custom-hooks/use-get-form-container-style";
 import useGetMilestoneId from "../../custom-hooks/use-get-milestone-id";
 import useGetTemplateId from "../../custom-hooks/use-get-template-id";
 import { useCreateSubmissionMutation } from "../../redux/services/submissions-api";
@@ -23,7 +23,7 @@ function CourseMilestoneSubmissionsTemplatesViewPage() {
   const courseId = useGetCourseId();
   const milestoneId = useGetMilestoneId();
   const templateId = useGetTemplateId();
-  const formContainerClassName = useGetFormContainerStyles();
+  const formContainerClassName = useGetFormContainerStyle();
   const { milestoneTemplates } = useGetTemplatesQueryState(
     courseId ?? skipToken,
     {

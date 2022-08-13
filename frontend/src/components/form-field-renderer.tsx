@@ -16,10 +16,6 @@ const useStyles = createStyles({
       columnGap: "40px",
     },
   },
-  // TODO: change to autosize when migrated to mantine ui v5
-  textDisplay: {
-    height: "150px",
-  },
 });
 
 type Props = {
@@ -47,8 +43,8 @@ function FormFieldRenderer({
           <TextField
             name={name}
             label={
-              <TextViewer<"span">
-                component="span"
+              <TextViewer
+                span
                 preserveWhiteSpace
                 overflowWrap
                 withLinkify
@@ -58,8 +54,8 @@ function FormFieldRenderer({
               </TextViewer>
             }
             description={
-              <TextViewer<"span">
-                component="span"
+              <TextViewer
+                span
                 preserveWhiteSpace
                 overflowWrap
                 withLinkify
@@ -81,8 +77,8 @@ function FormFieldRenderer({
           <TextareaField
             name={name}
             label={
-              <TextViewer<"span">
-                component="span"
+              <TextViewer
+                span
                 preserveWhiteSpace
                 overflowWrap
                 withLinkify
@@ -92,8 +88,8 @@ function FormFieldRenderer({
               </TextViewer>
             }
             description={
-              <TextViewer<"span">
-                component="span"
+              <TextViewer
+                span
                 preserveWhiteSpace
                 overflowWrap
                 withLinkify
@@ -116,8 +112,8 @@ function FormFieldRenderer({
           <NumericField
             name={name}
             label={
-              <TextViewer<"span">
-                component="span"
+              <TextViewer
+                span
                 preserveWhiteSpace
                 overflowWrap
                 withLinkify
@@ -127,8 +123,8 @@ function FormFieldRenderer({
               </TextViewer>
             }
             description={
-              <TextViewer<"span">
-                component="span"
+              <TextViewer
+                span
                 preserveWhiteSpace
                 overflowWrap
                 withLinkify
@@ -151,8 +147,8 @@ function FormFieldRenderer({
           <RadioGroupField
             name={name}
             label={
-              <TextViewer<"span">
-                component="span"
+              <TextViewer
+                span
                 preserveWhiteSpace
                 overflowWrap
                 withLinkify
@@ -162,8 +158,8 @@ function FormFieldRenderer({
               </TextViewer>
             }
             description={
-              <TextViewer<"span">
-                component="span"
+              <TextViewer
+                span
                 preserveWhiteSpace
                 overflowWrap
                 withLinkify
@@ -186,8 +182,8 @@ function FormFieldRenderer({
           <CheckboxGroupField
             name={name}
             label={
-              <TextViewer<"span">
-                component="span"
+              <TextViewer
+                span
                 preserveWhiteSpace
                 overflowWrap
                 withLinkify
@@ -197,8 +193,8 @@ function FormFieldRenderer({
               </TextViewer>
             }
             description={
-              <TextViewer<"span">
-                component="span"
+              <TextViewer
+                span
                 preserveWhiteSpace
                 overflowWrap
                 withLinkify
@@ -218,15 +214,16 @@ function FormFieldRenderer({
         const { content } = formField;
 
         return (
-          <ScrollArea
+          <ScrollArea.Autosize
             offsetScrollbars
-            className={classes.textDisplay}
+            maxHeight="200px"
             type="auto"
+            scrollbarSize={8}
           >
-            <TextViewer preserveWhiteSpace overflowWrap>
+            <TextViewer size="sm" preserveWhiteSpace overflowWrap withLinkify>
               {content}
             </TextViewer>
-          </ScrollArea>
+          </ScrollArea.Autosize>
         );
       }
       default:

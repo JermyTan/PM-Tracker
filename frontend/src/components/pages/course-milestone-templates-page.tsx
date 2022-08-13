@@ -29,7 +29,6 @@ const useStyles = createStyles(
       flexDirection: !noWrap ? "column-reverse" : undefined,
     },
     templateContainer: {
-      flex: "1 1 auto",
       width: "100%",
       maxWidth: noWrap ? MAX_FORM_WIDTH : undefined,
     },

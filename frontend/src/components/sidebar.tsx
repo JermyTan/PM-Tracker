@@ -1,10 +1,11 @@
+import { ComponentPropsWithoutRef } from "react";
 import {
   Box,
   BoxProps,
   Center,
   createStyles,
   ScrollArea,
-  Text,
+  Title,
 } from "@mantine/core";
 import { matchPath, useLocation, useNavigate } from "react-router-dom";
 import { MdSpaceDashboard, MdLogout } from "react-icons/md";
@@ -20,8 +21,9 @@ import SidebarLinkItem from "./sidebar-link-item";
 import { useAppDispatch } from "../redux/hooks";
 import resetAppState from "../redux/thunks/reset-app-state";
 import toastUtils from "../utils/toast-utils";
+import { APP_NAME } from "../constants";
 
-type Props = Omit<BoxProps<"nav">, "children"> & {
+type Props = Omit<BoxProps & ComponentPropsWithoutRef<"nav">, "children"> & {
   isSidebarExpanded: boolean;
 };
 
@@ -67,15 +69,14 @@ function Sidebar({ isSidebarExpanded, className, ...props }: Props) {
       {...props}
     >
       <Center py="sm" px="md">
-        <Text className={classes.appName} weight={700}>
-          {isSidebarExpanded ? "Pigeonhole" : "P"}
-        </Text>
+        <Title className={classes.appName}>
+          {isSidebarExpanded ? APP_NAME : APP_NAME.charAt(0)}
+        </Title>
       </Center>
 
       <ScrollArea
         className={classes.navContainer}
-        scrollbarSize={isSidebarExpanded ? 10 : 6}
-        scrollHideDelay={500}
+        scrollbarSize={isSidebarExpanded ? 8 : 6}
       >
         <SidebarLinkItem
           icon={MdSpaceDashboard}

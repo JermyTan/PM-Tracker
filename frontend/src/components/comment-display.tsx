@@ -13,13 +13,13 @@ import { FaEdit, FaChevronDown, FaTrashAlt } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { DATE_TIME_MONTH_NAME_FORMAT } from "../constants";
 import { useAppSelector } from "../redux/hooks";
-import { SubmissionFieldComment } from "../types/comments";
+import { SubmissionComment } from "../types/comments";
 import { displayDateTime } from "../utils/transform-utils";
 import CommentContentDisplayAndEditor from "./comment-content-display-and-editor";
 import CommentDeleteConfirmation from "./comment-delete-confirmation";
 
 type Props = {
-  comment: SubmissionFieldComment;
+  comment: SubmissionComment;
   courseId: number | string;
   submissionId: number;
 };
@@ -63,30 +63,33 @@ function CommentDisplay({ comment, courseId, submissionId }: Props) {
           </Group>
           {canModifyComment && (
             <Menu
-              control={
+              position="bottom-end"
+              transition="pop-bottom-right"
+              // hidden={isEditingComment}
+            >
+              <Menu.Target>
                 <ActionIcon>
                   <FaChevronDown />
                 </ActionIcon>
-              }
-              placement="end"
-              hidden={isEditingComment}
-              closeOnScroll
-            >
-              <Menu.Item
-                icon={<FaEdit size={14} />}
-                onClick={() => {
-                  setIsEditingComment(true);
-                }}
-              >
-                Edit comment
-              </Menu.Item>
+              </Menu.Target>
 
-              <Menu.Item
-                icon={<FaTrashAlt size={14} color="red" />}
-                onClick={openDeleteCommentModal}
-              >
-                Delete comment
-              </Menu.Item>
+              <Menu.Dropdown>
+                <Menu.Item
+                  icon={<FaEdit size={14} />}
+                  onClick={() => {
+                    setIsEditingComment(true);
+                  }}
+                >
+                  Edit comment
+                </Menu.Item>
+
+                <Menu.Item
+                  icon={<FaTrashAlt size={14} color="red" />}
+                  onClick={openDeleteCommentModal}
+                >
+                  Delete comment
+                </Menu.Item>
+              </Menu.Dropdown>
             </Menu>
           )}
           {isEditingComment && (

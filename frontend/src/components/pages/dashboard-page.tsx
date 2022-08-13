@@ -9,7 +9,7 @@ function DashboardPage() {
         <title>Dashboard | {APP_NAME}</title>
       </Head>
 
-      <Title>Dashboard</Title>
+      <Title order={2}>Dashboard</Title>
     </>
   );
 }

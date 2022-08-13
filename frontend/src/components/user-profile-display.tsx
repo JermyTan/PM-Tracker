@@ -1,21 +1,59 @@
-import { Avatar, Text, Group } from "@mantine/core";
+import { MouseEvent } from "react";
+import {
+  Avatar,
+  Text,
+  Group,
+  GroupProps,
+  AvatarProps,
+  TextProps,
+  Anchor,
+  AnchorProps,
+  Stack,
+  StackProps,
+} from "@mantine/core";
 import { UserData } from "../types/users";
 
-type Props = UserData;
+type Props = GroupProps & {
+  user: UserData;
+  avatarProps?: AvatarProps;
+  nameEmailContainerProps?: StackProps;
+  nameProps?: TextProps;
+  emailProps?: AnchorProps;
+};
 
-function UserProfileDisplay({ name, email, profileImage }: Props) {
+function UserProfileDisplay({
+  user: { name, email, profileImage },
+  avatarProps,
+  nameEmailContainerProps,
+  nameProps,
+  emailProps,
+  ...props
+}: Props) {
   return (
-    <Group spacing="sm">
-      <Avatar size={40} src={profileImage} radius={40} />
-      <div>
-        <Text size="sm" weight={500} lineClamp={1}>
+    <Group spacing="sm" {...props}>
+      <Avatar
+        alt=""
+        src={profileImage || undefined}
+        size={40}
+        radius={40}
+        {...avatarProps}
+      />
+      <Stack spacing={0} {...nameEmailContainerProps}>
+        <Text size="sm" weight={500} {...nameProps}>
           {name}
         </Text>
-        {/** TODO: mouse over to view/copy full email */}
-        <Text color="dimmed" size="xs" lineClamp={1}>
+        <Anchor
+          size="xs"
+          color="dimmed"
+          href={`mailto:${email}`}
+          onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+            event.stopPropagation();
+          }}
+          {...emailProps}
+        >
           {email}
-        </Text>
-      </div>
+        </Anchor>
+      </Stack>
     </Group>
   );
 }

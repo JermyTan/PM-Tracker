@@ -1,83 +1,106 @@
-import { Avatar, Paper, Stack, Space, Group } from "@mantine/core";
-import { UseFormReset } from "react-hook-form";
-import { CONTENT } from "../constants";
-import { useAppSelector } from "../redux/hooks";
 import {
-  useCreateSubmissionCommentMutation,
-  useGetSubmissionCommentsQuery,
-} from "../redux/services/comments-api";
-import toastUtils from "../utils/toast-utils";
+  Paper,
+  Stack,
+  PaperProps,
+  LoadingOverlay,
+  ScrollArea,
+} from "@mantine/core";
+import { skipToken } from "@reduxjs/toolkit/query/react";
+import { useSearchParams } from "react-router-dom";
+import useGetCourseId from "../custom-hooks/use-get-course-id";
+import useGetSubmissionId from "../custom-hooks/use-get-submission-id";
+import { useGetSubmissionCommentsQuery } from "../redux/services/comments-api";
+import { useResolveError } from "../utils/error-utils";
 import CommentDisplay from "./comment-display";
-import CommentEditForm, { CommentFormData } from "./comment-edit-form";
 import PlaceholderWrapper from "./placeholder-wrapper";
 
-type Props = {
-  fieldIndex: number;
-  courseId: string | number;
-  submissionId: number;
-};
+type Props<T> = Omit<PaperProps<T>, "children">;
 
-function CourseSubmissionCommentsSection({
-  fieldIndex,
-  courseId,
-  submissionId,
-}: Props) {
-  const currentUser = useAppSelector(({ currentUser }) => currentUser?.user);
+function CourseSubmissionCommentsSection<T = "div">(props: Props<T>) {
+  const courseId = useGetCourseId();
+  const submissionId = useGetSubmissionId();
+  const [searchParams] = useSearchParams();
+  const fieldIndex = searchParams.get("field");
+  const invalidState =
+    courseId === undefined || submissionId === undefined || fieldIndex === null;
 
-  const { comments, isLoading } = useGetSubmissionCommentsQuery(
-    {
-      courseId,
-      submissionId,
-      fieldIndex,
-    },
-    {
-      selectFromResult: ({ data: comments, isLoading }) => ({
-        comments,
-        isLoading,
-      }),
-    },
-  );
-  const [createComment] = useCreateSubmissionCommentMutation();
+  const { comments, isLoading, isFetching, error } =
+    useGetSubmissionCommentsQuery(
+      invalidState
+        ? skipToken
+        : {
+            courseId,
+            submissionId,
+            fieldIndex,
+          },
+      {
+        selectFromResult: ({
+          data: comments,
+          isLoading,
+          isFetching,
+          error,
+        }) => ({
+          comments,
+          isLoading,
+          isFetching,
+          error,
+        }),
+      },
+    );
+  useResolveError({ error, name: "course-submission-comments-section" });
+  // const [createComment] = useCreateSubmissionCommentMutation();
 
-  const handleCreateComment = async (
-    parsedData: CommentFormData,
-    reset: UseFormReset<CommentFormData>,
-  ) => {
-    const commentPostData: CommentFormData = {
-      content: parsedData[CONTENT],
-    };
+  // const handleCreateComment = async (
+  //   parsedData: CommentFormData,
+  //   reset: UseFormReset<CommentFormData>,
+  // ) => {
+  //   const commentPostData: CommentFormData = {
+  //     content: parsedData[CONTENT],
+  //   };
 
-    await createComment({
-      ...commentPostData,
-      courseId,
-      submissionId,
-      fieldIndex,
-    }).unwrap();
+  //   await createComment({
+  //     ...commentPostData,
+  //     courseId,
+  //     submissionId,
+  //     fieldIndex,
+  //   }).unwrap();
 
-    toastUtils.success({ message: "Succesfully created comment." });
-    reset({ [CONTENT]: "" });
-  };
+  //   toastUtils.success({ message: "Succesfully created comment." });
+  //   reset({ [CONTENT]: "" });
+  // };
+
+  if (invalidState) {
+    return null;
+  }
 
   return (
-    <Paper withBorder shadow="sm" p="md" radius="md">
-      <PlaceholderWrapper
-        py={10}
-        isLoading={isLoading}
-        loadingMessage="Loading comments..."
-        defaultMessage="No comments yet."
-        showDefaultMessage={!comments || comments?.length === 0}
+    <Paper {...props}>
+      <ScrollArea
+        sx={{ height: "1000px" }}
+        pr="xs"
+        scrollbarSize={8}
+        offsetScrollbars
       >
-        <Stack>
-          {comments?.map((comment) => (
-            <CommentDisplay
-              comment={comment}
-              courseId={courseId}
-              submissionId={submissionId}
-            />
-          ))}
-        </Stack>
-      </PlaceholderWrapper>
-      <Space h="lg" />
+        <PlaceholderWrapper
+          py={150}
+          isLoading={isLoading}
+          loadingMessage="Loading comments..."
+          defaultMessage="No comments yet."
+          showDefaultMessage={!comments || comments?.length === 0}
+        >
+          <LoadingOverlay visible={isFetching} />
+          <Stack>
+            {comments?.map((comment) => (
+              <CommentDisplay
+                comment={comment}
+                courseId={courseId}
+                submissionId={submissionId}
+              />
+            ))}
+          </Stack>
+        </PlaceholderWrapper>
+      </ScrollArea>
+      {/* <Space h="lg" />
       <Group align="flex-start" noWrap>
         <Avatar
           src={currentUser?.profileImage}
@@ -90,7 +113,7 @@ function CourseSubmissionCommentsSection({
           confirmButtonName="Comment"
           onSubmit={handleCreateComment}
         />
-      </Group>
+      </Group> */}
     </Paper>
   );
 }

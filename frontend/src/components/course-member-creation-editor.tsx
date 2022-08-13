@@ -1,23 +1,18 @@
-import {
-  Text,
-  Button,
-  Group,
-  useMantineTheme,
-  Stack,
-  Loader,
-} from "@mantine/core";
+import { Button, Group, Stack, Loader, Table, Badge } from "@mantine/core";
 import papaparse from "papaparse";
-import { Dropzone, MIME_TYPES } from "@mantine/dropzone";
+import { z } from "zod";
 import { MdPersonAdd } from "react-icons/md";
-import { GrDocumentCsv, GrClose, GrClear } from "react-icons/gr";
 import { RiFileDownloadLine } from "react-icons/ri";
-import { FiUpload } from "react-icons/fi";
 import { useState } from "react";
 import toastUtils from "../utils/toast-utils";
 import { useResolveError } from "../utils/error-utils";
 import { useBatchCreateCourseMembershipsMutation } from "../redux/services/members-api";
-import { CourseMembershipBatchCreateData } from "../types/courses";
-import { MEMBER_CREATION_DATA } from "../constants";
+import {
+  CourseMemberData,
+  CourseMembershipBatchCreateData,
+} from "../types/courses";
+import { EMAIL, NAME } from "../constants";
+import CourseMemberCsvFileUploader from "./course-member-csv-file-uploader";
 
 type Props = {
   courseId?: number | string;
@@ -26,16 +21,44 @@ type Props = {
 
 type MemberCreationCsvRowData = [string, string];
 
-type MemberCreationData = {
-  email: string;
-  name: string;
+type MemberCreationData = z.infer<typeof schema>;
+
+enum Status {
+  New = "NEW",
+  Created = "CREATED",
+  Invalid = "INVALID",
+}
+
+const schema = z.object({
+  [NAME]: z.string().trim().min(0),
+  [EMAIL]: z
+    .string()
+    .trim()
+    .min(1, "Please enter an email address")
+    .email("Invalid email address"),
+});
+
+type TableRow = {
+  data: MemberCreationData;
+  status: Status;
 };
+
+function getStatusColor(status: Status): string {
+  switch (status) {
+    case Status.Created:
+      return "green";
+    case Status.Invalid:
+      return "red";
+    case Status.New:
+      return "yellow";
+    default:
+      return "";
+  }
+}
 
 function CourseMemberCreationEditor({ courseId, onSuccess }: Props) {
   const [isParsingCSV, setIsParsingCSV] = useState(false);
-  const [memberCreationDataList, setMemberCreationDataList] = useState<
-    MemberCreationData[]
-  >([]);
+  const [tableRows, setTableRows] = useState<TableRow[]>([]);
 
   const { resolveError } = useResolveError();
   const [batchCreateCourseMemberships, { isLoading }] =
@@ -43,34 +66,66 @@ function CourseMemberCreationEditor({ courseId, onSuccess }: Props) {
       selectFromResult: ({ isLoading }) => ({ isLoading }),
     });
 
+  const updateTableData = (newCreatedMembersData: CourseMemberData[]) => {
+    const createdMemberEmailsSet = new Set(
+      newCreatedMembersData.map((memberData) => memberData.user.email),
+    );
+
+    const updatedTableData: TableRow[] = tableRows.map((row) => {
+      let { status } = row;
+      const { data } = row;
+      if (createdMemberEmailsSet.has(data.email)) {
+        status = Status.Created;
+      }
+
+      return {
+        data,
+        status,
+      };
+    });
+
+    setTableRows(updatedTableData);
+  };
+
   const handleSubmitBatchMembershipCreation = async () => {
     if (courseId === undefined) {
       return;
     }
 
+    const validatedData: MemberCreationData[] = tableRows
+      .filter((row) => row.status === Status.New)
+      .map((row) => row.data);
+
+    if (validatedData.length === 0) {
+      toastUtils.success({
+        message: "No new members to add to the course.",
+      });
+      return;
+    }
+
     const membershipsData: CourseMembershipBatchCreateData = {
-      memberCreationData: memberCreationDataList.map((memberData) => ({
-        email: memberData.email,
-        name: memberData.name,
-      })),
+      memberCreationData: validatedData,
     };
 
     try {
       await batchCreateCourseMemberships({
         courseId,
         ...membershipsData,
-      }).unwrap();
+      })
+        .unwrap()
+        .then((payload) => {
+          updateTableData(payload);
 
-      toastUtils.success({ message: "Succesfully created memberships." });
+          toastUtils.success({ message: "Succesfully created memberships." });
+        });
     } catch (error) {
       resolveError(error);
     }
   };
 
-  const theme = useMantineTheme();
+  const hasEmailData = tableRows.length !== 0;
 
-  const hasEmailData = memberCreationDataList.length !== 0;
-
+  // TODO: download here
   const downloadCSVTemplate = () => {};
 
   const parseCSVTemplate = (files: File[]) => {
@@ -93,14 +148,28 @@ function CourseMemberCreationEditor({ courseId, onSuccess }: Props) {
         // removes column headers
         data.shift();
 
-        const userCreationData: MemberCreationData[] = data
-          .filter((row) => row.length >= 1)
-          .map((row) => ({
+        const userCreationData: TableRow[] = data.map((row) => {
+          console.log("ROW:", row);
+          const data: MemberCreationData = {
             email: row[0],
-            name: row[1],
-          }));
+            name: row[1] ?? "",
+          };
 
-        setMemberCreationDataList(userCreationData);
+          let status: Status = Status.New;
+
+          try {
+            schema.parse(data);
+          } catch (error) {
+            status = Status.Invalid;
+          }
+
+          return {
+            data,
+            status,
+          };
+        });
+
+        setTableRows(userCreationData);
 
         toastUtils.info({
           message: "The CSV file content has been successfully parsed.",
@@ -113,7 +182,7 @@ function CourseMemberCreationEditor({ courseId, onSuccess }: Props) {
   };
 
   const clearData = () => {
-    setMemberCreationDataList([]);
+    setTableRows([]);
   };
 
   return (
@@ -133,70 +202,36 @@ function CourseMemberCreationEditor({ courseId, onSuccess }: Props) {
               isLoading ? <Loader size={14} /> : <MdPersonAdd size={14} />
             }
           >
-            Submit
+            Create New Members
           </Button>
         </Group>
       </Group>
       {hasEmailData ? (
-        <>
-          {memberCreationDataList.map((data) => (
-            <Text>
-              {data.email}
-              {data.name}
-            </Text>
-          ))}
-        </>
+        <Table striped>
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Name (Optional)</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tableRows.map((row, index) => (
+              <tr key={index}>
+                <td>{row.data.email}</td>
+                <td>{row.data.name}</td>
+                <td>
+                  <Badge color={getStatusColor(row.status)}>{row.status}</Badge>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
       ) : (
-        <Dropzone
-          onDrop={(files) => {
-            parseCSVTemplate(files);
-          }}
-          onReject={() => {
-            toastUtils.error({
-              message:
-                "Error uploading file. Please ensure that a valid CSV file is uploaded.",
-            });
-          }}
-          maxSize={3 * 1024 ** 2}
-          accept={[MIME_TYPES.csv]}
-          loading={isParsingCSV}
-        >
-          <Group
-            position="center"
-            spacing="xl"
-            style={{ minHeight: 220, pointerEvents: "none" }}
-          >
-            <Dropzone.Accept>
-              <FiUpload
-                size={50}
-                color={
-                  theme.colors[theme.primaryColor][
-                    theme.colorScheme === "dark" ? 4 : 6
-                  ]
-                }
-              />
-            </Dropzone.Accept>
-            <Dropzone.Reject>
-              <GrClose
-                size={50}
-                color={theme.colors.red[theme.colorScheme === "dark" ? 4 : 6]}
-              />
-            </Dropzone.Reject>
-            <Dropzone.Idle>
-              <GrDocumentCsv size={50} />
-            </Dropzone.Idle>
-
-            <div>
-              <Text size="xl" inline>
-                Drag images here or click to select files
-              </Text>
-              <Text size="sm" color="dimmed" inline mt={7}>
-                Attach as many files as you like, each file should not exceed
-                5mb
-              </Text>
-            </div>
-          </Group>
-        </Dropzone>
+        <CourseMemberCsvFileUploader
+          onDrop={parseCSVTemplate}
+          isLoading={isParsingCSV}
+        />
       )}
     </Stack>
   );

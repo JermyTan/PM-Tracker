@@ -2,14 +2,12 @@ import {
   Text,
   Button,
   Group,
-  MantineTheme,
   useMantineTheme,
   Stack,
   Loader,
 } from "@mantine/core";
 import papaparse from "papaparse";
-import { Dropzone, DropzoneStatus, MIME_TYPES } from "@mantine/dropzone";
-import { IconType } from "react-icons";
+import { Dropzone, MIME_TYPES } from "@mantine/dropzone";
 import { MdPersonAdd } from "react-icons/md";
 import { GrDocumentCsv, GrClose, GrClear } from "react-icons/gr";
 import { RiFileDownloadLine } from "react-icons/ri";
@@ -18,7 +16,6 @@ import { useState } from "react";
 import toastUtils from "../utils/toast-utils";
 import { useResolveError } from "../utils/error-utils";
 import { useBatchCreateCourseMembershipsMutation } from "../redux/services/members-api";
-import { emptySelector } from "../redux/utils";
 import { CourseMembershipBatchCreateData } from "../types/courses";
 
 type Props = {
@@ -27,61 +24,6 @@ type Props = {
 };
 
 type UserCreationCsvRowData = [string];
-
-function getIconColor(status: DropzoneStatus, theme: MantineTheme) {
-  // if (status.accepted) {
-  //   return theme.colors[theme.primaryColor][
-  //     theme.colorScheme === "dark" ? 4 : 6
-  //   ];
-  // }
-
-  // if (status.rejected) {
-  //   return theme.colors.red[theme.colorScheme === "dark" ? 4 : 6];
-  // }
-
-  if (theme.colorScheme === "dark") {
-    return theme.colors.dark[0];
-  }
-
-  return theme.colors.gray[7];
-}
-
-function FileUploadIcon({
-  status,
-  ...props
-}: React.ComponentProps<IconType> & { status: DropzoneStatus }) {
-  // if (status.accepted) {
-  //   return <FiUpload {...props} />;
-  // }
-
-  // if (status.rejected) {
-  //   return <GrClose {...props} />;
-  // }
-
-  return <GrDocumentCsv {...props} />;
-}
-
-const dropzoneChildren = (status: DropzoneStatus, theme: MantineTheme) => (
-  <Group
-    position="center"
-    spacing="xl"
-    style={{ minHeight: 220, pointerEvents: "none" }}
-  >
-    <FileUploadIcon
-      status={status}
-      style={{ color: getIconColor(status, theme) }}
-      size={80}
-    />
-    <div>
-      <Text size="xl" inline>
-        Drag images here or click to select files
-      </Text>
-      <Text size="sm" color="dimmed" inline mt={7}>
-        Attach as many files as you like, each file should not exceed 5mb
-      </Text>
-    </div>
-  </Group>
-);
 
 function CourseAddMembersEditor({ courseId, onSuccess }: Props) {
   const [isParsingCSV, setIsParsingCSV] = useState(false);
@@ -103,8 +45,6 @@ function CourseAddMembersEditor({ courseId, onSuccess }: Props) {
     const membershipsData: CourseMembershipBatchCreateData = {
       user_emails: userCreationDataList,
     };
-
-    console.log("MEMBERSHIPS DATA", membershipsData);
 
     try {
       await batchCreateCourseMemberships({
@@ -133,10 +73,10 @@ function CourseAddMembersEditor({ courseId, onSuccess }: Props) {
 
     setIsParsingCSV(true);
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    papaparse.parse<UserCreationCsvRowData>(csvFile, {
+    /* eslint-disable @typescript-eslint/no-unsafe-call */
+    papaparse.parse<UserCreationCsvRowData, papaparse.LocalFile>(csvFile, {
       worker: true,
-      error: (error) => {
+      error: (error: { message: string }) => {
         console.log("Parse CSV file error:", error, error.message);
         toastUtils.error({ message: error.message });
       },
@@ -154,6 +94,7 @@ function CourseAddMembersEditor({ courseId, onSuccess }: Props) {
         });
       },
     });
+    /* eslint-enable @typescript-eslint/no-unsafe-call */
 
     setIsParsingCSV(false);
   };
@@ -191,9 +132,8 @@ function CourseAddMembersEditor({ courseId, onSuccess }: Props) {
         </>
       ) : (
         <Dropzone
-          accept={[MIME_TYPES.csv]}
           onDrop={(files) => {
-            parseCSVTemplate(files as File[]);
+            parseCSVTemplate(files);
           }}
           onReject={() => {
             toastUtils.error({
@@ -201,9 +141,45 @@ function CourseAddMembersEditor({ courseId, onSuccess }: Props) {
                 "Error uploading file. Please ensure that a valid CSV file is uploaded.",
             });
           }}
+          maxSize={3 * 1024 ** 2}
+          accept={[MIME_TYPES.csv]}
           loading={isParsingCSV}
         >
-          {(status) => dropzoneChildren(status, theme)}
+          <Group
+            position="center"
+            spacing="xl"
+            style={{ minHeight: 220, pointerEvents: "none" }}
+          >
+            <Dropzone.Accept>
+              <FiUpload
+                size={50}
+                color={
+                  theme.colors[theme.primaryColor][
+                    theme.colorScheme === "dark" ? 4 : 6
+                  ]
+                }
+              />
+            </Dropzone.Accept>
+            <Dropzone.Reject>
+              <GrClose
+                size={50}
+                color={theme.colors.red[theme.colorScheme === "dark" ? 4 : 6]}
+              />
+            </Dropzone.Reject>
+            <Dropzone.Idle>
+              <GrDocumentCsv size={50} />
+            </Dropzone.Idle>
+
+            <div>
+              <Text size="xl" inline>
+                Drag images here or click to select files
+              </Text>
+              <Text size="sm" color="dimmed" inline mt={7}>
+                Attach as many files as you like, each file should not exceed
+                5mb
+              </Text>
+            </div>
+          </Group>
         </Dropzone>
       )}
     </Stack>

@@ -1,3 +1,4 @@
+from asyncio import constants
 import logging
 from collections import Counter
 
@@ -67,6 +68,8 @@ from .logic import (
     update_course_submission_comment,
 )
 from .serializers import (
+    BatchMembershipCreationSerializer,
+    CourseMemberCreationDataSerializer,
     GetCourseSubmissionSerializer,
     PatchCourseGroupSerializer,
     PostCourseGroupSerializer,
@@ -1092,5 +1095,51 @@ class SingleCourseSubmissionCommentView(APIView):
         deleted_comment = delete_course_submission_comment(submission_comment)
 
         data = course_submission_comment_to_json(deleted_comment)
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+
+class CourseMembershipsWithNewUserCreationView(APIView):
+    @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
+    @check_course
+    @check_requester_membership(Role.INSTRUCTOR, Role.CO_OWNER)
+    def post(
+        self,
+        request,
+        requester: User,
+        course: Course,
+        requester_membership: CourseMembership
+    ):
+        serializer = BatchMembershipCreationSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+
+        new_members_data = list(filter(lambda data: "email" in data, validated_data["member_creation_data"]))
+        emails = set(map(lambda data: data["email"], new_members_data))
+
+        # get users that already exist
+        existing_users = User.objects.filter(email__in=emails)
+        existing_users_emails = set(existing_users.values_list("email", flat=True))
+        
+        new_users_data = [
+            user_data for user_data in new_members_data 
+            if user_data["email"] not in existing_users_emails
+        ]
+
+        # create users that don't exist yet
+        new_users_to_be_created = (
+            User(email=user_data["email"], name="" if "name" not in user_data else user_data["name"]) 
+            for user_data in new_users_data
+        )
+        new_users = User.objects.bulk_create(new_users_to_be_created)
+
+        all_users = list(existing_users) + new_users
+        new_memberships_to_be_created = (CourseMembership(course=course, user=user) for user in all_users)
+        CourseMembership.objects.bulk_create(new_memberships_to_be_created, ignore_conflicts=True)
+
+        # return all members
+        memberships = CourseMembership.objects.filter(user__email__in=emails)
+        data = [course_membership_to_json(membership) for membership in memberships]
 
         return Response(data=data, status=status.HTTP_200_OK)

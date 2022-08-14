@@ -1,32 +1,78 @@
 import {
   Paper,
-  Stack,
   PaperProps,
   LoadingOverlay,
   ScrollArea,
+  createStyles,
+  Box,
+  Divider,
 } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/query/react";
+import {
+  ComponentPropsWithoutRef,
+  ElementType,
+  useLayoutEffect,
+  useRef,
+} from "react";
 import { useSearchParams } from "react-router-dom";
 import useGetCourseId from "../custom-hooks/use-get-course-id";
+import useGetSubmissionCommentPermissions from "../custom-hooks/use-get-submission-comment-permissions";
 import useGetSubmissionId from "../custom-hooks/use-get-submission-id";
-import { useGetSubmissionCommentsQuery } from "../redux/services/comments-api";
+import {
+  useCreateSubmissionCommentMutation,
+  useGetSubmissionCommentsQuery,
+} from "../redux/services/comments-api";
 import { useResolveError } from "../utils/error-utils";
-import CommentDisplay from "./comment-display";
+import toastUtils from "../utils/toast-utils";
+import CommentCard from "./comment-card";
+import CommentForm, { CommentFormData } from "./comment-form";
+import ConditionalRenderer from "./conditional-renderer";
 import PlaceholderWrapper from "./placeholder-wrapper";
 
-type Props<T> = Omit<PaperProps<T>, "children">;
+const useStyles = createStyles({
+  sectionContainer: {
+    position: "relative",
+    width: "400px",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+  },
+  commentsContainer: {
+    flex: "1 1 auto",
+    overflow: "hidden",
+  },
+  scrollAreaContainer: {
+    height: "100%",
+  },
+  scrollArea: {
+    height: "100%",
+  },
+  placeholder: {
+    height: "100%",
+  },
+});
 
-function CourseSubmissionCommentsSection<T = "div">(props: Props<T>) {
+type Props<C extends ElementType> = Omit<
+  PaperProps & ComponentPropsWithoutRef<C>,
+  "children"
+>;
+
+function CourseSubmissionCommentsSection<C extends ElementType = "div">({
+  className,
+  ...props
+}: Props<C>) {
   const courseId = useGetCourseId();
   const submissionId = useGetSubmissionId();
+  const { classes, cx } = useStyles();
   const [searchParams] = useSearchParams();
   const fieldIndex = searchParams.get("field");
-  const invalidState =
-    courseId === undefined || submissionId === undefined || fieldIndex === null;
+  const { canCreate } = useGetSubmissionCommentPermissions();
 
   const { comments, isLoading, isFetching, error } =
     useGetSubmissionCommentsQuery(
-      invalidState
+      courseId === undefined ||
+        submissionId === undefined ||
+        fieldIndex === null
         ? skipToken
         : {
             courseId,
@@ -48,73 +94,89 @@ function CourseSubmissionCommentsSection<T = "div">(props: Props<T>) {
       },
     );
   useResolveError({ error, name: "course-submission-comments-section" });
-  // const [createComment] = useCreateSubmissionCommentMutation();
+  const [createComment, { isCreating }] = useCreateSubmissionCommentMutation({
+    selectFromResult: ({ isLoading: isCreating }) => ({ isCreating }),
+  });
+  const hasCreatedComment = useRef(false);
+  const commentsViewPortRef = useRef<HTMLDivElement>(null);
 
-  // const handleCreateComment = async (
-  //   parsedData: CommentFormData,
-  //   reset: UseFormReset<CommentFormData>,
-  // ) => {
-  //   const commentPostData: CommentFormData = {
-  //     content: parsedData[CONTENT],
-  //   };
+  useLayoutEffect(() => {
+    if (
+      hasCreatedComment.current &&
+      comments &&
+      commentsViewPortRef.current &&
+      commentsViewPortRef.current.scrollHeight > 0
+    ) {
+      hasCreatedComment.current = false;
+      commentsViewPortRef.current.scrollTo({
+        top: commentsViewPortRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [comments]);
 
-  //   await createComment({
-  //     ...commentPostData,
-  //     courseId,
-  //     submissionId,
-  //     fieldIndex,
-  //   }).unwrap();
+  const onCreate = async (formData: CommentFormData) => {
+    if (
+      isCreating ||
+      courseId === undefined ||
+      submissionId === undefined ||
+      fieldIndex === null
+    ) {
+      return;
+    }
 
-  //   toastUtils.success({ message: "Succesfully created comment." });
-  //   reset({ [CONTENT]: "" });
-  // };
+    await createComment({
+      ...formData,
+      courseId,
+      submissionId,
+      fieldIndex,
+    }).unwrap();
 
-  if (invalidState) {
-    return null;
-  }
+    hasCreatedComment.current = true;
+
+    toastUtils.success({
+      message: "The new comment has been created successfully.",
+    });
+  };
 
   return (
-    <Paper {...props}>
-      <ScrollArea
-        sx={{ height: "1000px" }}
-        pr="xs"
-        scrollbarSize={8}
-        offsetScrollbars
-      >
-        <PlaceholderWrapper
-          py={150}
-          isLoading={isLoading}
-          loadingMessage="Loading comments..."
-          defaultMessage="No comments yet."
-          showDefaultMessage={!comments || comments?.length === 0}
-        >
-          <LoadingOverlay visible={isFetching} />
-          <Stack>
-            {comments?.map((comment) => (
-              <CommentDisplay
-                comment={comment}
-                courseId={courseId}
-                submissionId={submissionId}
-              />
-            ))}
-          </Stack>
-        </PlaceholderWrapper>
-      </ScrollArea>
-      {/* <Space h="lg" />
-      <Group align="flex-start" noWrap>
-        <Avatar
-          src={currentUser?.profileImage}
-          alt={currentUser?.name}
-          radius="xl"
-        />
+    <>
+      <Divider orientation="vertical" />
+      <Paper className={cx(className, classes.sectionContainer)} {...props}>
+        <LoadingOverlay visible={!isLoading && isFetching} />
+        <div className={classes.commentsContainer}>
+          <PlaceholderWrapper
+            className={classes.placeholder}
+            py={150}
+            isLoading={isLoading}
+            loadingMessage="Loading comments..."
+            defaultMessage="No comments."
+            showDefaultMessage={!comments || comments?.length === 0}
+          >
+            <Box className={classes.scrollAreaContainer} pl="md" pb="md">
+              <ScrollArea
+                className={classes.scrollArea}
+                scrollbarSize={8}
+                offsetScrollbars
+                type="auto"
+                viewportRef={commentsViewPortRef}
+                pr="md"
+              >
+                {comments?.map((comment) => (
+                  <CommentCard key={comment.id} {...comment} />
+                ))}
+              </ScrollArea>
+            </Box>
+          </PlaceholderWrapper>
+        </div>
 
-        <CommentEditForm
-          defaultValue=""
-          confirmButtonName="Comment"
-          onSubmit={handleCreateComment}
-        />
-      </Group> */}
-    </Paper>
+        <Box px="md" pb="xl">
+          <ConditionalRenderer allow={canCreate}>
+            <CommentForm type="new" onSubmit={onCreate} resetOnSubmitSuccess />
+          </ConditionalRenderer>
+        </Box>
+      </Paper>
+    </>
   );
 }
 

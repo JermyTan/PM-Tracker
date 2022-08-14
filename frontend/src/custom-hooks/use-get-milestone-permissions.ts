@@ -1,11 +1,12 @@
-import { INSTRUCTOR_PERMISSION_ROLES, Role } from "../types/courses";
+import { Role, roleToPropertiesMap } from "../types/courses";
 import { MilestoneData } from "../types/milestones";
 import useGetCurrentUserRole from "./use-get-current-user-role";
 
 export default function useGetMilestonePermissions(milestone?: MilestoneData) {
   const role = useGetCurrentUserRole();
   const canCreate =
-    role !== undefined && INSTRUCTOR_PERMISSION_ROLES.includes(role);
+    role !== undefined &&
+    roleToPropertiesMap[Role.Instructor].permissionRoles.includes(role);
 
   if (!milestone) {
     return {

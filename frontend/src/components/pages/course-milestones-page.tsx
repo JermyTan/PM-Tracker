@@ -27,7 +27,7 @@ import useGetScrollAreaContainerPaddingStyle from "../../custom-hooks/use-get-sc
 
 function CourseMilestonesPage() {
   const courseId = useGetCourseId();
-  const { scrollAreaContainerClassName, scrollbarSize, adjustedPadding } =
+  const { scrollAreaContainerClassName, scrollbarSize, referencePadding } =
     useGetScrollAreaContainerPaddingStyle({
       scrollbarSize: 8,
       referencePadding: 20,
@@ -62,11 +62,7 @@ function CourseMilestonesPage() {
         closeButtonLabel={`Cancel ${milestoneAlias} creation`}
         title={<Title order={3}>{capitalizedMilestoneAlias} Creation</Title>}
       >
-        <ScrollArea
-          offsetScrollbars
-          pr={adjustedPadding}
-          scrollbarSize={scrollbarSize}
-        >
+        <ScrollArea pr={referencePadding} scrollbarSize={scrollbarSize}>
           <MilestoneCreationForm onSuccess={close} />
         </ScrollArea>
       </Drawer>

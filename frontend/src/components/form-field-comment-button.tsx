@@ -1,6 +1,6 @@
 import { Button, createStyles } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/query/react";
-import { BiCommentDetail } from "react-icons/bi";
+import { BiCommentDetail, BiCommentEdit } from "react-icons/bi";
 import { useSearchParams } from "react-router-dom";
 import useGetCourseId from "../custom-hooks/use-get-course-id";
 import useGetSubmissionId from "../custom-hooks/use-get-submission-id";
@@ -49,11 +49,12 @@ function FormFieldCommentButton({ fieldIndex }: Props) {
     <Button
       variant={isActive ? "filled" : "light"}
       onClick={onClick}
-      color="violet"
+      color={isError ? "red" : "violet"}
       compact
-      leftIcon={<BiCommentDetail />}
+      leftIcon={isError ? <BiCommentEdit /> : <BiCommentDetail />}
       className={classes.button}
       loading={isFetching}
+      aria-label={isActive ? "Close comments" : "View comments"}
     >
       {!isFetching && (isError ? "Error" : count)}
     </Button>

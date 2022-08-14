@@ -1,17 +1,18 @@
 import { Text, TextProps } from "@mantine/core";
+import { ComponentPropsWithoutRef, ElementType } from "react";
 import { DATE_TIME_MONTH_NAME_FORMAT } from "../constants";
 import { displayDateTime } from "../utils/transform-utils";
 
-type Props<T> = {
-  startDateTime: number;
-  endDateTime: number | null;
-} & Omit<TextProps<T>, "children">;
+type Props<C extends ElementType> = Omit<
+  TextProps & ComponentPropsWithoutRef<C>,
+  "children"
+> & { startDateTime: number; endDateTime: number | null };
 
-function MilestoneActivePeriodDisplay<T = "div">({
+function MilestoneActivePeriodDisplay<C extends ElementType = "div">({
   startDateTime,
   endDateTime,
   ...props
-}: Props<T>) {
+}: Props<C>) {
   return (
     <Text {...props}>
       <Text inherit>

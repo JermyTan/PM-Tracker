@@ -43,8 +43,8 @@ const LINKIFY_OPTIONS = {
     linkType === "url" ? "noopener noreferrer" : null,
 };
 
-type Props<T extends ElementType> = Omit<
-  TextProps & ComponentPropsWithoutRef<T>,
+type Props<C extends ElementType> = Omit<
+  TextProps & ComponentPropsWithoutRef<C>,
   "children"
 > & {
   withLinkify?: boolean;
@@ -53,14 +53,14 @@ type Props<T extends ElementType> = Omit<
   children: ReactNode;
 };
 
-function TextViewer<T extends ElementType = "div">({
+function TextViewer<C extends ElementType = "div">({
   withLinkify,
   preserveWhiteSpace,
   overflowWrap,
   children,
   className,
   ...props
-}: Props<T>) {
+}: Props<C>) {
   const { classes, cx } = useStyles();
 
   const textComponent = (

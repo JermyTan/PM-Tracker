@@ -136,6 +136,7 @@ function FormFieldBuilder({
               variant="transparent"
               onClick={onDeleteField}
               disabled={!canDeleteField}
+              aria-label="Delete field"
             >
               <FaTrashAlt />
             </ActionIcon>

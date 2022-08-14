@@ -28,17 +28,23 @@ export enum Role {
 
 export const ALL_ROLES = Object.values(Role);
 
-export const CO_OWNER_PERMISSION_ROLES = [Role.CoOwner];
-
-export const INSTRUCTOR_PERMISSION_ROLES = [Role.Instructor, Role.CoOwner];
-
-// Matches a user's role in a course to the set of roles which the
-// user can add/remove to a course group
-export const editableRoleMap = new Map<Role | undefined, Set<Role>>([
-  [Role.Student, new Set<Role>([Role.Student])],
-  [Role.Instructor, new Set<Role>([Role.Student, Role.Instructor])],
-  [Role.CoOwner, new Set<Role>([Role.Student, Role.Instructor, Role.CoOwner])],
-]);
+export const roleToPropertiesMap = {
+  [Role.CoOwner]: {
+    label: "Co-Owner",
+    permissionRoles: [Role.CoOwner],
+    modifiableRoles: ALL_ROLES,
+  },
+  [Role.Instructor]: {
+    label: "Instructor",
+    permissionRoles: [Role.Instructor, Role.CoOwner],
+    modifiableRoles: [Role.Student, Role.Instructor],
+  },
+  [Role.Student]: {
+    label: "Student",
+    permissionRoles: ALL_ROLES,
+    modifiableRoles: [Role.Student],
+  },
+};
 
 export type CourseSummaryData = BaseData & {
   [NAME]: string;

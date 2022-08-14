@@ -24,11 +24,11 @@ export enum SubmissionType {
 }
 
 export const submissionTypeToPropertiesMap = {
-  [SubmissionType.Individual]: { label: "Individual", Icon: MdPerson },
-  [SubmissionType.Group]: { label: "Group", Icon: MdPeopleAlt },
+  [SubmissionType.Individual]: { label: "Individual", icon: MdPerson },
+  [SubmissionType.Group]: { label: "Group", icon: MdPeopleAlt },
   [SubmissionType.IndividualGroup]: {
     label: "Individual/Group",
-    Icon: MdOutlinePeopleAlt,
+    icon: MdOutlinePeopleAlt,
   },
 };
 

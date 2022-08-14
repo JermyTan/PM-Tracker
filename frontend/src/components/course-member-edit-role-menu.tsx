@@ -1,6 +1,5 @@
 import { Button, Group, Radio, Space } from "@mantine/core";
 import { skipToken } from "@reduxjs/toolkit/dist/query";
-import { capitalCase } from "change-case";
 import { useState } from "react";
 import { ROLE } from "../constants";
 import useGetCourseId from "../custom-hooks/use-get-course-id";
@@ -8,9 +7,9 @@ import { useGetSingleCourseQuery } from "../redux/services/courses-api";
 import { useUpdateCourseMembershipMutation } from "../redux/services/members-api";
 import {
   CourseMemberData,
-  editableRoleMap,
   Role,
   ALL_ROLES,
+  roleToPropertiesMap,
 } from "../types/courses";
 import { useResolveError } from "../utils/error-utils";
 import toastUtils from "../utils/toast-utils";
@@ -27,7 +26,6 @@ function CourseMemberEditRoleMenu({ member, onSuccess }: Props) {
   const { course } = useGetSingleCourseQuery(courseId ?? skipToken, {
     selectFromResult: ({ data: course }) => ({ course }),
   });
-  const editableRoles = editableRoleMap.get(course?.role) || new Set<Role>();
 
   const membershipId = member.id;
 
@@ -35,6 +33,9 @@ function CourseMemberEditRoleMenu({ member, onSuccess }: Props) {
 
   const [updateCourseMemberRole, { isLoading }] =
     useUpdateCourseMembershipMutation();
+
+  const editableRoles =
+    roleToPropertiesMap[course?.role ?? Role.Student].modifiableRoles;
 
   const onUpdateCourseMemberRole = async () => {
     if (isLoading || courseId === undefined) {
@@ -78,8 +79,8 @@ function CourseMemberEditRoleMenu({ member, onSuccess }: Props) {
         {ALL_ROLES.map((role) => (
           <Radio
             value={role}
-            label={capitalCase(role)}
-            disabled={!editableRoles.has(role)}
+            label={roleToPropertiesMap[role].label}
+            disabled={!editableRoles.includes(role)}
           />
         ))}
       </Radio.Group>

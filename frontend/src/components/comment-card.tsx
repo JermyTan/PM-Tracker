@@ -16,8 +16,8 @@ import { BiCommentEdit, BiCommentX } from "react-icons/bi";
 import { IoIosMore, IoMdClose } from "react-icons/io";
 import { DATE_TIME_MONTH_NAME_FORMAT } from "../constants";
 import useGetCourseId from "../custom-hooks/use-get-course-id";
+import useGetSubmissionCommentPermissions from "../custom-hooks/use-get-submission-comment-permissions";
 import useGetSubmissionId from "../custom-hooks/use-get-submission-id";
-import { useAppSelector } from "../redux/hooks";
 import {
   useDeleteSubmissionCommentMutation,
   useUpdateSubmissionCommentMutation,
@@ -28,6 +28,7 @@ import { useResolveError } from "../utils/error-utils";
 import toastUtils from "../utils/toast-utils";
 import { displayDateTime } from "../utils/transform-utils";
 import CommentForm, { CommentFormData } from "./comment-form";
+import ConditionalRenderer from "./conditional-renderer";
 import TextViewer from "./text-viewer";
 
 const useStyles = createStyles({
@@ -45,7 +46,6 @@ function CommentCard(props: Props) {
   const submissionId = useGetSubmissionId();
   const isEdited = createdAt !== updatedAt;
   const [isEditingComment, setEditingComment] = useState(false);
-  const userId = useAppSelector(({ currentUser }) => currentUser?.user?.id);
   const { classes } = useStyles();
   const { ref, hovered } = useHover();
   const [
@@ -59,8 +59,7 @@ function CommentCard(props: Props) {
     selectFromResult: ({ isLoading: isDeleting }) => ({ isDeleting }),
   });
   const { resolveError } = useResolveError({ name: "commend-card" });
-
-  const canModifyComment = userId === commenter.id && !isDeleted;
+  const { canModify, canDelete } = useGetSubmissionCommentPermissions(props);
 
   const onUpdateComment = async (formData: CommentFormData) => {
     if (isUpdating || courseId === undefined || submissionId === undefined) {
@@ -128,28 +127,34 @@ function CommentCard(props: Props) {
 
   return (
     <Group py="xs" align="flex-start" noWrap spacing="sm" ref={ref}>
-      <Modal
-        opened={isDeleteModalOpened}
-        onClose={closeDeleteModal}
-        centered
-        title="Delete comment"
-        closeButtonLabel="Cancel comment deletion"
-      >
-        <Stack>
-          <Text size="sm">Are you sure you want to delete this comment?</Text>
+      <ConditionalRenderer allow={canDelete}>
+        <Modal
+          opened={isDeleteModalOpened}
+          onClose={closeDeleteModal}
+          centered
+          title="Delete comment"
+          closeButtonLabel="Cancel comment deletion"
+        >
+          <Stack>
+            <Text size="sm">Are you sure you want to delete this comment?</Text>
 
-          {contentComponent}
+            {contentComponent}
 
-          <Group position="right">
-            <Button variant="default" onClick={closeDeleteModal}>
-              No don&apos;t delete
-            </Button>
-            <Button color="red" loading={isDeleting} onClick={onDeleteComment}>
-              Delete comment
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
+            <Group position="right">
+              <Button variant="default" onClick={closeDeleteModal}>
+                No don&apos;t delete
+              </Button>
+              <Button
+                color="red"
+                loading={isDeleting}
+                onClick={onDeleteComment}
+              >
+                Delete comment
+              </Button>
+            </Group>
+          </Stack>
+        </Modal>
+      </ConditionalRenderer>
 
       <Avatar
         src={commenter.profileImage || undefined}
@@ -168,8 +173,10 @@ function CommentCard(props: Props) {
                 : "Ex-course member"}
             </Text>
           </div>
-          {hovered && canModifyComment && !isEditingComment && (
-            <Menu position="left-start" transition="pop-top-right">
+          <ConditionalRenderer
+            allow={hovered && (canModify || canDelete) && !isEditingComment}
+          >
+            <Menu position="bottom-end" transition="pop-top-right">
               <Menu.Target>
                 <ActionIcon aria-label="More actions">
                   <IoIosMore />
@@ -177,22 +184,26 @@ function CommentCard(props: Props) {
               </Menu.Target>
 
               <Menu.Dropdown>
-                <Menu.Item
-                  icon={<BiCommentEdit />}
-                  onClick={() => setEditingComment(true)}
-                >
-                  Edit comment
-                </Menu.Item>
+                <ConditionalRenderer allow={canModify}>
+                  <Menu.Item
+                    icon={<BiCommentEdit />}
+                    onClick={() => setEditingComment(true)}
+                  >
+                    Edit comment
+                  </Menu.Item>
+                </ConditionalRenderer>
 
-                <Menu.Item
-                  icon={<BiCommentX color="red" />}
-                  onClick={openDeleteModal}
-                >
-                  Delete comment
-                </Menu.Item>
+                <ConditionalRenderer allow={canDelete}>
+                  <Menu.Item
+                    icon={<BiCommentX color="red" />}
+                    onClick={openDeleteModal}
+                  >
+                    Delete comment
+                  </Menu.Item>
+                </ConditionalRenderer>
               </Menu.Dropdown>
             </Menu>
-          )}
+          </ConditionalRenderer>
 
           {isEditingComment && (
             <ActionIcon

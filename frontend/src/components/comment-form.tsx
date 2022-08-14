@@ -1,4 +1,4 @@
-import { forwardRef, Ref, useImperativeHandle } from "react";
+import { forwardRef, Ref, useEffect, useImperativeHandle } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ActionIcon, createStyles, Group } from "@mantine/core";
 import { MdCheck, MdSend } from "react-icons/md";
@@ -37,10 +37,16 @@ type Props = {
   defaultValues?: CommentFormProps;
   onSubmit?: (formData: CommentFormData) => Promise<unknown>;
   type: "new" | "existing";
+  resetOnSubmitSuccess?: boolean;
 };
 
 function CommentForm(
-  { defaultValues = DEFAULT_VALUES, onSubmit: handleOnSubmit, type }: Props,
+  {
+    defaultValues = DEFAULT_VALUES,
+    onSubmit: handleOnSubmit,
+    type,
+    resetOnSubmitSuccess,
+  }: Props,
   ref: Ref<CommentFormHandler>,
 ) {
   const { classes } = useStyles();
@@ -50,7 +56,7 @@ function CommentForm(
   });
   const {
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isSubmitting, isSubmitSuccessful },
     reset,
   } = methods;
   useImperativeHandle(ref, () => ({ reset }), [reset]);
@@ -65,6 +71,12 @@ function CommentForm(
 
     await handleOnSubmit?.(formData);
   };
+
+  useEffect(() => {
+    if (isSubmitSuccessful && resetOnSubmitSuccess) {
+      reset();
+    }
+  }, [isSubmitSuccessful, resetOnSubmitSuccess, reset]);
 
   return (
     <FormProvider {...methods}>

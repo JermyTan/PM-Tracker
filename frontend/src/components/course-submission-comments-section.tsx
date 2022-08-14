@@ -10,13 +10,13 @@ import {
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import {
   ComponentPropsWithoutRef,
-  ElementRef,
   ElementType,
   useLayoutEffect,
   useRef,
 } from "react";
 import { useSearchParams } from "react-router-dom";
 import useGetCourseId from "../custom-hooks/use-get-course-id";
+import useGetSubmissionCommentPermissions from "../custom-hooks/use-get-submission-comment-permissions";
 import useGetSubmissionId from "../custom-hooks/use-get-submission-id";
 import {
   useCreateSubmissionCommentMutation,
@@ -26,6 +26,7 @@ import { useResolveError } from "../utils/error-utils";
 import toastUtils from "../utils/toast-utils";
 import CommentCard from "./comment-card";
 import CommentForm, { CommentFormData } from "./comment-form";
+import ConditionalRenderer from "./conditional-renderer";
 import PlaceholderWrapper from "./placeholder-wrapper";
 
 const useStyles = createStyles({
@@ -42,9 +43,9 @@ const useStyles = createStyles({
   },
   scrollAreaContainer: {
     height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-end",
+  },
+  scrollArea: {
+    height: "100%",
   },
   placeholder: {
     height: "100%",
@@ -65,18 +66,19 @@ function CourseSubmissionCommentsSection<C extends ElementType = "div">({
   const { classes, cx } = useStyles();
   const [searchParams] = useSearchParams();
   const fieldIndex = searchParams.get("field");
-  const shouldShowComments =
-    courseId !== undefined && submissionId !== undefined && fieldIndex !== null;
+  const { canCreate } = useGetSubmissionCommentPermissions();
 
   const { comments, isLoading, isFetching, error } =
     useGetSubmissionCommentsQuery(
-      shouldShowComments
-        ? {
+      courseId === undefined ||
+        submissionId === undefined ||
+        fieldIndex === null
+        ? skipToken
+        : {
             courseId,
             submissionId,
             fieldIndex,
-          }
-        : skipToken,
+          },
       {
         selectFromResult: ({
           data: comments,
@@ -95,7 +97,6 @@ function CourseSubmissionCommentsSection<C extends ElementType = "div">({
   const [createComment, { isCreating }] = useCreateSubmissionCommentMutation({
     selectFromResult: ({ isLoading: isCreating }) => ({ isCreating }),
   });
-  const formRef = useRef<ElementRef<typeof CommentForm>>(null);
   const hasCreatedComment = useRef(false);
   const commentsViewPortRef = useRef<HTMLDivElement>(null);
 
@@ -114,12 +115,13 @@ function CourseSubmissionCommentsSection<C extends ElementType = "div">({
     }
   }, [comments]);
 
-  if (!shouldShowComments) {
-    return null;
-  }
-
   const onCreate = async (formData: CommentFormData) => {
-    if (isCreating) {
+    if (
+      isCreating ||
+      courseId === undefined ||
+      submissionId === undefined ||
+      fieldIndex === null
+    ) {
       return;
     }
 
@@ -135,8 +137,6 @@ function CourseSubmissionCommentsSection<C extends ElementType = "div">({
     toastUtils.success({
       message: "The new comment has been created successfully.",
     });
-
-    formRef.current?.reset({ content: "" });
   };
 
   return (
@@ -155,6 +155,7 @@ function CourseSubmissionCommentsSection<C extends ElementType = "div">({
           >
             <Box className={classes.scrollAreaContainer} pl="md" pb="md">
               <ScrollArea
+                className={classes.scrollArea}
                 scrollbarSize={8}
                 offsetScrollbars
                 type="auto"
@@ -169,8 +170,10 @@ function CourseSubmissionCommentsSection<C extends ElementType = "div">({
           </PlaceholderWrapper>
         </div>
 
-        <Box px="md" pb="md">
-          <CommentForm ref={formRef} type="new" onSubmit={onCreate} />
+        <Box px="md" pb="xl">
+          <ConditionalRenderer allow={canCreate}>
+            <CommentForm type="new" onSubmit={onCreate} resetOnSubmitSuccess />
+          </ConditionalRenderer>
         </Box>
       </Paper>
     </>

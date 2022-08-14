@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import Head from "next/head";
-import { Anchor, Badge, Breadcrumbs, Group, Stack, Text } from "@mantine/core";
+import { Anchor, Badge, Breadcrumbs, Group, Stack } from "@mantine/core";
 import { generatePath, Link, matchPath, useLocation } from "react-router-dom";
 import { APP_NAME } from "../constants";
 import useGetCourseId from "../custom-hooks/use-get-course-id";

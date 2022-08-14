@@ -5,6 +5,8 @@ import Header from "./header";
 import Sidebar from "./sidebar";
 import { colorModeValue } from "../utils/theme-utils";
 import CourseSubmissionCommentsSection from "./course-submission-comments-section";
+import ConditionalRenderer from "./conditional-renderer";
+import useGetSubmissionCommentPermissions from "../custom-hooks/use-get-submission-comment-permissions";
 
 type Props = {
   children: ReactNode;
@@ -72,9 +74,16 @@ function AppLayout({ children }: Props) {
             </Box>
           </ScrollArea>
 
-          <CourseSubmissionCommentsSection
-            className={classes.commentsSection}
-          />
+          <ConditionalRenderer
+            permissionGetter={{
+              fn: useGetSubmissionCommentPermissions,
+              key: "canRender",
+            }}
+          >
+            <CourseSubmissionCommentsSection
+              className={classes.commentsSection}
+            />
+          </ConditionalRenderer>
         </div>
       </div>
     </div>

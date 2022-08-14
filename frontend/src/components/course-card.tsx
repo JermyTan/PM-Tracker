@@ -1,4 +1,11 @@
-import { Stack, ScrollArea, Paper, Alert, createStyles } from "@mantine/core";
+import {
+  Stack,
+  ScrollArea,
+  Paper,
+  Alert,
+  createStyles,
+  Button,
+} from "@mantine/core";
 import { HiEyeOff } from "react-icons/hi";
 import { generatePath, Link } from "react-router-dom";
 import { SINGLE_COURSE_PATH } from "../routes/paths";
@@ -19,13 +26,7 @@ function CourseCard(props: Props) {
   const { classes } = useStyles();
 
   return (
-    <Paper<typeof Link>
-      component={Link}
-      to={generatePath(SINGLE_COURSE_PATH, { courseId: `${id}` })}
-      withBorder
-      radius="md"
-      p="md"
-    >
+    <Paper shadow="md" withBorder radius="md" p="md">
       <Stack
         spacing="xs"
         justify="space-between"
@@ -60,16 +61,27 @@ function CourseCard(props: Props) {
           </ScrollArea.Autosize>
         </Stack>
 
-        {!isPublished && (
-          <Alert
-            p="xs"
-            color="orange"
-            icon={<HiEyeOff />}
-            title="Not published"
+        <Stack spacing="xs">
+          {!isPublished && (
+            <Alert
+              p="xs"
+              color="orange"
+              icon={<HiEyeOff />}
+              title="Not published"
+            >
+              Students cannot view this course.
+            </Alert>
+          )}
+
+          <Button<typeof Link>
+            component={Link}
+            to={generatePath(SINGLE_COURSE_PATH, { courseId: `${id}` })}
+            radius="xl"
+            variant="light"
           >
-            Students cannot view this course.
-          </Alert>
-        )}
+            Go to course
+          </Button>
+        </Stack>
       </Stack>
     </Paper>
   );

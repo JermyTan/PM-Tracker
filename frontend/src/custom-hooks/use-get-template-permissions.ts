@@ -1,11 +1,12 @@
-import { INSTRUCTOR_PERMISSION_ROLES, Role } from "../types/courses";
+import { Role, roleToPropertiesMap } from "../types/courses";
 import { TemplateData } from "../types/templates";
 import useGetCurrentUserRole from "./use-get-current-user-role";
 
 export default function useGetTemplatePermissions(template?: TemplateData) {
   const role = useGetCurrentUserRole();
   const canCreate =
-    role !== undefined && INSTRUCTOR_PERMISSION_ROLES.includes(role);
+    role !== undefined &&
+    roleToPropertiesMap[Role.Instructor].permissionRoles.includes(role);
   const canManage = canCreate;
 
   if (!template) {

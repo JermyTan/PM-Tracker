@@ -217,7 +217,7 @@ def course_submission_comment_to_json(
         FIELD_INDEX: submission_comment.field_index,
         ROLE: submission_comment.member.role
         if submission_comment.member is not None
-        else "",
+        else None,
     }
 
     data[ID] = submission_comment.id

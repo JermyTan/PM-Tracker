@@ -1,15 +1,9 @@
 import { createStyles } from "@mantine/core";
 
 const useStyles = createStyles(
-  (
-    _,
-    {
-      adjustedPadding,
-      referencePadding,
-    }: { adjustedPadding: number; referencePadding: number },
-  ) => ({
+  (_, { referencePadding }: { referencePadding: number }) => ({
     scrollAreaContainer: {
-      padding: `${referencePadding}px ${adjustedPadding}px ${referencePadding}px ${referencePadding}px !important`,
+      padding: `${referencePadding}px 0px ${referencePadding}px ${referencePadding}px !important`,
     },
   }),
 );
@@ -21,8 +15,8 @@ export default function useGetScrollAreaContainerPaddingStyle({
   scrollbarSize: number;
   referencePadding: number;
 }) {
-  const adjustedPadding = (referencePadding - scrollbarSize) / 2;
-  const { classes } = useStyles({ adjustedPadding, referencePadding });
+  const adjustedPadding = referencePadding - scrollbarSize;
+  const { classes } = useStyles({ referencePadding });
 
   return {
     scrollAreaContainerClassName: classes.scrollAreaContainer,

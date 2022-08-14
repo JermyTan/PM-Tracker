@@ -5,11 +5,9 @@ import {
   Group,
   LoadingOverlay,
   Paper,
-  ScrollArea,
   Stack,
   Text,
 } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
 import { useLocation, useNavigate } from "react-router-dom";
 import path from "path";
 import { useModals } from "@mantine/modals";
@@ -35,13 +33,10 @@ import MilestoneSubmissionForm, {
 import PlaceholderWrapper from "../placeholder-wrapper";
 import { DATE_TIME_MONTH_NAME_FORMAT, UNKNOWN_USER } from "../../constants";
 import { displayDateTime } from "../../utils/transform-utils";
-import CourseSubmissionCommentsSection from "../course-submission-comments-section";
-import useGetScrollAreaContainerPaddingStyle from "../../custom-hooks/use-get-scroll-area-container-padding-style";
 
 const useStyles = createStyles({
-  commentsContainer: {
-    flex: "1 1 auto",
-    minWidth: "450px",
+  formContainer: {
+    position: "relative",
   },
 });
 
@@ -94,12 +89,6 @@ function CourseMilestoneSubmissionsViewPage() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const modals = useModals();
-  const noWrap = useMediaQuery("(min-width: 1300px)");
-  const { scrollAreaContainerClassName, scrollbarSize, adjustedPadding } =
-    useGetScrollAreaContainerPaddingStyle({
-      scrollbarSize: 8,
-      referencePadding: 16,
-    });
 
   const isMilestoneOpen = checkIsMilestoneOpen(milestone);
 
@@ -214,6 +203,7 @@ function CourseMilestoneSubmissionsViewPage() {
               </Text>
             </Paper>
           </Group>
+
           <Group spacing={6}>
             <Text size="sm">Last updated by:</Text>
             <Paper withBorder p={6}>
@@ -238,39 +228,23 @@ function CourseMilestoneSubmissionsViewPage() {
         </Button>
       </Group>
 
-      <Group align="flex-start" position="center" noWrap={noWrap}>
-        <Paper
-          className={cx(formContainerClassName, scrollAreaContainerClassName)}
-          withBorder
-          shadow="sm"
-          radius="md"
-        >
-          <ScrollArea.Autosize
-            maxHeight="1000px"
-            styles={{ root: { paddingRight: adjustedPadding } }}
-            scrollbarSize={scrollbarSize}
-            offsetScrollbars
-          >
-            <LoadingOverlay visible={isFetching} />
-            <MilestoneSubmissionForm
-              ref={formRef}
-              defaultValues={submission}
-              readOnly={!isMilestoneOpen}
-              onSubmit={onUpdateSubmission}
-              withComments
-              submitButtonProps={{ disabled: isDeleting }}
-            />
-          </ScrollArea.Autosize>
-        </Paper>
-
-        <CourseSubmissionCommentsSection
-          className={classes.commentsContainer}
-          withBorder
-          shadow="sm"
-          p="md"
-          radius="md"
+      <Paper
+        withBorder
+        shadow="sm"
+        radius="md"
+        p="md"
+        className={cx(classes.formContainer, formContainerClassName)}
+      >
+        <LoadingOverlay visible={isFetching} />
+        <MilestoneSubmissionForm
+          ref={formRef}
+          defaultValues={submission}
+          readOnly={!isMilestoneOpen}
+          onSubmit={onUpdateSubmission}
+          withComments
+          submitButtonProps={{ disabled: isDeleting }}
         />
-      </Group>
+      </Paper>
     </Stack>
   );
 }

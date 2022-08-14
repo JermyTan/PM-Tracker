@@ -68,22 +68,26 @@ function MilestoneLayout({ children }: Props) {
       return [];
     }
 
-    const components: { label: ReactNode; path: string }[] = [
+    const components: { label: ReactNode; name: string }[] = [
       {
         label: (
           <Group spacing={4}>
-            <Text span inherit>
+            <Anchor<typeof Link>
+              inherit
+              component={Link}
+              to={generatePath(COURSE_MILESTONE_SUBMISSIONS_PATH, {
+                courseId,
+                milestoneId,
+              })}
+            >
               {milestone.name}
-            </Text>
+            </Anchor>
             <Badge variant="outline" color={isOpen ? "green" : "red"}>
               {isOpen ? "Open" : "Closed"}
             </Badge>
           </Group>
         ),
-        path: generatePath(COURSE_MILESTONE_SUBMISSIONS_PATH, {
-          courseId,
-          milestoneId,
-        }),
+        name: "milestone",
       },
     ];
 
@@ -104,11 +108,19 @@ function MilestoneLayout({ children }: Props) {
       )
     ) {
       components.push({
-        label: "Templates",
-        path: generatePath(COURSE_MILESTONE_SUBMISSIONS_TEMPLATES_PATH, {
-          courseId,
-          milestoneId,
-        }),
+        label: (
+          <Anchor<typeof Link>
+            inherit
+            component={Link}
+            to={generatePath(COURSE_MILESTONE_SUBMISSIONS_TEMPLATES_PATH, {
+              courseId,
+              milestoneId,
+            })}
+          >
+            Templates
+          </Anchor>
+        ),
+        name: "templates",
       });
     } else if (
       submissionId !== undefined &&
@@ -120,20 +132,24 @@ function MilestoneLayout({ children }: Props) {
       )
     ) {
       components.push({
-        label: submission.name,
-        path: generatePath(COURSE_MILESTONE_SINGLE_SUBMISSION_PATH, {
-          courseId,
-          milestoneId,
-          submissionId,
-        }),
+        label: (
+          <Anchor<typeof Link>
+            inherit
+            component={Link}
+            to={generatePath(COURSE_MILESTONE_SINGLE_SUBMISSION_PATH, {
+              courseId,
+              milestoneId,
+              submissionId,
+            })}
+          >
+            {submission.name}
+          </Anchor>
+        ),
+        name: "submission",
       });
     }
 
-    return components.map(({ label, path }, index) => (
-      <Anchor<typeof Link> key={`${index}.${path}`} component={Link} to={path}>
-        {label}
-      </Anchor>
-    ));
+    return components.map(({ label, name }) => <div key={name}>{label}</div>);
   })();
 
   return (

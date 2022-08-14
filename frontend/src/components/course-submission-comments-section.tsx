@@ -65,18 +65,18 @@ function CourseSubmissionCommentsSection<C extends ElementType = "div">({
   const { classes, cx } = useStyles();
   const [searchParams] = useSearchParams();
   const fieldIndex = searchParams.get("field");
-  const invalidState =
-    courseId === undefined || submissionId === undefined || fieldIndex === null;
+  const shouldShowComments =
+    courseId !== undefined && submissionId !== undefined && fieldIndex !== null;
 
   const { comments, isLoading, isFetching, error } =
     useGetSubmissionCommentsQuery(
-      invalidState
-        ? skipToken
-        : {
+      shouldShowComments
+        ? {
             courseId,
             submissionId,
             fieldIndex,
-          },
+          }
+        : skipToken,
       {
         selectFromResult: ({
           data: comments,
@@ -89,7 +89,6 @@ function CourseSubmissionCommentsSection<C extends ElementType = "div">({
           isFetching,
           error,
         }),
-        refetchOnMountOrArgChange: true,
       },
     );
   useResolveError({ error, name: "course-submission-comments-section" });
@@ -115,7 +114,7 @@ function CourseSubmissionCommentsSection<C extends ElementType = "div">({
     }
   }, [comments]);
 
-  if (invalidState) {
+  if (!shouldShowComments) {
     return null;
   }
 

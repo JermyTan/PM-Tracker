@@ -14,6 +14,8 @@ import {
   ROLE,
   OWNER_ID,
   USER,
+  MEMBER_CREATION_DATA,
+  EMAIL,
 } from "../constants";
 import { BaseData } from "./base";
 import { UserData } from "./users";
@@ -82,4 +84,13 @@ export type CourseMemberData = BaseData & {
 
 export type CourseMembershipPatchData = {
   [ROLE]: Role;
+};
+
+export type MemberCreationData = {
+  [EMAIL]: string;
+  [NAME]: string;
+};
+
+export type CourseMembershipBatchCreateData = {
+  [MEMBER_CREATION_DATA]: MemberCreationData[];
 };

@@ -16,6 +16,7 @@ from .views import (
     CourseSubmissionFieldCommentsView,
     CourseSubmissionSingleFieldCommentsView,
     SingleCourseSubmissionCommentView,
+    CourseMembershipsWithNewUserCreationView
 )
 
 urlpatterns = [
@@ -55,6 +56,11 @@ urlpatterns = [
         "<int:course_id>/memberships/",
         CourseMembershipsView.as_view(),
         name="course_memberships",
+    ),
+    path(
+        "<int:course_id>/memberships/new",
+        CourseMembershipsWithNewUserCreationView.as_view(),
+        name="course_memberships_with_new_user_creation",
     ),
     path(
         "<int:course_id>/memberships/<int:member_id>/",

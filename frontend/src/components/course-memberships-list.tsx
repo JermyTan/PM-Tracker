@@ -1,6 +1,8 @@
 import { skipToken } from "@reduxjs/toolkit/query/react";
-import { Text, Stack, ScrollArea } from "@mantine/core";
+import { Text, Stack, ScrollArea, Group, Button } from "@mantine/core";
+import { useModals } from "@mantine/modals";
 import { useMemo } from "react";
+import { MdPersonAdd } from "react-icons/md";
 import PlaceholderWrapper from "./placeholder-wrapper";
 import { Role, CourseMemberData, ALL_ROLES } from "../types/courses";
 import { useGetCourseMembershipsQuery } from "../redux/services/members-api";
@@ -9,6 +11,7 @@ import { sort } from "../utils/transform-utils";
 import { EMAIL, NAME, USER } from "../constants";
 import { useGetSingleCourseQuery } from "../redux/services/courses-api";
 import UserProfileDisplay from "./user-profile-display";
+import CourseMemberCreationEditor from "./course-member-creation-editor";
 
 type Props = {
   courseId: number | string | undefined;
@@ -28,6 +31,7 @@ function CourseMembershipsList({ courseId, hasAdminPermission }: Props) {
 
   const courseOwner = course?.owner;
   const courseOwnerId = courseOwner?.id;
+  const modals = useModals();
 
   const sortedPersonnel = useMemo(() => {
     const sortedPersonnel = new Map<Role, CourseMemberData[]>();
@@ -57,11 +61,32 @@ function CourseMembershipsList({ courseId, hasAdminPermission }: Props) {
     return sortedPersonnel;
   }, [coursePersonnel, courseOwnerId]);
 
+  const openAddMembersModal = () => {
+    const id = modals.openModal({
+      title: <Text weight="bold">Add Members to Course</Text>,
+      children: (
+        <CourseMemberCreationEditor
+          courseId={courseId}
+          onSuccess={() => modals.closeModal(id)}
+        />
+      ),
+      size: "xl",
+    });
+  };
+
   return (
     <Stack>
-      <Text weight={700} size="lg">
-        Course Members
-      </Text>
+      <Group position="apart">
+        <Text weight={700} size="lg">
+          Course Members
+        </Text>
+        <Button
+          onClick={openAddMembersModal}
+          leftIcon={<MdPersonAdd size={14} />}
+        >
+          Add Members
+        </Button>
+      </Group>
       <PlaceholderWrapper
         py={10}
         isLoading={isLoading}

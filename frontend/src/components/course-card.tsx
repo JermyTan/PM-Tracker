@@ -7,6 +7,7 @@ import {
   Button,
 } from "@mantine/core";
 import { HiEyeOff } from "react-icons/hi";
+import { ImEnter } from "react-icons/im";
 import { generatePath, Link } from "react-router-dom";
 import { SINGLE_COURSE_PATH } from "../routes/paths";
 import { CourseSummaryData } from "../types/courses";
@@ -76,10 +77,10 @@ function CourseCard(props: Props) {
           <Button<typeof Link>
             component={Link}
             to={generatePath(SINGLE_COURSE_PATH, { courseId: `${id}` })}
-            radius="xl"
-            variant="light"
+            variant="subtle"
+            rightIcon={<ImEnter size={16} />}
           >
-            Go to course
+            Enter course
           </Button>
         </Stack>
       </Stack>

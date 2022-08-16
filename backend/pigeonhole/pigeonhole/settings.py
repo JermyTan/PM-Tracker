@@ -31,6 +31,7 @@ DEBUG = bool(int(os.getenv("DEBUG", 0)))
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS").split(" ")
+CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS
 
 SITE_ID = 1
 
@@ -49,7 +50,6 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.flatpages",
     "corsheaders",
-    # "anymail",
     "pigeonhole",
     "content_delivery_service",
     "users",
@@ -95,11 +95,11 @@ WSGI_APPLICATION = "pigeonhole.wsgi.application"
 ## https://django-jazzmin.readthedocs.io/index.html
 
 JAZZMIN_SETTINGS = {
-    "site_title": "Pigeonhole",
-    "site_header": "Pigeonhole Admin",
-    "site_brand": "Pigeonhole Admin",
-    "welcome_sign": "Welcome to Pigeonhole Administration",
-    "copyright": "Pigeonhole",
+    "site_title": "iReflect",
+    "site_header": "iReflect Admin",
+    "site_brand": "iReflect Admin",
+    "welcome_sign": "Welcome to iReflect Administration",
+    "copyright": "iReflect",
     ## "site_logo": "treeckle-min.png",  ## TODO: change
     "site_icon": "favicon-32x32.png",  ## TODO: change
     "hide_apps": ["auth"],

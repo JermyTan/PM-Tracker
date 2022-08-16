@@ -11,3 +11,4 @@ django-jazzmin
 django[argon2]
 django-json-widget
 colorlog
+requests

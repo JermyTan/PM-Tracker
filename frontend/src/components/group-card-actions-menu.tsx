@@ -105,6 +105,7 @@ function GroupCardActionsMenu({
           onSuccess={() => modals.closeModal(id)}
         />
       ),
+      centered: true,
     });
   };
 
@@ -119,6 +120,7 @@ function GroupCardActionsMenu({
           onSuccess={() => modals.closeModal(id)}
         />
       ),
+      centered: true,
     });
   };
 
@@ -132,6 +134,7 @@ function GroupCardActionsMenu({
           onSuccess={() => modals.closeModal(id)}
         />
       ),
+      centered: true,
     });
   };
 
@@ -148,6 +151,7 @@ function GroupCardActionsMenu({
         />
       ),
       size: 800,
+      centered: true,
     });
   };
 
@@ -205,6 +209,7 @@ function GroupCardActionsMenu({
           confirmButtonName="Save changes"
         />
       ),
+      centered: true,
     });
   };
 

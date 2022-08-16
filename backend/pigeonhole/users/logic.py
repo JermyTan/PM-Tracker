@@ -12,6 +12,7 @@ from pigeonhole.common.constants import (
     HAS_PASSWORD_AUTH,
     GOOGLE_AUTH,
     FACEBOOK_AUTH,
+    IS_ACTIVATED,
 )
 from pigeonhole.common.parsers import parse_datetime_to_ms_timestamp
 from authentication.models import (
@@ -34,6 +35,7 @@ def user_to_json(user: User) -> dict:
         if user.profile_image is not None
         else None,
         ACCOUNT_TYPE: user.account_type,
+        IS_ACTIVATED: user.is_activated,
     }
 
     return data

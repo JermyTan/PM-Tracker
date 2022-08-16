@@ -24,6 +24,7 @@ function CourseMemberDisplay({ member, makeAdminOptionsAvailable }: Props) {
         title="Remove member from course"
         opened={isRemoveMemberModalOpen}
         onClose={() => setRemoveMemberModalOpen(false)}
+        centered
       >
         <CourseMemberRemoveConfirmation
           member={member}
@@ -35,6 +36,7 @@ function CourseMemberDisplay({ member, makeAdminOptionsAvailable }: Props) {
         title="Edit member's role in course"
         opened={isEditMemberRoleModalOpen}
         onClose={() => setEditMemberRoleModalOpen(false)}
+        centered
       >
         <CourseMemberEditRoleMenu
           member={member}

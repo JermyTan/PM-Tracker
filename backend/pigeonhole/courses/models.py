@@ -200,13 +200,45 @@ class CourseSubmission(TimestampedModel):
         return f"{self.name} | {self.creator}"
 
 
+class CourseSubmissionViewableGroup(TimestampedModel):
+    submission = models.ForeignKey(CourseSubmission, on_delete=models.CASCADE)
+    group = models.ForeignKey(CourseGroup, on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["submission_id", "group_id"],
+                name="unique_submission_viewable_group",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.submission.name} | {self.group}"
+
+
+class CourseSubmissionViewableMember(TimestampedModel):
+    submission = models.ForeignKey(CourseSubmission, on_delete=models.CASCADE)
+    member = models.ForeignKey(CourseMembership, on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["submission_id", "member_id"],
+                name="unique_submission_viewable_member",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.submission.name} | {self.member}"
+
+
 class Comment(TimestampedModel):
     content = models.TextField()
     is_deleted = models.BooleanField(default=False)
     commenter = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     def __str__(self) -> str:
-        return f"${self.created_at} | ${self.commenter}"
+        return f"{self.created_at} | {self.commenter}"
 
 
 class CourseSubmissionComment(TimestampedModel):

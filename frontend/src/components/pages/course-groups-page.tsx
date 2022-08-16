@@ -61,6 +61,7 @@ function CourseGroupPage() {
   return (
     <>
       <Modal
+        centered
         title="Create a New Group"
         opened={isCreateGroupModalOpen}
         onClose={() => {

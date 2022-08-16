@@ -5,6 +5,7 @@ import {
   FACEBOOK_AUTH,
   GOOGLE_AUTH,
   HAS_PASSWORD_AUTH,
+  IS_ACTIVATED,
   NAME,
   PASSWORD,
   PROFILE_IMAGE,
@@ -21,6 +22,7 @@ export type UserData = BaseData & {
   [NAME]: string;
   [PROFILE_IMAGE]: string | null;
   [ACCOUNT_TYPE]: AccountType;
+  [IS_ACTIVATED]: boolean;
 };
 
 export type SelfData = UserData & {

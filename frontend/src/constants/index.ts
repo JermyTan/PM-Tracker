@@ -74,3 +74,5 @@ export const GROUP = "group";
 export const TEMPLATE = "template";
 export const MEMBER_CREATION_DATA = "memberCreationData";
 export const UNKNOWN_USER = "unknown user";
+export const IS_ACTIVATED = "isActivated";
+export const SUPPORT_EMAIL = "ireflect-staff@googlegroups.com";

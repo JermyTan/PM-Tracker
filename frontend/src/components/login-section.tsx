@@ -1,6 +1,6 @@
 import { createStyles, Group, Stack, Title, Text, Anchor } from "@mantine/core";
 import { Link } from "react-router-dom";
-import { APP_NAME } from "../constants";
+import { APP_NAME, SUPPORT_EMAIL } from "../constants";
 import LoginProvider from "../contexts/login-provider";
 import { colorModeValue } from "../utils/theme-utils";
 import LoginCard from "./login-card";
@@ -38,8 +38,11 @@ function LoginSection() {
               Don&apos;t have an account?
             </Text>
 
-            <Anchor<typeof Link> component={Link} weight={600} to="/">
-              Sign up
+            <Anchor
+              href={`mailto:${SUPPORT_EMAIL}?subject=[Account%20sign%20up]`}
+              weight={600}
+            >
+              Contact us!
             </Anchor>
           </Group>
         </Stack>

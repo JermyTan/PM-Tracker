@@ -1,4 +1,12 @@
-import { ACCESS, EMAIL, NAME, REFRESH, TOKENS, USER } from "../constants";
+import {
+  ACCESS,
+  EMAIL,
+  IS_ACTIVATED,
+  NAME,
+  REFRESH,
+  TOKENS,
+  USER,
+} from "../constants";
 import { PasswordPayloadPostData, SelfData } from "./users";
 
 export type AuthenticationData = {
@@ -14,8 +22,9 @@ export type CheckAccountPostData = {
 };
 
 export type AccountDetails = {
-  [NAME]: string | null;
+  [NAME]: string;
   [EMAIL]: string;
+  [IS_ACTIVATED]: boolean;
 };
 
 export type PasswordLoginPostData = PasswordPayloadPostData & {

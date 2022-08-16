@@ -7,11 +7,12 @@ import {
   Badge,
   ScrollArea,
 } from "@mantine/core";
+import { saveAs } from "file-saver";
 import papaparse from "papaparse";
 import { z } from "zod";
 import { MdPersonAdd } from "react-icons/md";
 import { RiFileDownloadLine } from "react-icons/ri";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import toastUtils from "../utils/toast-utils";
 import { useResolveError } from "../utils/error-utils";
 import { useBatchCreateCourseMembershipsMutation } from "../redux/services/members-api";
@@ -67,6 +68,24 @@ function getStatusColor(status: Status): string {
 function CourseMemberCreationEditor({ courseId, onSuccess }: Props) {
   const [isParsingCSV, setIsParsingCSV] = useState(false);
   const [tableRows, setTableRows] = useState<TableRow[]>([]);
+
+  const onDownloadCsvTemplate = useCallback(() => {
+    const ADD_MEMBERS_CSV_TEMPLATE = new Blob(
+      [
+        papaparse.unparse({
+          fields: ["email", "name (optional)"],
+          data: [
+            ["example@u.nus.edu", "Jeremy Tan"],
+            ["another_example@comp.nus.edu.sg", "CYNTHIA LEE"],
+            ["exxxxx@u.nus.edu.sg"],
+          ],
+        }),
+      ],
+      { type: "text/csv;charset=utf-8" },
+    );
+
+    saveAs(ADD_MEMBERS_CSV_TEMPLATE, "add course members template.csv");
+  }, []);
 
   const { resolveError } = useResolveError();
   const [batchCreateCourseMemberships, { isLoading }] =
@@ -133,9 +152,6 @@ function CourseMemberCreationEditor({ courseId, onSuccess }: Props) {
 
   const hasEmailData = tableRows.length !== 0;
 
-  // TODO: download here
-  const downloadCSVTemplate = () => {};
-
   const parseCSVTemplate = (files: File[]) => {
     const csvFile = files[0];
 
@@ -196,8 +212,11 @@ function CourseMemberCreationEditor({ courseId, onSuccess }: Props) {
   return (
     <Stack>
       <Group position="apart">
-        <Button onClick={downloadCSVTemplate} leftIcon={<RiFileDownloadLine />}>
-          Download CSV Template
+        <Button
+          onClick={onDownloadCsvTemplate}
+          leftIcon={<RiFileDownloadLine />}
+        >
+          Download CSV template
         </Button>
         <Group hidden={!hasEmailData}>
           <Button onClick={clearData} disabled={isLoading} color="red">

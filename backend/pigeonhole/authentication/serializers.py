@@ -19,6 +19,7 @@ from pigeonhole.common.constants import (
     PASSWORD,
     USER,
     TOKENS,
+    IS_ACTIVATED,
 )
 from pigeonhole.common.exceptions import InternalServerError, BadRequest
 from users.models import User
@@ -257,7 +258,7 @@ class CheckAccountSerializer(BaseAuthenticationSerializer):
 
         try:
             user = get_users(email=email).get()
-            return {EMAIL: user.email, NAME: user.name}
+            return {EMAIL: user.email, NAME: user.name, IS_ACTIVATED: user.is_activated}
         except User.DoesNotExist as e:
             logger.warning(e)
             pass

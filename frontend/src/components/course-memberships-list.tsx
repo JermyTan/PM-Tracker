@@ -71,6 +71,7 @@ function CourseMembershipsList({ courseId, hasAdminPermission }: Props) {
         />
       ),
       size: "xl",
+      centered: true,
     });
   };
 

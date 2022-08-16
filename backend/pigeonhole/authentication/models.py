@@ -164,21 +164,25 @@ class AuthenticationData(ABC):
         except User.DoesNotExist as e:
             logger.warning(e)
             return None
-        
 
         ## user has been created, but has not logged in for the first time yet
-        if not user.name:
+        if not user.is_activated:
             image = None
 
             if self.profile_image:
                 image = Image(image_url=self.profile_image)
                 image.upload_image_to_server()
                 image.save()
-            
+
             user.name = self.name
             user.profile_image = image
+            user.is_activated = True
             user.save()
 
+        ## if user's name is empty, then we fill it up
+        if not user.name:
+            user.name = self.name
+            user.save()
 
         try:
             auth_method = self.auth_method_class.objects.get(user=user)

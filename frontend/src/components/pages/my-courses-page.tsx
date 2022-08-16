@@ -82,9 +82,9 @@ function MyCoursesPage() {
         <SimpleGrid
           cols={4}
           breakpoints={[
-            { maxWidth: "sm", cols: 1 },
-            { maxWidth: "md", cols: 2 },
-            { maxWidth: "xl", cols: 3 },
+            { maxWidth: 900, cols: 1 },
+            { maxWidth: 1200, cols: 2 },
+            { maxWidth: 1600, cols: 3 },
           ]}
           spacing="xs"
         >

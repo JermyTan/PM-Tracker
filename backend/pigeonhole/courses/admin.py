@@ -14,6 +14,9 @@ from .models import (
     CourseMilestoneTemplate,
     CourseSubmission,
     CourseSubmissionComment,
+    Comment,
+    CourseSubmissionViewableGroup,
+    CourseSubmissionViewableMember,
 )
 
 # Register your models here.
@@ -26,3 +29,6 @@ admin.site.register(CourseMilestone, BaseAdmin)
 admin.site.register(CourseMilestoneTemplate, BaseAdmin)
 admin.site.register(CourseSubmission, BaseAdmin)
 admin.site.register(CourseSubmissionComment, BaseAdmin)
+admin.site.register(Comment, BaseAdmin)
+admin.site.register(CourseSubmissionViewableGroup, BaseAdmin)
+admin.site.register(CourseSubmissionViewableMember, BaseAdmin)

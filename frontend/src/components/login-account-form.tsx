@@ -11,7 +11,13 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import toastUtils from "../utils/toast-utils";
-import { EMAIL, NAME, PASSWORD, REMEMBER_ME } from "../constants";
+import {
+  EMAIL,
+  NAME,
+  PASSWORD,
+  REMEMBER_ME,
+  SUPPORT_EMAIL,
+} from "../constants";
 import TextField from "./text-field";
 import PasswordField from "./password-field";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
@@ -59,9 +65,14 @@ function LoginAccountForm() {
   const [passwordLogin] = usePasswordLoginMutation({
     selectFromResult: emptySelector,
   });
-  const { accountDetails, setAccountDetails } = useContext(LoginContext);
-  const name = accountDetails?.name ?? "";
-  const email = accountDetails?.email ?? "";
+  const {
+    accountDetails: { name, email, isActivated } = {
+      name: "",
+      email: "",
+      isActivated: false,
+    },
+    setAccountDetails,
+  } = useContext(LoginContext);
   const methods = useForm<LoginAccountFormProps>({
     resolver: zodResolver(schema),
     defaultValues: { ...DEFAULT_VALUES, name, email, rememberMe },
@@ -93,7 +104,7 @@ function LoginAccountForm() {
         <Stack spacing="lg">
           <Stack>
             <Text size="lg" weight={600} align="center">
-              {name ? `Hi, ${name}` : "Create New Account"}
+              {isActivated ? `Hi, ${name}` : "Create New Account"}
             </Text>
             <Button
               size="xs"
@@ -105,27 +116,32 @@ function LoginAccountForm() {
               {email}
             </Button>
 
-            {!name && (
+            {(!name || !isActivated) && (
               <TextField
                 name={NAME}
                 label="Full name"
                 autoFocus
                 autoComplete="name"
+                disabled={Boolean(name)}
               />
             )}
 
             <PasswordField
               name={PASSWORD}
               label="Password"
-              autoComplete={name ? "current-password" : "new-password"}
+              autoComplete={isActivated ? "current-password" : "new-password"}
               autoFocus={Boolean(name)}
             />
 
             <Group position="apart">
               <CheckboxField name={REMEMBER_ME} label="Remember me" />
 
-              {name && (
-                <Anchor<"button"> component="button" weight={600} size="sm">
+              {isActivated && (
+                <Anchor
+                  href={`mailto:${SUPPORT_EMAIL}?subject=[Forgot%20password]`}
+                  weight={600}
+                  size="sm"
+                >
                   Forgot password?
                 </Anchor>
               )}
@@ -133,7 +149,7 @@ function LoginAccountForm() {
           </Stack>
 
           <Button loading={isSubmitting} type="submit">
-            {name ? "Login" : "Sign up"}
+            {isActivated ? "Login" : "Sign up"}
           </Button>
         </Stack>
       </form>

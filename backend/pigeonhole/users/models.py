@@ -33,9 +33,12 @@ class User(TimestampedModel):
     profile_image = models.OneToOneField(
         Image, null=True, blank=True, on_delete=models.SET_NULL
     )
+    is_activated = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return f"{self.name} | {self.email}"
+        status_string = "" if self.is_activated else " (not activated)"
+        label = f"{self.name} | {self.email}" if self.name else f"{self.email}"
+        return f"{label}{status_string}"
 
 
 def user_cleanup(sender, instance: User, **kwargs):

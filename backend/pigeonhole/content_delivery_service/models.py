@@ -6,16 +6,14 @@ from django.db import models
 from django.db.models.signals import post_delete
 from django.utils.crypto import get_random_string
 
-from imagekitio import ImageKit
-
 from pigeonhole.common.validators import is_url
 from pigeonhole.common.models import TimestampedModel
 
 logger = logging.getLogger("main")
 
-IMAGEKIT_PRIVATE_KEY = os.getenv("IMAGEKIT_PRIVATE_KEY")
-IMAGEKIT_PUBLIC_KEY = os.getenv("IMAGEKIT_PUBLIC_KEY")
-IMAGEKIT_BASE_URL = os.getenv("IMAGEKIT_BASE_URL")
+# IMAGEKIT_PRIVATE_KEY = os.getenv("IMAGEKIT_PRIVATE_KEY")
+# IMAGEKIT_PUBLIC_KEY = os.getenv("IMAGEKIT_PUBLIC_KEY")
+# IMAGEKIT_BASE_URL = os.getenv("IMAGEKIT_BASE_URL")
 
 ## TODO: setup imagekit account
 imagekit = None

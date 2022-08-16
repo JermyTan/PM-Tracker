@@ -51,7 +51,7 @@ const convertMemberDataToTransferListData = (
 
 const sortAndConvertMemberDataToListFormat = (members?: CourseMemberData[]) =>
   sort(members ?? [], {
-    props: [`${USER}.${NAME}`, `${USER}.${EMAIL}`],
+    key: [`${USER}.${NAME}`, `${USER}.${EMAIL}`],
   }).map((member) => convertMemberDataToTransferListData(member));
 
 const ItemComponent: TransferListItemComponent = ({

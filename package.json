@@ -3,6 +3,12 @@
     "husky": "^8.0.1"
   },
   "scripts": {
+    "build": "docker-compose -f docker-compose.production.yml build --parallel",
+    "push": "docker-compose -f docker-compose.production.yml push",
+    "pull": "sudo docker-compose -f docker-compose.production.yml pull",
+    "down": "sudo docker-compose -f docker-compose.production.yml down",
+    "up": "sudo docker-compose -f docker-compose.production.yml up -d",
+    "clean": "sudo docker image prune -a",
     "prepare": "husky install"
   }
 }

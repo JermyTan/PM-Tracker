@@ -144,7 +144,7 @@ function GroupCardActionsMenu({
           groupUserData={group?.members}
           courseId={courseId}
           userCourseRole={course?.role}
-          userIsInGroup={userIsInGroup}
+          userIsInGroup={userIsInGroup ?? false}
         />
       ),
       size: 800,

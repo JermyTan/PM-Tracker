@@ -2,10 +2,8 @@ Django==4.0.5
 djangorestframework==3.13.1
 djangorestframework-simplejwt==5.2.0
 gunicorn==20.1.0
-imagekitio==2.2.8
 psycopg2-binary==2.9.3
 python-dotenv==0.19.2
-django-anymail[sendinblue]==8.6
 djangorestframework-camel-case
 django-update-from-dict
 django-cors-headers

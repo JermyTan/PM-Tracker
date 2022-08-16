@@ -1,0 +1,68 @@
+version: "3.8"
+
+services:
+  ## entry point for ireflect app containers
+  app-reverse-proxy:
+    image: jermytan/ireflect-reverse-proxy:production
+    build:
+      context: ./app-reverse-proxy
+    volumes:
+      - static-volume:/app/static
+    networks:
+      - frontend
+      - backend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+
+  ## can only be accessed within frontend network
+  frontend:
+    image: jermytan/ireflect-frontend:production
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: https://rubric.comp.nus.edu.sg/api
+        # REACT_APP_GOOGLE_CLIENT_ID: 858509158388-d943lj9isgh7oaumkoj65kqvq1ehgt14.apps.googleusercontent.com
+        # REACT_APP_FACEBOOK_APP_ID: 2976187512667349
+        NEXT_PUBLIC_SITE_URL: https://rubric.comp.nus.edu.sg
+    networks:
+      - frontend
+    restart: always
+
+  ## can only be accessed within backend network
+  backend:
+    image: jermytan/ireflect-backend:production
+    build:
+      context: ./backend
+    command: sh -c "cd pigeonhole && gunicorn pigeonhole.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      - static-volume:/app/static
+    networks:
+      - backend
+    restart: always
+    env_file:
+      - .env.backend.production.local
+    depends_on:
+      - db
+
+  ## can only be accessed within backend network
+  db:
+    image: postgres:13-alpine
+    networks:
+      - backend
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/
+    env_file:
+      - .env.db.production.local
+    restart: always
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  postgres-data:
+  static-volume:

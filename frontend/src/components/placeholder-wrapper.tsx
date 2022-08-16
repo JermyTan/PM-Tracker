@@ -14,7 +14,7 @@ type Props = StackProps & {
   defaultMessage?: string;
   isInverted?: boolean;
   loaderProps?: LoaderProps;
-  textProps?: TextProps<"div">;
+  textProps?: TextProps;
 };
 
 function PlaceholderWrapper({

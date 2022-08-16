@@ -53,7 +53,7 @@ function CourseMembershipsList({ courseId, hasAdminPermission }: Props) {
       sortedPersonnel.set(
         role,
         sort(sortedPersonnel.get(role) ?? [], {
-          props: [`${USER}.${NAME}`, `${USER}.${EMAIL}`],
+          key: [`${USER}.${NAME}`, `${USER}.${EMAIL}`],
         }),
       );
     });

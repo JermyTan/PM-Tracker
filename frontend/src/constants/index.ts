@@ -1,4 +1,4 @@
-export const APP_NAME = "Pigeonhole";
+export const APP_NAME = "iReflect";
 export const EMAIL = "email";
 export const PASSWORD = "password";
 export const ID = "id";

@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.flatpages",
     "corsheaders",
-    "anymail",
+    # "anymail",
     "pigeonhole",
     "content_delivery_service",
     "users",

@@ -24,6 +24,7 @@ const useStyles = createStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     flex: "1 1 auto",
+    overflow: "hidden",
   },
   contentContainer: {
     display: "flex",

@@ -11,7 +11,7 @@ function SelectField({ name, ...props }: Props) {
     fieldState: { error },
   } = useController({ name });
 
-  return <Select error={error?.message} {...props} {...field} />;
+  return <Select {...props} error={error?.message} {...field} />;
 }
 
 export default SelectField;

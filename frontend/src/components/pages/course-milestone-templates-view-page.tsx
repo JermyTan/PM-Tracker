@@ -16,7 +16,7 @@ import { COURSE_MILESTONE_TEMPLATES_PATH } from "../../routes/paths";
 import { transformTemplateToSubmissionView } from "../../types/submissions";
 import { useResolveError } from "../../utils/error-utils";
 import toastUtils from "../../utils/toast-utils";
-import MilestoneSubmissionForm from "../milestone-submission-form";
+import SubmissionForm from "../submission-form";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import useGetTemplatePermissions from "../../custom-hooks/use-get-template-permissions";
 import ConditionalRenderer from "../conditional-renderer";
@@ -49,7 +49,7 @@ function CourseMilestoneTemplatesViewPage() {
   });
   const navigate = useNavigate();
   const modals = useModals();
-  const formRef = useRef<ElementRef<typeof MilestoneSubmissionForm>>(null);
+  const formRef = useRef<ElementRef<typeof SubmissionForm>>(null);
   const { canModify, canDelete } = useGetTemplatePermissions(
     submissionView?.template ?? undefined,
   );
@@ -139,7 +139,7 @@ function CourseMilestoneTemplatesViewPage() {
             radius="md"
             className={formContainerClassName}
           >
-            <MilestoneSubmissionForm
+            <SubmissionForm
               ref={formRef}
               defaultValues={submissionView}
               testMode

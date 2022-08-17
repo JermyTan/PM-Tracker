@@ -30,7 +30,7 @@ function CourseGroupPage() {
   const courseId = useGetCourseId();
 
   const { data: groups, isLoading } = useGetCourseGroupsQuery(
-    courseId ?? skipToken,
+    courseId === undefined ? skipToken : { courseId },
   );
 
   const { course } = useGetSingleCourseQuery(courseId ?? skipToken, {

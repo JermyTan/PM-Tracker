@@ -74,7 +74,7 @@ function GroupCard({ groupId, course }: Props) {
 
   // TODO: find out the proper way to handle this
   const { group, userIsInGroup } = useGetCourseGroupsQuery(
-    courseId ?? skipToken,
+    courseId === undefined ? skipToken : { courseId },
     {
       selectFromResult: ({ data }) => selectGroup(data, groupId),
     },

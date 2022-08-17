@@ -1,4 +1,4 @@
-import { Space, Title, Text, Stack } from "@mantine/core";
+import { Title, Text, Stack } from "@mantine/core";
 import Head from "next/head";
 import { APP_NAME, SUPPORT_EMAIL } from "../../constants";
 import { useAppSelector } from "../../redux/hooks";

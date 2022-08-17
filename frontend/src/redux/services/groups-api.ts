@@ -6,6 +6,7 @@ import {
   RenameGroupData,
   BatchUpdateGroupData,
 } from "../../types/groups";
+import { sanitizeObject } from "../../utils/transform-utils";
 import { cacher } from "./api-cache-utils";
 import baseApi from "./base-api";
 
@@ -13,14 +14,21 @@ const groupsApi = baseApi
   .enhanceEndpoints({ addTagTypes: ["Group"] })
   .injectEndpoints({
     endpoints: (build) => ({
-      getCourseGroups: build.query<GroupData[], number | string>({
-        query: (courseId) => ({
+      getCourseGroups: build.query<
+        GroupData[],
+        { courseId: string | number; me?: string | number | boolean }
+      >({
+        query: ({ courseId, me }) => ({
           url: `/courses/${courseId}/groups/`,
           method: "GET",
+          params: sanitizeObject({
+            me,
+          }),
         }),
-        providesTags: (result, _, courseId) =>
+        providesTags: (result, _, { courseId }) =>
           cacher.providesList(result, "Group", [`${courseId}`]),
       }),
+
       createCourseGroup: build.mutation<
         GroupData,
         GroupPostData & { courseId: number | string }

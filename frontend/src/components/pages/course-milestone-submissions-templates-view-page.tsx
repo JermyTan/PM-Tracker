@@ -16,7 +16,7 @@ import {
   SubmissionPostData,
 } from "../../types/submissions";
 import { useResolveError } from "../../utils/error-utils";
-import MilestoneSubmissionForm from "../milestone-submission-form";
+import SubmissionForm from "../submission-form";
 import PlaceholderWrapper from "../placeholder-wrapper";
 
 function CourseMilestoneSubmissionsTemplatesViewPage() {
@@ -43,7 +43,7 @@ function CourseMilestoneSubmissionsTemplatesViewPage() {
     selectFromResult: ({ isLoading }) => ({ isLoading }),
   });
   const navigate = useNavigate();
-  const formRef = useRef<ElementRef<typeof MilestoneSubmissionForm>>(null);
+  const formRef = useRef<ElementRef<typeof SubmissionForm>>(null);
   const { resolveError } = useResolveError({
     name: "course-milestone-submissions-templates-view-page",
   });
@@ -69,7 +69,7 @@ function CourseMilestoneSubmissionsTemplatesViewPage() {
         submissionType,
         isDraft,
         formResponseData,
-        groupId: null, // TODO: update to GroupData | null
+        groupId: null,
         milestoneId,
         templateId: submissionView.template.id,
       };
@@ -122,7 +122,7 @@ function CourseMilestoneSubmissionsTemplatesViewPage() {
             radius="md"
             className={formContainerClassName}
           >
-            <MilestoneSubmissionForm
+            <SubmissionForm
               ref={formRef}
               defaultValues={submissionView}
               readOnly

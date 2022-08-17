@@ -9,7 +9,7 @@ type Props = {
 
 function CourseMembersList({ courseId }: Props) {
   const { data: members, isLoading } = useGetCourseGroupsQuery(
-    courseId ?? skipToken,
+    courseId === undefined ? skipToken : { courseId },
   );
 
   return (

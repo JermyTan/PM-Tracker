@@ -27,9 +27,7 @@ import { FormResponseField, SubmissionPutData } from "../../types/submissions";
 import { useResolveError } from "../../utils/error-utils";
 import { checkIsMilestoneOpen } from "../../utils/misc-utils";
 import toastUtils from "../../utils/toast-utils";
-import MilestoneSubmissionForm, {
-  SubmissionFormData,
-} from "../milestone-submission-form";
+import SubmissionForm, { SubmissionFormData } from "../submission-form";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import { DATE_TIME_MONTH_NAME_FORMAT, UNKNOWN_USER } from "../../constants";
 import { displayDateTime } from "../../utils/transform-utils";
@@ -76,7 +74,7 @@ function CourseMilestoneSubmissionsViewPage() {
       },
     );
   useResolveError({ error, name: "course-milestone-submissions-view-page" });
-  const formRef = useRef<ElementRef<typeof MilestoneSubmissionForm>>(null);
+  const formRef = useRef<ElementRef<typeof SubmissionForm>>(null);
   const [updateSubmission, { isUpdating }] = useUpdateSubmissionMutation({
     selectFromResult: ({ isLoading: isUpdating }) => ({ isUpdating }),
   });
@@ -104,7 +102,7 @@ function CourseMilestoneSubmissionsViewPage() {
     }
 
     const { name, description } = submission;
-    const { isDraft, submissionType, formResponseData, group } = formData;
+    const { isDraft, submissionType, formResponseData, groupId } = formData;
     const typedFormResponseData = formResponseData as FormResponseField[];
 
     const submissionPutData: SubmissionPutData = {
@@ -113,7 +111,7 @@ function CourseMilestoneSubmissionsViewPage() {
       isDraft,
       submissionType,
       formResponseData: typedFormResponseData,
-      groupId: group?.id ?? null,
+      groupId,
     };
 
     await updateSubmission({
@@ -215,6 +213,20 @@ function CourseMilestoneSubmissionsViewPage() {
               </Text>
             </Paper>
           </Group>
+
+          {milestone && milestone.endDateTime !== null && (
+            <Group spacing={6}>
+              <Text size="sm">Finalize by:</Text>
+              <Paper withBorder p={6}>
+                <Text size="sm">
+                  {displayDateTime(
+                    milestone.endDateTime,
+                    DATE_TIME_MONTH_NAME_FORMAT,
+                  )}
+                </Text>
+              </Paper>
+            </Group>
+          )}
         </Group>
 
         <Button
@@ -236,7 +248,7 @@ function CourseMilestoneSubmissionsViewPage() {
         className={cx(classes.formContainer, formContainerClassName)}
       >
         <LoadingOverlay visible={isFetching} />
-        <MilestoneSubmissionForm
+        <SubmissionForm
           ref={formRef}
           defaultValues={submission}
           readOnly={!isMilestoneOpen}

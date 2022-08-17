@@ -95,57 +95,10 @@ const allFormResponseFieldSchemas: [
   textDisplayFormFieldSchema,
 ];
 
-export const formResponseFieldSchema = z
-  .discriminatedUnion(TYPE, allFormResponseFieldSchemas)
-  // NOTE: zod currently doesn't support composition after refinement
-  // as such refinement is done here instead of above
-  .refine(
-    (field) => {
-      const typedField = field as FormResponseField;
-
-      switch (typedField.type) {
-        case FormFieldType.Text:
-        case FormFieldType.TextArea:
-        case FormFieldType.Numeric:
-        case FormFieldType.Mcq: {
-          const { required, response } = typedField;
-          return !required || response !== "";
-        }
-        case FormFieldType.Mrq: {
-          const { required, response } = typedField;
-          return !required || response.length > 0;
-        }
-        default:
-          return true;
-      }
-    },
-    (field) => {
-      const typedField = field as FormResponseField;
-
-      switch (typedField.type) {
-        case FormFieldType.Text:
-        case FormFieldType.TextArea:
-        case FormFieldType.Numeric: {
-          return { message: "This field is required", path: [RESPONSE] };
-        }
-        case FormFieldType.Mcq: {
-          return { message: "Please select an option", path: [RESPONSE] };
-        }
-        case FormFieldType.Mrq: {
-          const { choices } = typedField;
-          return {
-            message:
-              choices.length === 1
-                ? "Please check the option"
-                : "Please select at least 1 option",
-            path: [RESPONSE],
-          };
-        }
-        default:
-          return { message: "An unknown error has occurred", path: [RESPONSE] };
-      }
-    },
-  );
+export const formResponseFieldSchema = z.discriminatedUnion(
+  TYPE,
+  allFormResponseFieldSchemas,
+);
 
 export type TextFormResponseField = z.infer<typeof textFormResponseFieldSchema>;
 
@@ -230,7 +183,7 @@ export function transformTemplateToSubmissionView({
   const submissionView: SubmissionViewData = {
     name,
     description,
-    isDraft: false,
+    isDraft: true,
     submissionType,
     creator: null,
     editor: null,

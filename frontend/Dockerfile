@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 node:16-alpine AS build
+FROM node:16-alpine AS build
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_SITE_URL
 

@@ -41,6 +41,7 @@ function CourseRoleGroupList({
 
           return (
             <CourseMemberDisplay
+              key={member.id}
               member={member}
               makeAdminOptionsAvailable={makeAdminOptionsAvailable}
             />

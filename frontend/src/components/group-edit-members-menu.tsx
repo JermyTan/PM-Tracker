@@ -176,8 +176,8 @@ function GroupEditMembersMenu({
     <PlaceholderWrapper
       isLoading={isLoadingCourseMemberships}
       loadingMessage="Loading members..."
-      defaultMessage="No members found."
-      showDefaultMessage={!allCourseMembers || allCourseMembers?.length === 0}
+      // defaultMessage="No members found."
+      // showDefaultMessage={!allCourseMembers || allCourseMembers?.length === 0}
     >
       <TransferList
         itemComponent={ItemComponent}

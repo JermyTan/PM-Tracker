@@ -5,13 +5,20 @@ type Props = SelectProps & {
   name: string;
 };
 
-function SelectField({ name, ...props }: Props) {
+function SelectField({ name, required, ...props }: Props) {
   const {
     field,
     fieldState: { error },
   } = useController({ name });
 
-  return <Select {...props} error={error?.message} {...field} />;
+  return (
+    <Select
+      withAsterisk={required}
+      {...props}
+      error={error?.message}
+      {...field}
+    />
+  );
 }
 
 export default SelectField;

@@ -62,6 +62,10 @@ function GroupCardActionsMenu({
     canDeleteGroup ||
     canModifyGroupName;
 
+  if (!hasAvailableActions) {
+    return null;
+  }
+
   const onJoinOrLeaveGroup = async (action: GroupPatchAction) => {
     if (
       isJoiningOrLeavingGroup ||
@@ -214,11 +218,7 @@ function GroupCardActionsMenu({
   };
 
   return (
-    <Menu
-      position="bottom-start"
-      // hidden={!hasAvailableActions}
-      withinPortal
-    >
+    <Menu position="bottom-start" withinPortal>
       <Menu.Target>
         <ActionIcon>
           <FaChevronDown />

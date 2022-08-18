@@ -78,6 +78,7 @@ function CourseMemberEditRoleMenu({ member, onSuccess }: Props) {
       >
         {ALL_ROLES.map((role) => (
           <Radio
+            key={role}
             value={role}
             label={roleToPropertiesMap[role].label}
             disabled={!editableRoles.includes(role)}

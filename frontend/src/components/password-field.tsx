@@ -5,7 +5,7 @@ type Props = PasswordInputProps & {
   name: string;
 };
 
-function PasswordField({ name, ...props }: Props) {
+function PasswordField({ name, required, ...props }: Props) {
   const {
     formState: { errors },
     register,
@@ -14,7 +14,12 @@ function PasswordField({ name, ...props }: Props) {
   const error = get(errors, name);
 
   return (
-    <PasswordInput error={error?.message} {...props} {...register(name)} />
+    <PasswordInput
+      withAsterisk={required}
+      {...props}
+      error={error?.message}
+      {...register(name)}
+    />
   );
 }
 

@@ -92,8 +92,8 @@ function CourseGroupPage() {
           <PlaceholderWrapper
             py={150}
             isLoading={isLoading}
-            loadingMessage="Loading courses..."
-            defaultMessage="No courses found."
+            loadingMessage="Loading groups..."
+            defaultMessage="No groups found."
             showDefaultMessage={!isLoading && (!groups || groups?.length === 0)}
           >
             <Stack spacing="xs">

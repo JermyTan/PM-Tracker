@@ -52,14 +52,9 @@ function CourseMemberCsvFileUploader({ onDrop, isLoading }: Props) {
           <GrDocumentCsv size={50} />
         </Dropzone.Idle>
 
-        <div>
-          <Text size="xl" inline>
-            Drag images here or click to select files
-          </Text>
-          <Text size="sm" color="dimmed" inline mt={7}>
-            Attach as many files as you like, each file should not exceed 5mb
-          </Text>
-        </div>
+        <Text size="xl" inline>
+          Drag and drop, or click here to select CSV file.
+        </Text>
       </Group>
     </Dropzone>
   );

@@ -5,7 +5,7 @@ type Props = TextInputProps & {
   name: string;
 };
 
-function TextField({ name, ...props }: Props) {
+function TextField({ name, required, ...props }: Props) {
   const {
     formState: { errors },
     register,
@@ -13,7 +13,14 @@ function TextField({ name, ...props }: Props) {
 
   const error = get(errors, name);
 
-  return <TextInput error={error?.message} {...props} {...register(name)} />;
+  return (
+    <TextInput
+      withAsterisk={required}
+      {...props}
+      error={error?.message}
+      {...register(name)}
+    />
+  );
 }
 
 export default TextField;

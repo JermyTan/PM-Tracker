@@ -11,7 +11,6 @@ from rest_framework.exceptions import PermissionDenied
 from pigeonhole.common.constants import ROLE
 from pigeonhole.common.parsers import parse_ms_timestamp_to_datetime
 from pigeonhole.common.exceptions import BadRequest, InternalServerError
-from users.logic import get_users
 from users.middlewares import check_account_access
 from users.models import User, AccountType
 from .models import (
@@ -56,6 +55,7 @@ from .logic import (
     create_course_submission_comment,
     delete_course_submission_comment,
     get_requested_course_submissions,
+    is_group_member,
     update_course,
     create_course_milestone,
     update_course_group,
@@ -69,6 +69,7 @@ from .logic import (
 from .serializers import (
     BatchMembershipCreationSerializer,
     CourseMemberCreationDataSerializer,
+    GetCourseGroupSerializer,
     GetCourseSubmissionSerializer,
     PatchCourseGroupSerializer,
     PostCourseGroupSerializer,
@@ -487,6 +488,11 @@ class CourseGroupsView(APIView):
         course: Course,
         requester_membership: CourseMembership,
     ):
+        serializer = GetCourseGroupSerializer(data=request.query_params.dict())
+
+        serializer.is_valid(raise_exception=True)
+        should_show_only_my_groups = serializer.validated_data["me"]
+
         ## prefetch related is used for performance optimization
         ## reference: https://betterprogramming.pub/django-select-related-and-prefetch-related-f23043fd635d
         groups: QuerySet[CourseGroup] = course.coursegroup_set.prefetch_related(
@@ -505,6 +511,10 @@ class CourseGroupsView(APIView):
             )
             else course_group_to_json(group)
             for group in groups
+            if (
+                not should_show_only_my_groups
+                or is_group_member(membership=requester_membership, group=group)
+            )
         ]
 
         return Response(data=data, status=status.HTTP_200_OK)
@@ -1101,7 +1111,7 @@ class SingleCourseSubmissionCommentView(APIView):
 class CourseMembershipsWithNewUserCreationView(APIView):
     @check_account_access(AccountType.STANDARD, AccountType.EDUCATOR, AccountType.ADMIN)
     @check_course
-    @check_requester_membership(Role.INSTRUCTOR, Role.CO_OWNER)
+    @check_requester_membership(Role.CO_OWNER)
     def post(
         self,
         request,

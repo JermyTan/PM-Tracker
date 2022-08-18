@@ -5,7 +5,7 @@ type Props = TextareaProps & {
   name: string;
 };
 
-function TextareaField({ name, ...props }: Props) {
+function TextareaField({ name, required, ...props }: Props) {
   const {
     formState: { errors },
     register,
@@ -13,7 +13,14 @@ function TextareaField({ name, ...props }: Props) {
 
   const error = get(errors, name);
 
-  return <Textarea error={error?.message} {...props} {...register(name)} />;
+  return (
+    <Textarea
+      withAsterisk={required}
+      {...props}
+      error={error?.message}
+      {...register(name)}
+    />
+  );
 }
 
 export default TextareaField;

@@ -6,9 +6,9 @@ type Props = NumberInputProps & {
   name: string;
 };
 
-function NumericField({ name, ...props }: Props) {
+function NumericField({ name, required, ...props }: Props) {
   const {
-    field: { value, name: fieldName, ref, onChange: onHandleChange, onBlur },
+    field: { value, onChange: onHandleChange, ...other },
     fieldState: { error },
   } = useController<{ [name: string]: string }>({ name });
 
@@ -24,13 +24,12 @@ function NumericField({ name, ...props }: Props) {
 
   return (
     <NumberInput
-      error={error?.message}
+      withAsterisk={required}
       {...props}
+      error={error?.message}
       value={Number.isNaN(numericValue) ? undefined : numericValue}
       onChange={onChange}
-      name={fieldName}
-      ref={ref}
-      onBlur={onBlur}
+      {...other}
     />
   );
 }

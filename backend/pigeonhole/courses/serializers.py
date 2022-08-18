@@ -117,6 +117,10 @@ class PatchCourseMembershipSerializer(serializers.ModelSerializer):
         fields = ("role",)
 
 
+class GetCourseGroupSerializer(serializers.Serializer):
+    me = serializers.BooleanField(required=False, default=False)
+
+
 class PostCourseGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseGroup
@@ -207,11 +211,14 @@ class PostCourseSubmissionCommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ("content",)
 
+
 PutCourseSubmissionCommentSerializer = PostCourseSubmissionCommentSerializer
+
 
 class CourseMemberCreationDataSerializer(serializers.Serializer):
     email = serializers.EmailField()
     name = serializers.CharField(max_length=255, allow_blank=True, required=False)
+
 
 class BatchMembershipCreationSerializer(serializers.Serializer):
     member_creation_data = serializers.JSONField()

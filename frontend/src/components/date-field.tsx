@@ -5,7 +5,7 @@ type Props = DatePickerProps & {
   name: string;
 };
 
-function DateField({ name, ...props }: Props) {
+function DateField({ name, required, ...props }: Props) {
   const {
     field,
     fieldState: { error },
@@ -13,9 +13,11 @@ function DateField({ name, ...props }: Props) {
 
   return (
     <DatePicker
-      error={error?.message}
+      withAsterisk={required}
       firstDayOfWeek="sunday"
+      withinPortal
       {...props}
+      error={error?.message}
       {...field}
     />
   );

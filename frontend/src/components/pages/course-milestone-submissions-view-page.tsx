@@ -23,7 +23,7 @@ import {
   useGetSingleSubmissionQuery,
   useUpdateSubmissionMutation,
 } from "../../redux/services/submissions-api";
-import { FormResponseField, SubmissionPutData } from "../../types/submissions";
+import { SubmissionPutData } from "../../types/submissions";
 import { useResolveError } from "../../utils/error-utils";
 import { checkIsMilestoneOpen } from "../../utils/misc-utils";
 import toastUtils from "../../utils/toast-utils";
@@ -103,14 +103,13 @@ function CourseMilestoneSubmissionsViewPage() {
 
     const { name, description } = submission;
     const { isDraft, submissionType, formResponseData, groupId } = formData;
-    const typedFormResponseData = formResponseData as FormResponseField[];
 
     const submissionPutData: SubmissionPutData = {
       name,
       description,
       isDraft,
       submissionType,
-      formResponseData: typedFormResponseData,
+      formResponseData,
       groupId,
     };
 

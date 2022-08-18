@@ -12,6 +12,7 @@ import { EMAIL, NAME, USER } from "../constants";
 import { useGetSingleCourseQuery } from "../redux/services/courses-api";
 import UserProfileDisplay from "./user-profile-display";
 import CourseMemberCreationEditor from "./course-member-creation-editor";
+import useGetCurrentUserRole from "../custom-hooks/use-get-current-user-role";
 
 type Props = {
   courseId: number | string | undefined;
@@ -32,6 +33,7 @@ function CourseMembershipsList({ courseId, hasAdminPermission }: Props) {
   const courseOwner = course?.owner;
   const courseOwnerId = courseOwner?.id;
   const modals = useModals();
+  const role = useGetCurrentUserRole();
 
   const sortedPersonnel = useMemo(() => {
     const sortedPersonnel = new Map<Role, CourseMemberData[]>();
@@ -81,12 +83,14 @@ function CourseMembershipsList({ courseId, hasAdminPermission }: Props) {
         <Text weight={700} size="lg">
           Course Members
         </Text>
-        <Button
-          onClick={openAddMembersModal}
-          leftIcon={<MdPersonAdd size={14} />}
-        >
-          Add Members
-        </Button>
+        {role === Role.CoOwner && (
+          <Button
+            onClick={openAddMembersModal}
+            leftIcon={<MdPersonAdd size={14} />}
+          >
+            Add Members
+          </Button>
+        )}
       </Group>
       <PlaceholderWrapper
         py={10}
@@ -109,6 +113,7 @@ function CourseMembershipsList({ courseId, hasAdminPermission }: Props) {
               const personnel = sortedPersonnel.get(role);
               return (
                 <CourseRoleGroupList
+                  key={role}
                   role={role}
                   course={course}
                   personnel={personnel ?? []}

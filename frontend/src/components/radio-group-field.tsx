@@ -7,7 +7,13 @@ type Props = Omit<RadioGroupProps, "children"> & {
   readOnly?: boolean;
 };
 
-function RadioGroupField({ name, choices, readOnly, ...props }: Props) {
+function RadioGroupField({
+  name,
+  choices,
+  readOnly,
+  required,
+  ...props
+}: Props) {
   const {
     field: { onChange, ...other },
     fieldState: { error },
@@ -15,8 +21,9 @@ function RadioGroupField({ name, choices, readOnly, ...props }: Props) {
 
   return (
     <Radio.Group
-      error={error?.message}
+      withAsterisk={required}
       {...props}
+      error={error?.message}
       {...other}
       // NOTE: html readOnly is not exposed
       // so currently using this hack to make it readOnly

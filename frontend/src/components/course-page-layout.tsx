@@ -86,7 +86,7 @@ function CoursePageLayout({ children }: Props) {
 
       <Space h={8} />
 
-      <Tabs value={tabDetails[activeIndex].value} loop>
+      <Tabs keepMounted={false} value={tabDetails[activeIndex].value} loop>
         <Tabs.List>
           {tabDetails.map(({ value, label }) => (
             <Text<typeof Link> key={value} component={Link} to={value}>

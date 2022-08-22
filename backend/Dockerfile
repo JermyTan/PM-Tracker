@@ -12,10 +12,10 @@ ENV PYTHONUNBUFFERED 1
 ## install dependencies
 RUN pip install --upgrade pip
 COPY ./requirements.txt .
-RUN echo "http://dl-4.alpinelinux.org/alpine/v3.16/main" >> /etc/apk/repositories && \
-    echo "http://dl-4.alpinelinux.org/alpine/v3.16/community" >> /etc/apk/repositories
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.16/main/" >> /etc/apk/repositories && \
+    echo "http://dl-cdn.alpinelinux.org/alpine/v3.16/community" >> /etc/apk/repositories
 RUN apk update && \
-    apk add postgresql-libs chromium chromium-chromedriver && \
+    apk add --no-cache postgresql-libs chromium chromium-chromedriver && \
     apk add --no-cache --virtual .build-deps \
     gcc \
     musl-dev \

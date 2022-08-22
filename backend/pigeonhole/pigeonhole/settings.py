@@ -33,7 +33,7 @@ CORS_ALLOW_ALL_ORIGINS = DEBUG
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS").split(" ")
 CSRF_TRUSTED_ORIGINS = [
     f"http{'' if DEBUG else 's'}://{host}" for host in ALLOWED_HOSTS
-    ]
+]
 
 SITE_ID = 1
 
@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "authentication",
     "courses",
     "forms",
+    "feedback",
 ]
 
 MIDDLEWARE = [

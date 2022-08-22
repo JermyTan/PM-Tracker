@@ -49,7 +49,8 @@ To install all app dependencies.
 
 **`python pigeonhole/manage.py startapp <service_name>`**
 
-Then move `<service_name>` folder from root into `pigeonhole` folder.
+Then move `<service_name>` folder from root into `pigeonhole` folder,
+and add `<service_name>` to `INSTALLED_APPS` in `pigeonhole/pigeonhole/settings.py`.
 
 ### Create superuser
 

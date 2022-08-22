@@ -1,4 +1,3 @@
-from email.policy import default
 from rest_framework import serializers
 
 from pigeonhole.common.models import MergeSerializersMixin

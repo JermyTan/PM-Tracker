@@ -45,7 +45,9 @@ CHROMEDRIVER_PATH = "/usr/local/bin/chromedriver"
 def analyse(text):
 
     chrome_options = Options()
-    #     chrome_options.add_argument("--headless")
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
 
     text_question_element_class = "ql-editor"
     submit_element_class = "btn-lg"

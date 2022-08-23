@@ -812,18 +812,34 @@ def update_course_submission(
 def can_view_course_submission(
     requester_membership: CourseMembership, submission: CourseSubmission
 ) -> bool:
-    if (
+    return (
         requester_membership.role != Role.STUDENT
         or submission.creator == requester_membership
-    ):
-        return True
-
-    if submission.group is not None:
-        return is_group_member(
-            membership=requester_membership, group=submission.group, force_query_db=True
+        or (
+            submission.group is not None
+            and is_group_member(
+                membership=requester_membership,
+                group=submission.group,
+                force_query_db=True,
+            )
         )
-
-    return False
+        or any(
+            requester_membership == viewable_member.member
+            for viewable_member in submission.coursesubmissionviewablemember_set.select_related(
+                "member"
+            )
+        )
+        or any(
+            is_group_member(
+                membership=requester_membership,
+                group=viewable_group.group,
+                force_query_db=True,
+            )
+            for viewable_group in submission.coursesubmissionviewablegroup_set.select_related(
+                "group"
+            )
+        )
+    )
 
 
 def can_update_course_submission(

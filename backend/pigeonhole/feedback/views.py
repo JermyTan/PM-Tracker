@@ -13,7 +13,7 @@ from users.models import User, AccountType
 from users.middlewares import check_account_access
 from .serializers import PostFeedbackSerializer
 
-## TODO: this is only a temporary implemention. Should not relay on webscraping in the long run.
+## TODO: this is only a temporary implemention. Should not rely on webscraping in the long run.
 def answer_reflection(driver, element_class, reflection):
     text_questions = driver.find_element(By.CLASS_NAME, element_class)
     text_questions.clear()
@@ -51,9 +51,7 @@ def analyse(text):
     submit_element_class = "btn-lg"
 
     url = "https://acawriter-demo.utscic.edu.au/demo"
-    coreDriver = webdriver.Chrome(
-        options=chrome_options
-    )  # Change executable path to current executable location
+    coreDriver = webdriver.Chrome(options=chrome_options)
     coreDriver.get(url)
 
     select_element = coreDriver.find_element(By.ID, "grammar")

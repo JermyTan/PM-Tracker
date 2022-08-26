@@ -2,6 +2,7 @@ import { createStyles, Group, ScrollArea, Stack } from "@mantine/core";
 import { FormField, FormFieldType } from "../types/templates";
 import CheckboxGroupField from "./checkbox-group-field";
 import FormFieldCommentButton from "./form-field-comment-button";
+import FormFieldFeedbackRenderer from "./form-field-feedback-renderer";
 import NumericField from "./numeric-field";
 import RadioGroupField from "./radio-group-field";
 import TextField from "./text-field";
@@ -35,7 +36,7 @@ function FormFieldRenderer({
 }: Props) {
   const { classes } = useStyles();
 
-  const component = (() => {
+  const mainComponent = (() => {
     switch (formField.type) {
       case FormFieldType.Text: {
         const { label, description, placeholder, required } = formField;
@@ -71,8 +72,7 @@ function FormFieldRenderer({
         );
       }
       case FormFieldType.TextArea: {
-        const { label, description, placeholder, required, hasFeedback } =
-          formField;
+        const { label, description, placeholder, required } = formField;
         return (
           <TextareaField
             name={name}
@@ -231,14 +231,23 @@ function FormFieldRenderer({
     }
   })();
 
-  return component ? (
+  const metaComponent = (() => {
+    if (formField.type !== FormFieldType.TextArea || !formField.hasFeedback) {
+      return null;
+    }
+
+    return <FormFieldFeedbackRenderer name={name} />;
+  })();
+
+  return mainComponent ? (
     <Stack spacing={8}>
-      {component}
+      {mainComponent}
       {withComments && (
         <Group position="right">
           <FormFieldCommentButton fieldIndex={index} />
         </Group>
       )}
+      {metaComponent}
     </Stack>
   ) : null;
 }

@@ -18,6 +18,7 @@ import {
 import { useResolveError } from "../../utils/error-utils";
 import SubmissionForm from "../submission-form";
 import PlaceholderWrapper from "../placeholder-wrapper";
+import useGetCourseMilestoneSubmissionPermissions from "../../custom-hooks/use-get-course-milestone-submission-permissions";
 
 function CourseMilestoneSubmissionsTemplatesViewPage() {
   const courseId = useGetCourseId();
@@ -47,6 +48,7 @@ function CourseMilestoneSubmissionsTemplatesViewPage() {
   const { resolveError } = useResolveError({
     name: "course-milestone-submissions-templates-view-page",
   });
+  const { canCreate } = useGetCourseMilestoneSubmissionPermissions();
 
   // creates blank submission
   const onUseTemplate = async () => {
@@ -55,7 +57,8 @@ function CourseMilestoneSubmissionsTemplatesViewPage() {
       courseId === undefined ||
       milestoneId === undefined ||
       submissionView === undefined ||
-      submissionView.template?.id === undefined
+      submissionView.template?.id === undefined ||
+      !canCreate
     ) {
       return;
     }
@@ -110,6 +113,7 @@ function CourseMilestoneSubmissionsTemplatesViewPage() {
               loading={isLoading}
               leftIcon={<FiFileText />}
               onClick={onUseTemplate}
+              disabled={!canCreate}
             >
               Use template
             </Button>

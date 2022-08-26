@@ -31,6 +31,7 @@ import SubmissionForm, { SubmissionFormData } from "../submission-form";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import { DATE_TIME_MONTH_NAME_FORMAT, UNKNOWN_USER } from "../../constants";
 import { displayDateTime } from "../../utils/transform-utils";
+import useGetCourseMilestoneSubmissionPermissions from "../../custom-hooks/use-get-course-milestone-submission-permissions";
 
 const useStyles = createStyles({
   formContainer: {
@@ -87,8 +88,7 @@ function CourseMilestoneSubmissionsViewPage() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const modals = useModals();
-
-  const isMilestoneOpen = checkIsMilestoneOpen(milestone);
+  const { canModify, canDelete } = useGetCourseMilestoneSubmissionPermissions();
 
   const onUpdateSubmission = async (formData: SubmissionFormData) => {
     if (
@@ -232,7 +232,7 @@ function CourseMilestoneSubmissionsViewPage() {
           color="red"
           leftIcon={<FaTrashAlt size={12} />}
           loading={isDeleting}
-          disabled={!isMilestoneOpen || isUpdating}
+          disabled={!canDelete || isUpdating}
           onClick={openDeleteModal}
         >
           Delete submission
@@ -250,7 +250,7 @@ function CourseMilestoneSubmissionsViewPage() {
         <SubmissionForm
           ref={formRef}
           defaultValues={submission}
-          readOnly={!isMilestoneOpen}
+          readOnly={!canModify}
           onSubmit={onUpdateSubmission}
           withComments
           submitButtonProps={{ disabled: isDeleting }}

@@ -210,11 +210,24 @@ function SubmissionForm(
         }),
       },
     );
-  const groupOptions: SelectItem[] = useMemo(
-    () =>
-      groups?.map(({ id, name }) => ({ label: name, value: `${id}` })) ?? [],
-    [groups],
-  );
+  const groupOptions: SelectItem[] = useMemo(() => {
+    const options =
+      groups?.map(({ id, name }) => ({ label: name, value: `${id}` })) ?? [];
+
+    if (group?.id === undefined) {
+      return options;
+    }
+
+    const groupId = `${group.id}`;
+
+    if (options.some(({ value }) => value === groupId)) {
+      return options;
+    }
+
+    options.push({ label: group.name, value: groupId });
+
+    return options;
+  }, [groups, group]);
 
   const { fields } = useFieldArray({
     control,
@@ -323,6 +336,7 @@ function SubmissionForm(
                 </Tooltip>
               </Group>
             }
+            disabled={readOnly}
           />
 
           {canSelectGroup && (
@@ -331,7 +345,7 @@ function SubmissionForm(
               data={groupOptions}
               name={GROUP_ID}
               rightSection={isLoadingGroups ? <Loader size="xs" /> : undefined}
-              disabled={isLoadingGroups}
+              disabled={isLoadingGroups || readOnly}
               error={getErrorMessage(courseGroupsError)}
               required={isGroupRequired}
               placeholder={`Please select a group${

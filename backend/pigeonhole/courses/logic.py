@@ -729,9 +729,7 @@ def create_course_submission(
         logger.warning(e)
         raise ValueError(f"No such template found in this course.")
 
-    if requester_membership.role == Role.STUDENT and not is_milestone_active(
-        milestone=milestone
-    ):
+    if not is_milestone_active(milestone=milestone):
         raise ValueError(
             f"{(course.coursesettings.milestone_alias or MILESTONE).capitalize()} is not open."
         )

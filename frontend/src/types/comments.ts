@@ -9,7 +9,7 @@ import { BaseData } from "./base";
 import { Role } from "./courses";
 import { UserData } from "./users";
 
-export type SubmissionComment = BaseData & {
+export type SubmissionCommentData = BaseData & {
   [CONTENT]: string;
   [COMMENTER]: UserData;
   [ROLE]: Role | null;

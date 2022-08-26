@@ -319,6 +319,9 @@ class SingleCourseMilestoneView(APIView):
         requester_membership: CourseMembership,
         milestone: CourseMilestone,
     ):
+        if requester_membership.role == Role.STUDENT and not milestone.is_published:
+            raise PermissionDenied()
+
         data = course_milestone_to_json(milestone)
 
         return Response(data=data, status=status.HTTP_200_OK)

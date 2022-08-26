@@ -22,7 +22,7 @@ import {
   useDeleteSubmissionCommentMutation,
   useUpdateSubmissionCommentMutation,
 } from "../redux/services/comments-api";
-import { SubmissionComment } from "../types/comments";
+import { SubmissionCommentData } from "../types/comments";
 import { roleToPropertiesMap } from "../types/courses";
 import { useResolveError } from "../utils/error-utils";
 import toastUtils from "../utils/toast-utils";
@@ -37,7 +37,7 @@ const useStyles = createStyles({
   },
 });
 
-type Props = SubmissionComment;
+type Props = SubmissionCommentData;
 
 function CommentCard(props: Props) {
   const { id, content, commenter, role, isDeleted, createdAt, updatedAt } =

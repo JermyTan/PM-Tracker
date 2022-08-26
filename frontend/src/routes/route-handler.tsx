@@ -23,6 +23,7 @@ import MilestoneDetailsLayout from "../components/milestone-details-layout";
 import useGetTemplatePermissions from "../custom-hooks/use-get-template-permissions";
 import CourseMilestoneSubmissionsTemplatesViewPage from "../components/pages/course-milestone-submissions-templates-view-page";
 import CourseMilestoneSubmissionsViewPage from "../components/pages/course-milestone-submissions-view-page";
+import useGetCourseMilestoneSubmissionPermissions from "../custom-hooks/use-get-course-milestone-submission-permissions";
 
 function RouteHandler() {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
@@ -81,9 +82,17 @@ function RouteHandler() {
                 <Route
                   path="submissions/templates"
                   element={
-                    <CourseMilestoneTemplatesPage studentView>
-                      <Outlet />
-                    </CourseMilestoneTemplatesPage>
+                    <ConditionalRenderer
+                      permissionGetter={{
+                        fn: useGetCourseMilestoneSubmissionPermissions,
+                        key: "canCreate",
+                      }}
+                      fallback={<Navigate to="/dashboard" replace />}
+                    >
+                      <CourseMilestoneTemplatesPage studentView>
+                        <Outlet />
+                      </CourseMilestoneTemplatesPage>
+                    </ConditionalRenderer>
                   }
                 >
                   <Route

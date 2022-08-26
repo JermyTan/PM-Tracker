@@ -19,6 +19,8 @@ import { useResolveError } from "../../utils/error-utils";
 import CourseSubmissionsTable from "../course-submissions-table";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import CourseSubmissionSummarySection from "../course-submission-summary-section";
+import useGetCourseMilestoneSubmissionPermissions from "../../custom-hooks/use-get-course-milestone-submission-permissions";
+import ConditionalRenderer from "../conditional-renderer";
 
 enum SubmissionViewOption {
   All = "all",
@@ -104,14 +106,26 @@ function CourseMilestoneSubmissionsPage() {
       <Group position="apart">
         <Title order={3}>Submissions</Title>
 
-        <Button<typeof Link>
-          component={Link}
-          to="templates"
-          color="teal"
-          leftIcon={<FaPlus />}
+        <ConditionalRenderer
+          permissionGetter={{
+            fn: useGetCourseMilestoneSubmissionPermissions,
+            key: "canCreate",
+          }}
+          fallback={
+            <Button color="teal" leftIcon={<FaPlus />} disabled>
+              Create new submission
+            </Button>
+          }
         >
-          Create new submission
-        </Button>
+          <Button<typeof Link>
+            component={Link}
+            to="templates"
+            color="teal"
+            leftIcon={<FaPlus />}
+          >
+            Create new submission
+          </Button>
+        </ConditionalRenderer>
       </Group>
 
       <PlaceholderWrapper

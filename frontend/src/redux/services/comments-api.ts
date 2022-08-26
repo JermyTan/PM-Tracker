@@ -1,5 +1,5 @@
 import {
-  SubmissionComment,
+  SubmissionCommentData,
   SubmissionCommentPostData,
   SubmissionCommentPatchData,
 } from "../../types/comments";
@@ -27,7 +27,7 @@ const commentsApi = baseApi
       }),
 
       getSubmissionComments: build.query<
-        SubmissionComment[],
+        SubmissionCommentData[],
         {
           courseId: string | number;
           submissionId: string | number;
@@ -47,7 +47,7 @@ const commentsApi = baseApi
       }),
 
       createSubmissionComment: build.mutation<
-        SubmissionComment,
+        SubmissionCommentData,
         SubmissionCommentPostData & {
           courseId: string | number;
           submissionId: string | number;
@@ -81,7 +81,7 @@ const commentsApi = baseApi
       }),
 
       updateSubmissionComment: build.mutation<
-        SubmissionComment,
+        SubmissionCommentData,
         SubmissionCommentPatchData & {
           courseId: string | number;
           submissionId: string | number;
@@ -119,7 +119,7 @@ const commentsApi = baseApi
       }),
 
       deleteSubmissionComment: build.mutation<
-        SubmissionComment,
+        SubmissionCommentData,
         {
           courseId: string | number;
           submissionId: string | number;

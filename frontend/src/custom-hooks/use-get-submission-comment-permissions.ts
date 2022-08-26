@@ -1,11 +1,11 @@
 import { useSearchParams } from "react-router-dom";
-import { SubmissionComment } from "../types/comments";
+import { SubmissionCommentData } from "../types/comments";
 import useGetCourseId from "./use-get-course-id";
 import useGetCurrentUserId from "./use-get-current-user-id";
 import useGetSubmissionId from "./use-get-submission-id";
 
 export default function useGetSubmissionCommentPermissions(
-  comment?: SubmissionComment,
+  comment?: SubmissionCommentData,
 ) {
   const courseId = useGetCourseId();
   const submissionId = useGetSubmissionId();

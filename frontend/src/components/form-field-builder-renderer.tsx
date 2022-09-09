@@ -1,4 +1,4 @@
-import { Text, Stack, Group } from "@mantine/core";
+import { Text, Stack, Group, Anchor } from "@mantine/core";
 import {
   CHOICES,
   CONTENT,
@@ -122,7 +122,18 @@ function FormFieldBuilderRenderer({ formFieldType, builderName }: Props) {
           <SwitchField
             key={hasFeedbackFieldName}
             name={hasFeedbackFieldName}
-            label={<Text size="sm">Enable feedback</Text>}
+            label={
+              <Text size="sm">
+                Enable automated reflective feedback (see{" "}
+                <Anchor
+                  inherit
+                  href="https://acawriter-demo.utscic.edu.au/demo"
+                >
+                  AcaWriter
+                </Anchor>
+                )
+              </Text>
+            }
           />
         );
       }

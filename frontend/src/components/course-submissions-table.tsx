@@ -42,7 +42,7 @@ function CourseSubmissionsTable({ submissions }: Props) {
           <th>ID</th>
           <th>Name</th>
           <th>Submission type</th>
-          <th>Group</th>
+          <th>Submission group</th>
           <th>Last updated by</th>
           <th>Last updated at</th>
           <th>Visibility</th>

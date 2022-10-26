@@ -1,5 +1,5 @@
 import { Switch, SwitchProps } from "@mantine/core";
-import { useFormContext, get } from "react-hook-form";
+import { useController } from "react-hook-form";
 import { useEffect } from "react";
 import toastUtils from "../utils/toast-utils";
 
@@ -9,11 +9,9 @@ type Props = SwitchProps & {
 
 function SwitchField({ name, ...props }: Props) {
   const {
-    formState: { errors },
-    register,
-  } = useFormContext();
-
-  const error = get(errors, name);
+    field: { value, ...other },
+    fieldState: { error },
+  } = useController<{ [name: string]: boolean }>({ name });
 
   useEffect(() => {
     if (error?.message) {
@@ -21,7 +19,7 @@ function SwitchField({ name, ...props }: Props) {
     }
   }, [error]);
 
-  return <Switch {...props} {...register(name)} />;
+  return <Switch {...props} checked={value} {...other} />;
 }
 
 export default SwitchField;

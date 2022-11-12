@@ -258,8 +258,9 @@ export function parseToSubmissionCsvFiles(
                           }\n\n${displayDateTime(
                             createdAt,
                             DATE_TIME_MONTH_NAME_FORMAT,
-                          )}\n\n--\n`,
-                      );
+                          )}\n\n--`,
+                      )
+                      .join("\n");
 
                     return [response, comments];
                   },

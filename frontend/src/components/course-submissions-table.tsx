@@ -1,7 +1,7 @@
 import { Anchor, Badge, createStyles, Group, Table } from "@mantine/core";
 import { useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { DATE_TIME_MONTH_NAME_FORMAT } from "../constants";
+import { DATE_TIME_MONTH_NAME_FORMAT, UPDATED_AT } from "../constants";
 import { SubmissionSummaryData } from "../types/submissions";
 import { colorModeValue } from "../utils/theme-utils";
 import { sort, displayDateTime } from "../utils/transform-utils";
@@ -28,7 +28,8 @@ function CourseSubmissionsTable({ submissions }: Props) {
   const sortedSubmissions = useMemo(
     () =>
       sort(submissions, {
-        key: (a, b) => b.updatedAt - a.updatedAt,
+        key: UPDATED_AT,
+        reverse: true,
       }),
     [submissions],
   );

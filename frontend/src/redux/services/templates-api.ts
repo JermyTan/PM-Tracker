@@ -16,7 +16,7 @@ const templatesApi = baseApi
           method: "GET",
         }),
         providesTags: (result, _, courseId) =>
-          cacher.providesList(result, "Template", [`${courseId}`]),
+          cacher.providesList(result, "Template", [courseId]),
       }),
 
       createTemplate: build.mutation<
@@ -31,7 +31,7 @@ const templatesApi = baseApi
           body: templatePostData,
         }),
         invalidatesTags: (_, error, { courseId }) =>
-          error ? [] : cacher.invalidatesList("Template", [`${courseId}`]),
+          error ? [] : cacher.invalidatesList("Template", [courseId]),
       }),
 
       getSingleTemplate: build.query<
@@ -43,7 +43,7 @@ const templatesApi = baseApi
           method: "GET",
         }),
         providesTags: (_, __, { templateId: id, courseId }) => [
-          cacher.getIdTag(id, "Template", [`${courseId}`]),
+          cacher.getIdTag(id, "Template", [courseId]),
         ],
       }),
 
@@ -60,7 +60,7 @@ const templatesApi = baseApi
           body: templatePutData,
         }),
         invalidatesTags: (_, error, { templateId: id, courseId }) =>
-          error ? [] : [cacher.getIdTag(id, "Template", [`${courseId}`])],
+          error ? [] : [cacher.getIdTag(id, "Template", [courseId])],
       }),
 
       deleteTemplate: build.mutation<
@@ -75,7 +75,7 @@ const templatesApi = baseApi
           method: "DELETE",
         }),
         invalidatesTags: (_, error, { templateId: id, courseId }) =>
-          error ? [] : [cacher.getIdTag(id, "Template", [`${courseId}`])],
+          error ? [] : [cacher.getIdTag(id, "Template", [courseId])],
       }),
     }),
   });

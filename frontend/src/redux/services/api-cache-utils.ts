@@ -3,17 +3,23 @@
 export function getIdTag<R extends string | number, T extends string>(
   id: R,
   type: T,
-  additionalIdComponents: string[] = [],
+  additionalIdComponents: unknown[] = [],
 ) {
-  return { type, id: [`${id}`, ...additionalIdComponents].join(".") };
+  const additionalStringIdComponents = additionalIdComponents.map((v) =>
+    String(v),
+  );
+  return { type, id: [`${id}`, ...additionalStringIdComponents].join(".") };
 }
 
 export function getCustomTag<R extends string, T extends string>(
   id: R,
   type: T,
-  additionalIdComponents: string[] = [],
+  additionalIdComponents: unknown[] = [],
 ) {
-  return { type, id: [id, ...additionalIdComponents].join(".") };
+  const additionalStringIdComponents = additionalIdComponents.map((v) =>
+    String(v),
+  );
+  return { type, id: [id, ...additionalStringIdComponents].join(".") };
 }
 
 export function providesList<
@@ -22,7 +28,7 @@ export function providesList<
 >(
   resultsWithIds: R | undefined,
   type: T,
-  additionalIdComponents: string[] = [],
+  additionalIdComponents: unknown[] = [],
 ) {
   const listTag = [getCustomTag("LIST", type, additionalIdComponents)];
 
@@ -38,7 +44,7 @@ export function providesList<
 
 export function invalidatesList<T extends string>(
   type: T,
-  additionalIdComponents: string[] = [],
+  additionalIdComponents: unknown[] = [],
 ) {
   return [getCustomTag("LIST", type, additionalIdComponents)];
 }

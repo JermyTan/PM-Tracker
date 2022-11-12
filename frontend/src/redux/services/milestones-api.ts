@@ -16,7 +16,7 @@ const milestonesApi = baseApi
           method: "GET",
         }),
         providesTags: (result, _, courseId) =>
-          cacher.providesList(result, "Milestone", [`${courseId}`]),
+          cacher.providesList(result, "Milestone", [courseId]),
       }),
 
       createMilestone: build.mutation<
@@ -31,7 +31,7 @@ const milestonesApi = baseApi
           body: milestonePostData,
         }),
         invalidatesTags: (_, error, { courseId }) =>
-          error ? [] : cacher.invalidatesList("Milestone", [`${courseId}`]),
+          error ? [] : cacher.invalidatesList("Milestone", [courseId]),
       }),
 
       getSingleMilestone: build.query<
@@ -43,7 +43,7 @@ const milestonesApi = baseApi
           method: "GET",
         }),
         providesTags: (_, __, { milestoneId: id, courseId }) => [
-          cacher.getIdTag(id, "Milestone", [`${courseId}`]),
+          cacher.getIdTag(id, "Milestone", [courseId]),
         ],
       }),
 
@@ -60,7 +60,7 @@ const milestonesApi = baseApi
           body: milestonePutData,
         }),
         invalidatesTags: (_, error, { milestoneId: id, courseId }) =>
-          error ? [] : [cacher.getIdTag(id, "Milestone", [`${courseId}`])],
+          error ? [] : [cacher.getIdTag(id, "Milestone", [courseId])],
       }),
 
       deleteMilestone: build.mutation<
@@ -75,7 +75,7 @@ const milestonesApi = baseApi
           method: "DELETE",
         }),
         invalidatesTags: (_, error, { milestoneId: id, courseId }) =>
-          error ? [] : [cacher.getIdTag(id, "Milestone", [`${courseId}`])],
+          error ? [] : [cacher.getIdTag(id, "Milestone", [courseId])],
       }),
     }),
   });

@@ -16,6 +16,9 @@ import {
 } from "../constants";
 import { isStringOrArray, sanitizeArray } from "../utils/transform-utils";
 import { BaseData } from "./base";
+import { FormFieldType } from "./enums";
+
+export { FormFieldType };
 
 export enum SubmissionType {
   Individual = "INDIVIDUAL",
@@ -31,15 +34,6 @@ export const submissionTypeToPropertiesMap = {
     icon: MdOutlinePeopleAlt,
   },
 };
-
-export enum FormFieldType {
-  Text = "TEXT",
-  TextArea = "TEXT_AREA",
-  Numeric = "NUMERIC",
-  Mcq = "MCQ",
-  Mrq = "MRQ",
-  TextDisplay = "TEXT_DISPLAY",
-}
 
 export const superFormFieldSchema = z.object({
   [LABEL]: z.string().trim().min(1, "Please enter a question/label"),

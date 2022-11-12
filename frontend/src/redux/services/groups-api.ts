@@ -26,7 +26,7 @@ const groupsApi = baseApi
           }),
         }),
         providesTags: (result, _, { courseId }) =>
-          cacher.providesList(result, "Group", [`${courseId}`]),
+          cacher.providesList(result, "Group", [courseId]),
       }),
 
       createCourseGroup: build.mutation<
@@ -39,7 +39,7 @@ const groupsApi = baseApi
           body: groupPostData,
         }),
         invalidatesTags: (_, error, { courseId }) =>
-          error ? [] : cacher.invalidatesList("Group", [`${courseId}`]),
+          error ? [] : cacher.invalidatesList("Group", [courseId]),
       }),
 
       // joinOrLeaveCourseGroup: build.mutation<
@@ -94,7 +94,7 @@ const groupsApi = baseApi
           body: groupPatchData,
         }),
         invalidatesTags: (_, error, { groupId: id, courseId }) =>
-          error ? [] : [cacher.getIdTag(id, "Group", [`${courseId}`])],
+          error ? [] : [cacher.getIdTag(id, "Group", [courseId])],
       }),
 
       deleteCourseGroup: build.mutation<
@@ -106,7 +106,7 @@ const groupsApi = baseApi
           method: "DELETE",
         }),
         invalidatesTags: (_, error, { groupId: id, courseId }) =>
-          error ? [] : [cacher.getIdTag(id, "Group", [`${courseId}`])],
+          error ? [] : [cacher.getIdTag(id, "Group", [courseId])],
       }),
     }),
   });

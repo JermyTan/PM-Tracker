@@ -11,7 +11,7 @@ import { UserData } from "./users";
 
 export type SubmissionCommentData = BaseData & {
   [CONTENT]: string;
-  [COMMENTER]: UserData;
+  [COMMENTER]: UserData | null;
   [ROLE]: Role | null;
   [IS_DELETED]: boolean;
   [FIELD_INDEX]: number;

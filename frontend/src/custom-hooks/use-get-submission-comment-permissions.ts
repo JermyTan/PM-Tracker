@@ -29,7 +29,8 @@ export default function useGetSubmissionCommentPermissions(
 
   const { isDeleted, commenter } = comment;
 
-  const canModify = userId === commenter.id && !isDeleted;
+  const canModify =
+    userId !== undefined && userId === commenter?.id && !isDeleted;
   const canDelete = canModify;
 
   return {

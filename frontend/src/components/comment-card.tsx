@@ -14,7 +14,12 @@ import { useDisclosure, useHover } from "@mantine/hooks";
 import { useState } from "react";
 import { BiCommentEdit, BiCommentX } from "react-icons/bi";
 import { IoIosMore, IoMdClose } from "react-icons/io";
-import { DATE_TIME_MONTH_NAME_FORMAT } from "../constants";
+import {
+  COMMENT_HAS_BEEN_DELETED,
+  DATE_TIME_MONTH_NAME_FORMAT,
+  EX_COURSE_MEMBER,
+  UNKNOWN_USER,
+} from "../constants";
 import useGetCourseId from "../custom-hooks/use-get-course-id";
 import useGetSubmissionCommentPermissions from "../custom-hooks/use-get-submission-comment-permissions";
 import useGetSubmissionId from "../custom-hooks/use-get-submission-id";
@@ -108,7 +113,7 @@ function CommentCard(props: Props) {
       return (
         <Alert p={4} color="gray">
           <Text color="dimmed" italic size="sm">
-            Comment has been deleted.
+            {COMMENT_HAS_BEEN_DELETED}
           </Text>
         </Alert>
       );
@@ -157,7 +162,7 @@ function CommentCard(props: Props) {
       </ConditionalRenderer>
 
       <Avatar
-        src={commenter.profileImage || undefined}
+        src={commenter?.profileImage || undefined}
         alt=""
         size={32}
         radius={32}
@@ -166,11 +171,11 @@ function CommentCard(props: Props) {
       <Stack className={classes.textContainer} spacing={6}>
         <Group align="flex-start" position="apart" noWrap>
           <div>
-            <Text size="sm">{commenter.name}</Text>
+            <Text size="sm">{commenter?.name ?? UNKNOWN_USER}</Text>
             <Text size="xs" color="dimmed">
               {role !== null
                 ? roleToPropertiesMap[role].label
-                : "Ex-course member"}
+                : EX_COURSE_MEMBER}
             </Text>
           </div>
           <ConditionalRenderer

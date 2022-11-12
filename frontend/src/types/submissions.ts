@@ -1,5 +1,6 @@
 import { z, ZodDiscriminatedUnionOption } from "zod";
 import {
+  COMMENTS,
   CREATOR,
   DESCRIPTION,
   EDITOR,
@@ -18,6 +19,7 @@ import {
   TYPE,
 } from "../constants";
 import { BaseData } from "./base";
+import { SubmissionCommentData } from "./comments";
 import { GroupData } from "./groups";
 import { MilestoneData } from "./milestones";
 import {
@@ -168,40 +170,6 @@ export type SubmissionSummaryData = BaseData &
 export type SubmissionData = SubmissionSummaryData &
   Pick<SubmissionViewData, typeof TEMPLATE | typeof FORM_RESPONSE_DATA>;
 
-export function transformTemplateToSubmissionView({
-  template,
-  overrides,
-}: {
-  template?: TemplateData;
-  overrides?: Partial<SubmissionViewData>;
-}) {
-  if (!template) {
-    return undefined;
-  }
-
-  const { name, description, submissionType, formFieldData } = template;
-  const submissionView: SubmissionViewData = {
-    name,
-    description,
-    isDraft: true,
-    submissionType,
-    creator: null,
-    editor: null,
-    milestone: null,
-    group: null,
-    template,
-    formResponseData: formFieldData.map((formField) => {
-      switch (formField.type) {
-        case FormFieldType.TextDisplay:
-          return formField;
-        case FormFieldType.Mrq:
-          return { ...formField, response: [] };
-        default:
-          return { ...formField, response: "" };
-      }
-    }),
-    ...overrides,
-  };
-
-  return submissionView;
-}
+export type SubmissionDataWithComments = SubmissionData & {
+  [COMMENTS]: SubmissionCommentData[];
+};

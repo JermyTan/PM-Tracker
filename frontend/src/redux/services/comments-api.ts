@@ -19,10 +19,7 @@ const commentsApi = baseApi
           method: "GET",
         }),
         providesTags: (_, __, { courseId, submissionId }) => [
-          cacher.getCustomTag("COUNT", "Comment", [
-            `${courseId}`,
-            `${submissionId}`,
-          ]),
+          cacher.getCustomTag("COUNT", "Comment", [courseId, submissionId]),
         ],
       }),
 
@@ -40,9 +37,9 @@ const commentsApi = baseApi
         }),
         providesTags: (result, _, { courseId, submissionId, fieldIndex }) =>
           cacher.providesList(result, "Comment", [
-            `${courseId}`,
-            `${submissionId}`,
-            `${fieldIndex}`,
+            courseId,
+            submissionId,
+            fieldIndex,
           ]),
       }),
 
@@ -69,13 +66,13 @@ const commentsApi = baseApi
             ? []
             : [
                 ...cacher.invalidatesList("Comment", [
-                  `${courseId}`,
-                  `${submissionId}`,
-                  `${fieldIndex}`,
+                  courseId,
+                  submissionId,
+                  fieldIndex,
                 ]),
                 cacher.getCustomTag("COUNT", "Comment", [
-                  `${courseId}`,
-                  `${submissionId}`,
+                  courseId,
+                  submissionId,
                 ]),
               ],
       }),
@@ -107,13 +104,13 @@ const commentsApi = baseApi
             ? []
             : [
                 cacher.getIdTag(id, "Comment", [
-                  `${courseId}`,
-                  `${submissionId}`,
-                  `${result.fieldIndex}`,
+                  courseId,
+                  submissionId,
+                  result.fieldIndex,
                 ]),
                 cacher.getCustomTag("COUNT", "Comment", [
-                  `${courseId}`,
-                  `${submissionId}`,
+                  courseId,
+                  submissionId,
                 ]),
               ],
       }),
@@ -139,13 +136,13 @@ const commentsApi = baseApi
             ? []
             : [
                 cacher.getIdTag(id, "Comment", [
-                  `${courseId}`,
-                  `${submissionId}`,
-                  `${result.fieldIndex}`,
+                  courseId,
+                  submissionId,
+                  result.fieldIndex,
                 ]),
                 cacher.getCustomTag("COUNT", "Comment", [
-                  `${courseId}`,
-                  `${submissionId}`,
+                  courseId,
+                  submissionId,
                 ]),
               ],
       }),

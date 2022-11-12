@@ -21,6 +21,7 @@ import PlaceholderWrapper from "../placeholder-wrapper";
 import CourseSubmissionSummarySection from "../course-submission-summary-section";
 import useGetCourseMilestoneSubmissionPermissions from "../../custom-hooks/use-get-course-milestone-submission-permissions";
 import ConditionalRenderer from "../conditional-renderer";
+import CourseSubmissionsExportButton from "../course-submissions-export-button";
 
 enum SubmissionViewOption {
   All = "all",
@@ -106,26 +107,32 @@ function CourseMilestoneSubmissionsPage() {
       <Group position="apart">
         <Title order={3}>Submissions</Title>
 
-        <ConditionalRenderer
-          permissionGetter={{
-            fn: useGetCourseMilestoneSubmissionPermissions,
-            key: "canCreate",
-          }}
-          fallback={
-            <Button color="teal" leftIcon={<FaPlus />} disabled>
+        <Group>
+          <CourseSubmissionsExportButton
+            disabled={!submissions || submissions.length === 0}
+          />
+
+          <ConditionalRenderer
+            permissionGetter={{
+              fn: useGetCourseMilestoneSubmissionPermissions,
+              key: "canCreate",
+            }}
+            fallback={
+              <Button color="teal" leftIcon={<FaPlus />} disabled>
+                Create new submission
+              </Button>
+            }
+          >
+            <Button<typeof Link>
+              component={Link}
+              to="templates"
+              color="teal"
+              leftIcon={<FaPlus />}
+            >
               Create new submission
             </Button>
-          }
-        >
-          <Button<typeof Link>
-            component={Link}
-            to="templates"
-            color="teal"
-            leftIcon={<FaPlus />}
-          >
-            Create new submission
-          </Button>
-        </ConditionalRenderer>
+          </ConditionalRenderer>
+        </Group>
       </Group>
 
       <PlaceholderWrapper

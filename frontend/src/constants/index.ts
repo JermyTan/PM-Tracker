@@ -78,3 +78,6 @@ export const IS_ACTIVATED = "isActivated";
 export const SUPPORT_EMAIL = "ireflect-staff@googlegroups.com";
 export const FEEDBACK = "feedback";
 export const ANNOTATED_CONTENT = "annotatedContent";
+export const COMMENTS = "comments";
+export const EX_COURSE_MEMBER = "Ex-course member";
+export const COMMENT_HAS_BEEN_DELETED = "Comment has been deleted.";

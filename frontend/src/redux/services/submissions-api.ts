@@ -1,5 +1,6 @@
 import {
   SubmissionData,
+  SubmissionDataWithComments,
   SubmissionPostData,
   SubmissionPutData,
   SubmissionSummaryData,
@@ -13,7 +14,7 @@ const submissionsApi = baseApi
   .injectEndpoints({
     endpoints: (build) => ({
       getSubmissions: build.query<
-        SubmissionSummaryData[],
+        SubmissionSummaryData[] | SubmissionDataWithComments[],
         {
           courseId: string | number;
           milestoneId?: string | number;
@@ -21,6 +22,7 @@ const submissionsApi = baseApi
           creatorId?: string | number;
           editorId?: string | number;
           templateId?: string | number;
+          full?: boolean;
         }
       >({
         query: ({
@@ -30,6 +32,7 @@ const submissionsApi = baseApi
           creatorId,
           editorId,
           templateId,
+          full,
         }) => ({
           url: `/courses/${courseId}/submissions/`,
           method: "GET",
@@ -39,10 +42,31 @@ const submissionsApi = baseApi
             creatorId,
             editorId,
             templateId,
+            full,
           }),
         }),
-        providesTags: (result, _, { courseId }) =>
-          cacher.providesList(result, "Submission", [`${courseId}`]),
+        providesTags: (
+          result,
+          _,
+          {
+            courseId,
+            milestoneId,
+            groupId,
+            creatorId,
+            editorId,
+            templateId,
+            full,
+          },
+        ) =>
+          cacher.providesList(result, "Submission", [
+            courseId,
+            milestoneId,
+            groupId,
+            creatorId,
+            editorId,
+            templateId,
+            full,
+          ]),
       }),
 
       createSubmission: build.mutation<
@@ -57,7 +81,7 @@ const submissionsApi = baseApi
           body: submissionPostData,
         }),
         invalidatesTags: (_, error, { courseId }) =>
-          error ? [] : cacher.invalidatesList("Submission", [`${courseId}`]),
+          error ? [] : cacher.invalidatesList("Submission", [courseId]),
       }),
 
       getSingleSubmission: build.query<
@@ -69,7 +93,7 @@ const submissionsApi = baseApi
           method: "GET",
         }),
         providesTags: (_, __, { submissionId: id, courseId }) => [
-          cacher.getIdTag(id, "Submission", [`${courseId}`]),
+          cacher.getIdTag(id, "Submission", [courseId]),
         ],
       }),
 
@@ -86,7 +110,7 @@ const submissionsApi = baseApi
           body: submissionPutData,
         }),
         invalidatesTags: (_, error, { submissionId: id, courseId }) =>
-          error ? [] : [cacher.getIdTag(id, "Submission", [`${courseId}`])],
+          error ? [] : [cacher.getIdTag(id, "Submission", [courseId])],
       }),
 
       deleteSubmission: build.mutation<
@@ -101,7 +125,7 @@ const submissionsApi = baseApi
           method: "DELETE",
         }),
         invalidatesTags: (_, error, { submissionId: id, courseId }) =>
-          error ? [] : [cacher.getIdTag(id, "Submission", [`${courseId}`])],
+          error ? [] : [cacher.getIdTag(id, "Submission", [courseId])],
       }),
     }),
   });
@@ -111,6 +135,7 @@ export const useGetSingleSubmissionQueryState =
 
 export const {
   useGetSubmissionsQuery,
+  useLazyGetSubmissionsQuery,
   useCreateSubmissionMutation,
   useGetSingleSubmissionQuery,
   useUpdateSubmissionMutation,

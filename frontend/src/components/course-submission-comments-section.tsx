@@ -15,6 +15,7 @@ import {
   useRef,
 } from "react";
 import { useSearchParams } from "react-router-dom";
+import { CREATED_AT } from "../constants";
 import useGetCourseId from "../custom-hooks/use-get-course-id";
 import useGetSubmissionCommentPermissions from "../custom-hooks/use-get-submission-comment-permissions";
 import useGetSubmissionId from "../custom-hooks/use-get-submission-id";
@@ -24,6 +25,7 @@ import {
 } from "../redux/services/comments-api";
 import { useResolveError } from "../utils/error-utils";
 import toastUtils from "../utils/toast-utils";
+import { sort } from "../utils/transform-utils";
 import CommentCard from "./comment-card";
 import CommentForm, { CommentFormData } from "./comment-form";
 import ConditionalRenderer from "./conditional-renderer";
@@ -86,7 +88,11 @@ function CourseSubmissionCommentsSection<C extends ElementType = "div">({
           isFetching,
           error,
         }) => ({
-          comments,
+          comments: comments
+            ? sort(comments, {
+                key: CREATED_AT,
+              })
+            : undefined,
           isLoading,
           isFetching,
           error,

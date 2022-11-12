@@ -13,7 +13,6 @@ import {
   useGetTemplatesQueryState,
 } from "../../redux/services/templates-api";
 import { COURSE_MILESTONE_TEMPLATES_PATH } from "../../routes/paths";
-import { transformTemplateToSubmissionView } from "../../types/submissions";
 import { useResolveError } from "../../utils/error-utils";
 import toastUtils from "../../utils/toast-utils";
 import SubmissionForm from "../submission-form";
@@ -21,6 +20,7 @@ import PlaceholderWrapper from "../placeholder-wrapper";
 import useGetTemplatePermissions from "../../custom-hooks/use-get-template-permissions";
 import ConditionalRenderer from "../conditional-renderer";
 import useGetFormContainerStyle from "../../custom-hooks/use-get-form-container-style";
+import { transformTemplateToSubmissionView } from "../../utils/transform-utils";
 
 function CourseMilestoneTemplatesViewPage() {
   const courseId = useGetCourseId();

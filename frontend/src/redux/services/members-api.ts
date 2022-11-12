@@ -16,7 +16,7 @@ const membersApi = baseApi
           method: "GET",
         }),
         providesTags: (result, _, courseId) =>
-          cacher.providesList(result, "Member", [`${courseId}`]),
+          cacher.providesList(result, "Member", [courseId]),
       }),
 
       updateCourseMembership: build.mutation<
@@ -32,7 +32,7 @@ const membersApi = baseApi
           body: courseMembershipPatchData,
         }),
         invalidatesTags: (_, error, { membershipId: id, courseId }) =>
-          error ? [] : [cacher.getIdTag(id, "Member", [`${courseId}`])],
+          error ? [] : [cacher.getIdTag(id, "Member", [courseId])],
       }),
 
       deleteCourseMembership: build.mutation<
@@ -44,7 +44,7 @@ const membersApi = baseApi
           method: "DELETE",
         }),
         invalidatesTags: (_, error, { membershipId: id, courseId }) =>
-          error ? [] : [cacher.getIdTag(id, "Member", [`${courseId}`])],
+          error ? [] : [cacher.getIdTag(id, "Member", [courseId])],
       }),
 
       batchCreateCourseMemberships: build.mutation<
@@ -59,7 +59,7 @@ const membersApi = baseApi
           body: courseMembershipBatchCreateData,
         }),
         invalidatesTags: (_, error, { courseId }) =>
-          error ? [] : cacher.invalidatesList("Member", [`${courseId}`]),
+          error ? [] : cacher.invalidatesList("Member", [courseId]),
       }),
     }),
   });

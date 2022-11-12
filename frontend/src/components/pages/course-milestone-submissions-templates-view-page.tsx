@@ -11,14 +11,12 @@ import useGetTemplateId from "../../custom-hooks/use-get-template-id";
 import { useCreateSubmissionMutation } from "../../redux/services/submissions-api";
 import { useGetTemplatesQueryState } from "../../redux/services/templates-api";
 import { COURSE_MILESTONE_SINGLE_SUBMISSION_PATH } from "../../routes/paths";
-import {
-  transformTemplateToSubmissionView,
-  SubmissionPostData,
-} from "../../types/submissions";
+import { SubmissionPostData } from "../../types/submissions";
 import { useResolveError } from "../../utils/error-utils";
 import SubmissionForm from "../submission-form";
 import PlaceholderWrapper from "../placeholder-wrapper";
 import useGetCourseMilestoneSubmissionPermissions from "../../custom-hooks/use-get-course-milestone-submission-permissions";
+import { transformTemplateToSubmissionView } from "../../utils/transform-utils";
 
 function CourseMilestoneSubmissionsTemplatesViewPage() {
   const courseId = useGetCourseId();

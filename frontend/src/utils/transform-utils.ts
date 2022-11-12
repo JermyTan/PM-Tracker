@@ -220,17 +220,16 @@ export function parseToSubmissionCsvFiles(
                 formResponseData,
                 comments,
               }) => {
-                const fieldIndexToCommentsMap = comments.reduce(
-                  (map, comment) => {
-                    map.set(comment.fieldIndex, [
-                      ...(map.get(comment.fieldIndex) ?? []),
-                      comment,
-                    ]);
+                const fieldIndexToCommentsMap = sort(comments, {
+                  key: CREATED_AT,
+                }).reduce((map, comment) => {
+                  map.set(comment.fieldIndex, [
+                    ...(map.get(comment.fieldIndex) ?? []),
+                    comment,
+                  ]);
 
-                    return map;
-                  },
-                  new Map<number, SubmissionCommentData[]>(),
-                );
+                  return map;
+                }, new Map<number, SubmissionCommentData[]>());
                 const formResponses = formResponseData.flatMap(
                   (responseData, index) => {
                     const response = (() => {
@@ -248,7 +247,14 @@ export function parseToSubmissionCsvFiles(
                     const comments = fieldIndexToCommentsMap
                       .get(index)
                       ?.map(
-                        ({ content, role, isDeleted, commenter }) =>
+                        ({
+                          content,
+                          role,
+                          isDeleted,
+                          commenter,
+                          createdAt,
+                          updatedAt,
+                        }) =>
                           `${commenter?.name ?? UNKNOWN_USER}\n${
                             role !== null
                               ? roleToPropertiesMap[role].label
@@ -258,7 +264,11 @@ export function parseToSubmissionCsvFiles(
                           }\n\n${displayDateTime(
                             createdAt,
                             DATE_TIME_MONTH_NAME_FORMAT,
-                          )}\n\n--`,
+                          )}${
+                            !isDeleted && createdAt !== updatedAt
+                              ? " (edited)"
+                              : ""
+                          }\n\n--`,
                       )
                       .join("\n");
 

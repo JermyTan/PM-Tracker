@@ -72,7 +72,7 @@ function CourseSubmissionsExportButton({ disabled }: Props) {
       const zip = new JSZip();
 
       Object.entries(submissionCsvFiles).forEach(([filename, data]) =>
-        zip.file(filename, data),
+        zip.file(`${filename}.csv`, data),
       );
 
       const zippedFile = await zip.generateAsync({ type: "blob" });

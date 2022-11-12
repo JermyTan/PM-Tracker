@@ -245,22 +245,21 @@ export function parseToSubmissionCsvFiles(
                         : response;
                     })();
 
-                    const comments = fieldIndexToCommentsMap.get(index)?.map(
-                      ({ content, role, isDeleted, commenter }) => `${
-                        commenter?.name ?? UNKNOWN_USER
-                      }
-                      ${
-                        role !== null
-                          ? roleToPropertiesMap[role].label
-                          : EX_COURSE_MEMBER
-                      }
-
-                      ${isDeleted ? COMMENT_HAS_BEEN_DELETED : content}
-
-                      ${displayDateTime(createdAt, DATE_TIME_MONTH_NAME_FORMAT)}
-                      
-                      --`,
-                    );
+                    const comments = fieldIndexToCommentsMap
+                      .get(index)
+                      ?.map(
+                        ({ content, role, isDeleted, commenter }) =>
+                          `${commenter?.name ?? UNKNOWN_USER}\n${
+                            role !== null
+                              ? roleToPropertiesMap[role].label
+                              : EX_COURSE_MEMBER
+                          }\n\n${
+                            isDeleted ? COMMENT_HAS_BEEN_DELETED : content
+                          }\n\n${displayDateTime(
+                            createdAt,
+                            DATE_TIME_MONTH_NAME_FORMAT,
+                          )}\n\n--\n`,
+                      );
 
                     return [response, comments];
                   },

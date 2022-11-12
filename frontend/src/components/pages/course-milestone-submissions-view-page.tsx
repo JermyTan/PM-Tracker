@@ -25,7 +25,6 @@ import {
 } from "../../redux/services/submissions-api";
 import { SubmissionPutData } from "../../types/submissions";
 import { useResolveError } from "../../utils/error-utils";
-import { checkIsMilestoneOpen } from "../../utils/misc-utils";
 import toastUtils from "../../utils/toast-utils";
 import SubmissionForm, { SubmissionFormData } from "../submission-form";
 import PlaceholderWrapper from "../placeholder-wrapper";

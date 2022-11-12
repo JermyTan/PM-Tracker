@@ -174,6 +174,7 @@ class GetCourseSubmissionSerializer(serializers.Serializer):
     creator_id = IdField(required=False, default=None)
     editor_id = IdField(required=False, default=None)
     template_id = IdField(required=False, default=None)
+    full = serializers.BooleanField(required=False, default=False)
 
 
 class PutCourseSubmissionSerializer(serializers.ModelSerializer):

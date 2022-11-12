@@ -55,6 +55,7 @@ from .logic import (
     create_course_submission_comment,
     delete_course_submission_comment,
     get_requested_course_submissions,
+    get_course_submission_comments,
     is_group_member,
     update_course,
     create_course_milestone,
@@ -805,8 +806,12 @@ class CourseSubmissionsView(APIView):
             template_id=validated_data["template_id"],
         )
 
+        full = validated_data["full"]
+
         data = [
-            course_submission_summary_to_json(submission)
+            course_submission_to_json(submission=submission, with_comments=True)
+            if full
+            else course_submission_summary_to_json(submission)
             for submission in submissions
             if can_view_course_submission(
                 requester_membership=requester_membership, submission=submission
@@ -990,12 +995,8 @@ class CourseSubmissionSingleFieldCommentsView(APIView):
         if field_index < 0 or field_index >= len(submission.form_response_data):
             raise BadRequest(detail="No such field.")
 
-        comments: QuerySet[CourseSubmissionComment] = (
-            submission.coursesubmissioncomment_set.select_related(
-                "comment__commenter__profile_image", "member"
-            )
-            .filter(field_index=field_index)
-            .order_by("created_at")
+        comments = get_course_submission_comments(submission).filter(
+            field_index=field_index
         )
 
         data = [course_submission_comment_to_json(comment) for comment in comments]

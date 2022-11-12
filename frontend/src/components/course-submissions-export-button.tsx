@@ -77,7 +77,7 @@ function CourseSubmissionsExportButton({ disabled }: Props) {
 
       const zippedFile = await zip.generateAsync({ type: "blob" });
 
-      saveAs(zippedFile, `submissions | ${milestone.name}.zip`);
+      saveAs(zippedFile, `submissions - ${milestone.name}.zip`);
     } catch (error) {
       resolveError(error);
     } finally {

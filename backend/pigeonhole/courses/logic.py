@@ -36,7 +36,7 @@ from pigeonhole.common.constants import (
     GROUP,
     MILESTONE,
     ID,
-    COMMENT,
+    COMMENTS,
     COMMENTER,
     FIELD_INDEX,
     CONTENT,
@@ -64,6 +64,54 @@ from .models import (
 )
 
 logger = logging.getLogger("main")
+
+
+def get_courses(*args, **kwargs) -> QuerySet[Course]:
+    return Course.objects.filter(*args, **kwargs)
+
+
+def get_requested_course_submissions(
+    course: Course,
+    milestone_id: Optional[int],
+    group_id: Optional[int],
+    creator_id: Optional[int],
+    editor_id: Optional[int],
+    template_id: Optional[int],
+) -> QuerySet[CourseSubmission]:
+    submissions: QuerySet[
+        CourseSubmission
+    ] = course.coursesubmission_set.select_related(
+        "milestone",
+        "group",
+        "template__form",
+        "creator__user__profile_image",
+        "editor__user__profile_image",
+    )
+
+    if milestone_id is not None:
+        submissions = submissions.filter(milestone_id=milestone_id)
+
+    if group_id is not None:
+        submissions = submissions.filter(group_id=group_id)
+
+    if creator_id is not None:
+        submissions = submissions.filter(creator__user_id=creator_id)
+
+    if editor_id is not None:
+        submissions = submissions.filter(editor__user_id=editor_id)
+
+    if template_id is not None:
+        submissions = submissions.filter(template_id=template_id)
+
+    return submissions
+
+
+def get_course_submission_comments(
+    submission: CourseSubmission,
+) -> QuerySet[CourseSubmissionComment]:
+    return submission.coursesubmissioncomment_set.select_related(
+        "comment__commenter__profile_image", "member"
+    )
 
 
 def course_summary_to_json(course: Course, membership: CourseMembership) -> dict:
@@ -183,24 +231,13 @@ def course_submission_summary_to_json(submission: CourseSubmission) -> dict:
     return data
 
 
-def course_submission_to_json(submission: CourseSubmission) -> dict:
-    data = course_submission_summary_to_json(submission)
-
-    data |= {
-        TEMPLATE: course_milestone_template_to_json(submission.template)
-        if submission.template is not None
-        else None,
-        FORM_RESPONSE_DATA: submission.form_response_data,
-    }
-
-    return data
-
-
 def comment_to_json(comment: Comment) -> dict:
     data = to_base_json(comment)
 
     data |= {
-        COMMENTER: user_to_json(comment.commenter),
+        COMMENTER: user_to_json(comment.commenter)
+        if comment.commenter is not None
+        else None,
         CONTENT: "" if comment.is_deleted else comment.content,
         IS_DELETED: comment.is_deleted,
     }
@@ -225,43 +262,27 @@ def course_submission_comment_to_json(
     return data
 
 
-def get_courses(*args, **kwargs) -> QuerySet[Course]:
-    return Course.objects.filter(*args, **kwargs)
+def course_submission_to_json(
+    submission: CourseSubmission, with_comments: bool = False
+) -> dict:
+    data = course_submission_summary_to_json(submission)
 
+    data |= {
+        TEMPLATE: course_milestone_template_to_json(submission.template)
+        if submission.template is not None
+        else None,
+        FORM_RESPONSE_DATA: submission.form_response_data,
+    }
 
-def get_requested_course_submissions(
-    course: Course,
-    milestone_id: Optional[int],
-    group_id: Optional[int],
-    creator_id: Optional[int],
-    editor_id: Optional[int],
-    template_id: Optional[int],
-) -> QuerySet[CourseSubmission]:
-    submissions: QuerySet[
-        CourseSubmission
-    ] = course.coursesubmission_set.select_related(
-        "milestone",
-        "group",
-        "creator__user__profile_image",
-        "editor__user__profile_image",
-    )
+    if with_comments:
+        comments = get_course_submission_comments(submission)
+        data |= {
+            COMMENTS: [
+                course_submission_comment_to_json(comment) for comment in comments
+            ]
+        }
 
-    if milestone_id is not None:
-        submissions = submissions.filter(milestone_id=milestone_id)
-
-    if group_id is not None:
-        submissions = submissions.filter(group_id=group_id)
-
-    if creator_id is not None:
-        submissions = submissions.filter(creator__user_id=creator_id)
-
-    if editor_id is not None:
-        submissions = submissions.filter(editor__user_id=editor_id)
-
-    if template_id is not None:
-        submissions = submissions.filter(template_id=template_id)
-
-    return submissions
+    return data
 
 
 @transaction.atomic
